@@ -1,0 +1,5806 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KiberOgoh UZ — Mahalla kiber qalqoni</title>
+  <meta name="description"
+    content="KiberOgoh UZ — mahalla darajasidagi milliy kiber qalqon platformasi. Fuqarolarni onlayn firibgarlik va kiber tahdidlardan himoya qiladi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    /* =========================================================
+   KiberOgoh UZ — demo platforma
+   Design system. Brendi taqdimotdan kengaytirilgan:
+   navy + gold, qalqon motivi, serif sarlavha + sans UI + mono skaner.
+   ========================================================= */
+
+    :root {
+      /* Brand / structure */
+      --navy: #161F3D;
+      --navy-2: #1E284A;
+      --navy-3: #2A3556;
+      --gold: #EE9B1C;
+      --gold-700: #C97E0C;
+      --gold-soft: #FCEBC9;
+
+      /* Ink & surfaces */
+      --ink: #1B2233;
+      --muted: #69718C;
+      --faint: #98A0B8;
+      --line: #E5E9F2;
+      --line-2: #EEF1F7;
+      --surface: #FFFFFF;
+      --canvas: #F3F5FA;
+
+      /* Functional / categories */
+      --red: #DD4D4D;
+      --red-soft: #FBE7E7;
+      --teal: #1B9E86;
+      --teal-soft: #DCF3EE;
+      --purple: #6B5AD8;
+      --purple-soft: #E9E6FA;
+      --blue: #2E78C7;
+      --blue-soft: #E2EEFB;
+      --amber-soft: #FBEFD3;
+
+      /* Type */
+      --display: "Lora", Georgia, "Times New Roman", serif;
+      --ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "Spline Sans Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+      /* Radius & shadow */
+      --r-sm: 8px;
+      --r: 14px;
+      --r-lg: 20px;
+      --r-xl: 26px;
+      --shadow-sm: 0 1px 2px rgba(22, 31, 61, .05), 0 1px 3px rgba(22, 31, 61, .06);
+      --shadow: 0 6px 22px rgba(22, 31, 61, .08), 0 2px 6px rgba(22, 31, 61, .05);
+      --shadow-lg: 0 20px 50px rgba(22, 31, 61, .16);
+
+      /* Layout */
+      --bar-h: 64px;
+      --rail-w: 256px;
+      --maxw: 1240px;
+    }
+
+    /* ---------- reset ---------- */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--ui);
+      color: var(--ink);
+      background: var(--canvas);
+      line-height: 1.55;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: var(--display);
+      font-weight: 600;
+      line-height: 1.18;
+      color: var(--navy);
+      margin: 0;
+      letter-spacing: -.01em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    img,
+    svg {
+      display: block;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    /* eyebrow label, echoes deck */
+    .eyebrow {
+      font-family: var(--ui);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold-700);
+    }
+
+    /* =========================================================
+   APP SHELL
+   ========================================================= */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: var(--bar-h);
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand__logo {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 11px;
+      background: var(--gold);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand__logo svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .brand__name {
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 19px;
+      color: #fff;
+      letter-spacing: .2px;
+    }
+
+    .brand__name b {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .brand__tag {
+      font-size: 11px;
+      color: #aeb6d4;
+      letter-spacing: .04em;
+      margin-top: -3px;
+    }
+
+    .topbar__spacer {
+      flex: 1;
+    }
+
+    .region-pill {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .12);
+      color: #dfe4f4;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .region-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 3px rgba(27, 158, 134, .25);
+    }
+
+    .region-pill b {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 14px;
+      background: var(--navy);
+      color: #fff;
+      transition: transform .12s ease, box-shadow .12s ease, background .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn--gold {
+      background: var(--gold);
+      color: var(--navy);
+      box-shadow: 0 4px 14px rgba(238, 155, 28, .35);
+    }
+
+    .btn--gold:hover {
+      background: #f2a531;
+      box-shadow: 0 6px 18px rgba(238, 155, 28, .45);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn--ghost:hover {
+      border-color: var(--navy);
+    }
+
+    .btn--ghost-light {
+      background: rgba(255, 255, 255, .08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .16);
+    }
+
+    .btn--block {
+      width: 100%;
+    }
+
+    .btn--lg {
+      padding: 14px 22px;
+      font-size: 15px;
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .16);
+      color: #fff;
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      font-size: 20px;
+    }
+
+    /* ---------- layout ---------- */
+    .shell {
+      display: grid;
+      grid-template-columns: var(--rail-w) 1fr;
+      min-height: calc(100vh - var(--bar-h));
+    }
+
+    .rail {
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+      padding: 18px 14px 28px;
+      position: sticky;
+      top: var(--bar-h);
+      align-self: start;
+      height: calc(100vh - var(--bar-h));
+      overflow-y: auto;
+    }
+
+    .rail__group {
+      margin-bottom: 18px;
+    }
+
+    .rail__label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--faint);
+      padding: 0 12px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: transparent;
+      border: 0;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 11px;
+      color: var(--ink);
+      font-size: 14.5px;
+      font-weight: 500;
+      transition: background .14s ease, color .14s ease;
+    }
+
+    .nav-item:hover {
+      background: var(--canvas);
+    }
+
+    .nav-item .ico {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      color: var(--muted);
+    }
+
+    .nav-item.is-active {
+      background: var(--navy);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .nav-item.is-active .ico {
+      color: var(--gold);
+    }
+
+    .nav-item .badge {
+      margin-left: auto;
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 1px 7px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .rail__foot {
+      margin-top: 8px;
+      padding: 14px 12px;
+      border-radius: 14px;
+      background: var(--canvas);
+    }
+
+    .rail__foot p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .main {
+      padding: 30px clamp(18px, 4vw, 44px) 64px;
+      max-width: var(--maxw);
+      width: 100%;
+    }
+
+    /* ---------- views ---------- */
+    .view {
+      display: none;
+      animation: viewIn .32s ease both;
+    }
+
+    .view.is-active {
+      display: block;
+    }
+
+    @keyframes viewIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .page-head {
+      margin-bottom: 24px;
+    }
+
+    .page-head h1 {
+      font-size: clamp(26px, 3.4vw, 36px);
+      margin-top: 6px;
+    }
+
+    .page-head p.lead {
+      color: var(--muted);
+      font-size: 16px;
+      margin-top: 8px;
+      max-width: 64ch;
+    }
+
+    /* =========================================================
+   CARDS / GENERIC
+   ========================================================= */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card--pad {
+      padding: 22px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 30px 0 14px;
+    }
+
+    .section-title h2 {
+      font-size: 21px;
+    }
+
+    .section-title .hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* stat cards (dashboard) */
+    .stat-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .stat {
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat__ico {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 14px;
+    }
+
+    .stat__ico svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .stat__num {
+      font-family: var(--display);
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .stat__label {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .stat__target {
+      font-size: 12px;
+      color: var(--teal);
+      font-weight: 600;
+      margin-top: 8px;
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .i-gold {
+      background: var(--gold-soft);
+      color: var(--gold-700);
+    }
+
+    .i-teal {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .i-red {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .i-purple {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    .i-blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    /* dashboard composition */
+    .dash-grid {
+      grid-template-columns: 1.5fr 1fr;
+      align-items: start;
+    }
+
+    /* shield status */
+    .shield-card {
+      background: linear-gradient(160deg, var(--navy) 0%, #10172e 100%);
+      color: #fff;
+      border: 0;
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shield-card .eyebrow {
+      color: var(--gold);
+    }
+
+    .shield-card h3 {
+      color: #fff;
+      font-size: 20px;
+      margin: 6px 0 2px;
+    }
+
+    .shield-ring {
+      position: relative;
+      width: 168px;
+      height: 168px;
+      margin: 14px auto 6px;
+    }
+
+    .shield-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .shield-ring .track {
+      fill: none;
+      stroke: rgba(255, 255, 255, .12);
+      stroke-width: 12;
+    }
+
+    .shield-ring .prog {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 12;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.4s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .shield-ring__center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .shield-ring__center .pct {
+      font-family: var(--display);
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .shield-ring__center .cap {
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #aeb6d4;
+      margin-top: 4px;
+    }
+
+    .shield-sweep {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, rgba(238, 155, 28, .22) 30deg, transparent 60deg);
+    }
+
+    .shield-meta {
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .shield-meta div {
+      text-align: center;
+    }
+
+    .shield-meta .v {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .shield-meta .k {
+      font-size: 11px;
+      color: #aeb6d4;
+    }
+
+    /* =========================================================
+   THREAT FEED
+   ========================================================= */
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alert {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow-sm);
+      align-items: start;
+    }
+
+    .alert.is-new {
+      animation: alertIn .5s ease both;
+    }
+
+    @keyframes alertIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(.99);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .alert__ico {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+    }
+
+    .alert__ico svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .alert__body h4 {
+      font-family: var(--ui);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .alert__body p {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .alert__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .tag {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--canvas);
+      color: var(--muted);
+    }
+
+    .tag--region {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .alert__side {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .sev {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .sev--high {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .sev--mid {
+      background: var(--amber-soft);
+      color: var(--gold-700);
+    }
+
+    .sev--low {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .alert__time {
+      font-size: 12px;
+      color: var(--faint);
+      margin-top: 8px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 8px 15px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all .14s ease;
+    }
+
+    .chip:hover {
+      border-color: var(--navy);
+      color: var(--ink);
+    }
+
+    .chip.is-active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    /* =========================================================
+   TEKSHIRGICH (checker) — signature
+   ========================================================= */
+    .checker {
+      grid-template-columns: 1.15fr 1fr;
+      align-items: start;
+    }
+
+    .checker__panel {
+      padding: 26px;
+    }
+
+    .checker__input-wrap {
+      position: relative;
+      margin: 18px 0 14px;
+    }
+
+    .checker__input {
+      width: 100%;
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 16px;
+      background: var(--canvas);
+      resize: vertical;
+      min-height: 96px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .checker__input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px var(--gold-soft);
+      background: #fff;
+    }
+
+    .checker__examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .ex-chip {
+      font-family: var(--mono);
+      font-size: 12px;
+      border: 1px dashed var(--line);
+      background: #fff;
+      color: var(--muted);
+      padding: 6px 11px;
+      border-radius: 9px;
+    }
+
+    .ex-chip:hover {
+      border-color: var(--gold);
+      color: var(--gold-700);
+    }
+
+    /* result panel */
+    .scanner {
+      background: var(--navy);
+      color: #fff;
+      border: 0;
+      padding: 0;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scanner__head {
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scanner__head .lamp {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #3a456b;
+    }
+
+    .scanner__head .title {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .1em;
+      color: #aeb6d4;
+      text-transform: uppercase;
+    }
+
+    .scanner__body {
+      padding: 22px;
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: #c5cbe6;
+    }
+
+    .scan-line {
+      opacity: 0;
+      transform: translateX(-6px);
+      animation: scanLine .35s ease forwards;
+      display: flex;
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .scan-line .ok {
+      color: var(--teal);
+    }
+
+    .scan-line .warn {
+      color: var(--gold);
+    }
+
+    .scan-line .bad {
+      color: #ff8585;
+    }
+
+    @keyframes scanLine {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .scanner__idle {
+      color: #5b648c;
+      text-align: center;
+      margin: auto;
+      padding: 30px;
+    }
+
+    .scanner__idle svg {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 12px;
+      opacity: .5;
+    }
+
+    .verdict {
+      padding: 20px 22px;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .verdict__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 9px 16px;
+      border-radius: 12px;
+    }
+
+    .verdict--bad .verdict__badge {
+      background: rgba(221, 77, 77, .16);
+      color: #ff8585;
+    }
+
+    .verdict--warn .verdict__badge {
+      background: rgba(238, 155, 28, .16);
+      color: var(--gold);
+    }
+
+    .verdict--ok .verdict__badge {
+      background: rgba(27, 158, 134, .18);
+      color: #39d6b6;
+    }
+
+    .verdict__advice {
+      font-family: var(--ui);
+      font-size: 14px;
+      color: #dfe4f4;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .scan-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, .1);
+      border-radius: 9px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .scan-bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--gold);
+      transition: width .1s linear;
+    }
+
+    /* =========================================================
+   VIKTORINA (quiz)
+   ========================================================= */
+    .quiz {
+      max-width: 760px;
+    }
+
+    .quiz__progress {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .quiz__bar {
+      flex: 1;
+      height: 8px;
+      background: var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .quiz__bar i {
+      display: block;
+      height: 100%;
+      background: var(--gold);
+      border-radius: 9px;
+      transition: width .4s ease;
+    }
+
+    .quiz__score {
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 14px;
+    }
+
+    .quiz__level {
+      font-size: 12px;
+      color: var(--gold-700);
+      font-weight: 700;
+    }
+
+    .q-card {
+      padding: 28px;
+    }
+
+    .q-scenario {
+      background: var(--canvas);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin: 6px 0 8px;
+    }
+
+    .q-scenario .from {
+      font-size: 12px;
+      color: var(--faint);
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .q-scenario .msg {
+      font-size: 15.5px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .q-ask {
+      font-weight: 600;
+      font-size: 16px;
+      margin: 18px 0 14px;
+      color: var(--navy);
+      font-family: var(--display);
+    }
+
+    .q-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .q-choice {
+      border: 1.5px solid var(--line);
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      transition: all .14s ease;
+    }
+
+    .q-choice:hover {
+      border-color: var(--navy);
+      transform: translateY(-1px);
+    }
+
+    .q-choice.correct {
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .q-choice.wrong {
+      border-color: var(--red);
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .q-choice:disabled {
+      cursor: default;
+    }
+
+    .q-explain {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      display: none;
+    }
+
+    .q-explain.show {
+      display: block;
+      animation: viewIn .3s ease both;
+    }
+
+    .q-explain.good {
+      background: var(--teal-soft);
+      color: #0f6b5a;
+    }
+
+    .q-explain.bad {
+      background: var(--red-soft);
+      color: #a52d2d;
+    }
+
+    .q-explain b {
+      font-weight: 700;
+    }
+
+    .q-actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .quiz-result {
+      text-align: center;
+      padding: 40px 28px;
+    }
+
+    .quiz-result .medal {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold-soft);
+    }
+
+    .quiz-result .medal svg {
+      width: 48px;
+      height: 48px;
+      color: var(--gold-700);
+    }
+
+    .quiz-result h2 {
+      font-size: 28px;
+    }
+
+    .quiz-result .lvl {
+      color: var(--gold-700);
+      font-weight: 700;
+      font-size: 15px;
+      margin: 8px 0 4px;
+    }
+
+    .quiz-result p {
+      color: var(--muted);
+      max-width: 46ch;
+      margin: 6px auto 22px;
+    }
+
+    /* =========================================================
+   BAZA (scam database)
+   ========================================================= */
+    .search-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border: 1.5px solid var(--line);
+      border-radius: 13px;
+      font-size: 15px;
+      background: var(--surface);
+    }
+
+    .search input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px var(--gold-soft);
+    }
+
+    .search svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--faint);
+    }
+
+    .scam-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .scam {
+      padding: 22px;
+    }
+
+    .scam__top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .scam__ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+    }
+
+    .scam__ico svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .scam h3 {
+      font-size: 17px;
+    }
+
+    .scam__cat {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .scam dl {
+      margin: 14px 0 0;
+    }
+
+    .scam dt {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-top: 12px;
+    }
+
+    .scam dd {
+      margin: 3px 0 0;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .scam dd.warn {
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    .scam dd.do {
+      color: var(--teal);
+      font-weight: 500;
+    }
+
+    /* =========================================================
+   JAMOA (community)
+   ========================================================= */
+    .notice {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      background: var(--purple-soft);
+      border: 1px solid #d9d3f7;
+      border-radius: 14px;
+      padding: 15px 18px;
+      margin-bottom: 20px;
+    }
+
+    .notice svg {
+      width: 22px;
+      height: 22px;
+      color: var(--purple);
+      flex: 0 0 22px;
+      margin-top: 1px;
+    }
+
+    .notice p {
+      font-size: 13.5px;
+      color: #43398f;
+    }
+
+    .post {
+      padding: 18px 20px;
+    }
+
+    .post+.post {
+      margin-top: 14px;
+    }
+
+    .post__head {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 10px;
+    }
+
+    .post__av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .post__who {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .role-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .role-badge--vol {
+      background: var(--gold-soft);
+      color: var(--gold-700);
+    }
+
+    .role-badge--mod {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .post__meta {
+      font-size: 12px;
+      color: var(--faint);
+    }
+
+    .post__body {
+      font-size: 14.5px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .post__blocked {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      background: var(--red-soft);
+      color: #a52d2d;
+      border-radius: 9px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .post__verified {
+      margin-top: 10px;
+      font-size: 13px;
+      background: var(--teal-soft);
+      color: #0f6b5a;
+      border-radius: 9px;
+      padding: 9px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .post__verified svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 17px;
+      margin-top: 1px;
+    }
+
+    /* =========================================================
+   YORDAM (help / accordion)
+   ========================================================= */
+    .acc {}
+
+    .acc__item {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .acc__btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: transparent;
+      border: 0;
+      padding: 18px 20px;
+      text-align: left;
+    }
+
+    .acc__btn .num {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold-700);
+      font-weight: 600;
+    }
+
+    .acc__btn .t {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--navy);
+      font-family: var(--display);
+      flex: 1;
+    }
+
+    .acc__btn .caret {
+      width: 20px;
+      height: 20px;
+      color: var(--muted);
+      transition: transform .25s ease;
+      flex: 0 0 20px;
+    }
+
+    .acc__item.open .caret {
+      transform: rotate(180deg);
+    }
+
+    .acc__panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+    }
+
+    .acc__panel-inner {
+      padding: 0 20px 20px 56px;
+      color: var(--ink);
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .acc__panel-inner ol,
+    .acc__panel-inner ul {
+      margin: 6px 0;
+      padding-left: 18px;
+    }
+
+    .acc__panel-inner li {
+      margin: 6px 0;
+    }
+
+    .acc__panel-inner b {
+      color: var(--navy);
+    }
+
+    /* =========================================================
+   RO'YXATDAN O'TISH (privacy-first cascade)
+   ========================================================= */
+    .reg {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+
+    .reg__form {
+      padding: 28px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink);
+      margin-bottom: 7px;
+    }
+
+    .field .hint {
+      font-weight: 400;
+      color: var(--faint);
+      font-size: 12.5px;
+    }
+
+    .select {
+      position: relative;
+    }
+
+    .select select {
+      width: 100%;
+      appearance: none;
+      padding: 13px 40px 13px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 13px;
+      font-size: 15px;
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--ui);
+    }
+
+    .select select:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px var(--gold-soft);
+    }
+
+    .select select:disabled {
+      background: var(--canvas);
+      color: var(--faint);
+    }
+
+    .select::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .privacy-aside {
+      padding: 26px;
+      background: var(--navy);
+      color: #fff;
+      border: 0;
+    }
+
+    .privacy-aside .eyebrow {
+      color: var(--gold);
+    }
+
+    .privacy-aside h3 {
+      color: #fff;
+      font-size: 20px;
+      margin: 6px 0 14px;
+    }
+
+    .priv-item {
+      display: flex;
+      gap: 13px;
+      padding: 13px 0;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .priv-item:first-of-type {
+      border-top: 0;
+    }
+
+    .priv-item svg {
+      width: 22px;
+      height: 22px;
+      color: var(--gold);
+      flex: 0 0 22px;
+      margin-top: 2px;
+    }
+
+    .priv-item h4 {
+      color: #fff;
+      font-family: var(--ui);
+      font-size: 14.5px;
+      font-weight: 700;
+    }
+
+    .priv-item p {
+      font-size: 13px;
+      color: #aeb6d4;
+      margin-top: 2px;
+    }
+
+    .reg-success {
+      text-align: center;
+      padding: 30px 20px;
+      display: none;
+    }
+
+    .reg-success.show {
+      display: block;
+      animation: viewIn .35s ease both;
+    }
+
+    .reg-success .check {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      background: var(--teal-soft);
+      display: grid;
+      place-items: center;
+    }
+
+    .reg-success .check svg {
+      width: 38px;
+      height: 38px;
+      color: var(--teal);
+    }
+
+    .reg-success .where {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--navy);
+      background: var(--canvas);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    /* =========================================================
+   LOYIHA HAQIDA (about — compiled deck)
+   ========================================================= */
+    .about-hero {
+      background: linear-gradient(150deg, var(--navy), #10172e);
+      color: #fff;
+      border: 0;
+      padding: 38px;
+      border-radius: var(--r-xl);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 26px;
+    }
+
+    .about-hero .eyebrow {
+      color: var(--gold);
+    }
+
+    .about-hero h2 {
+      color: #fff;
+      font-size: clamp(24px, 3vw, 32px);
+      max-width: 18ch;
+      margin: 10px 0 12px;
+    }
+
+    .about-hero p {
+      color: #c5cbe6;
+      max-width: 60ch;
+      font-size: 15.5px;
+    }
+
+    .about-hero__rings {
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, transparent 38%, rgba(238, 155, 28, .10) 39%, rgba(238, 155, 28, .10) 46%, transparent 47%, transparent 60%, rgba(255, 255, 255, .05) 61%, rgba(255, 255, 255, .05) 68%, transparent 69%);
+    }
+
+    .feature-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .feature {
+      padding: 20px;
+      display: flex;
+      gap: 14px;
+    }
+
+    .feature__ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+    }
+
+    .feature__ico svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .feature h4 {
+      font-family: var(--ui);
+      font-weight: 700;
+      font-size: 15.5px;
+      color: var(--ink);
+    }
+
+    .feature p {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* modules row */
+    .mod-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .mod {
+      padding: 18px;
+      text-align: left;
+    }
+
+    .mod__ico {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+    }
+
+    .mod__ico svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .mod h4 {
+      font-family: var(--ui);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .mod p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* pyramid */
+    .pyramid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pyr-row {
+      color: #fff;
+      border-radius: 13px;
+      padding: 15px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pyr-row .lvl {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .pyr-row .desc {
+      font-size: 12.5px;
+      opacity: .85;
+      margin-top: 2px;
+    }
+
+    .pyr-1 {
+      width: 42%;
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .pyr-2 {
+      width: 58%;
+      background: var(--blue);
+    }
+
+    .pyr-3 {
+      width: 74%;
+      background: var(--teal);
+    }
+
+    .pyr-4 {
+      width: 92%;
+      background: var(--navy);
+    }
+
+    /* roadmap */
+    .road {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .road__step {
+      padding: 18px;
+      position: relative;
+    }
+
+    .road__n {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .road__when {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-700);
+      letter-spacing: .04em;
+    }
+
+    .road__step h4 {
+      font-family: var(--ui);
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 3px 0 5px;
+    }
+
+    .road__step p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* metrics strip */
+    .metrics {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .metric .big {
+      font-family: var(--display);
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .metric .y2 {
+      font-size: 12.5px;
+      color: var(--teal);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .metric .lab {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* =========================================================
+   FOOTER
+   ========================================================= */
+    .foot {
+      border-top: 1px solid var(--line);
+      margin-top: 50px;
+      padding: 26px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .foot__row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .foot__demo {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--amber-soft);
+      color: var(--gold-700);
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 12.5px;
+    }
+
+    /* =========================================================
+   XONADONLAR REYTINGI (leaderboard + engagement)
+   ========================================================= */
+    /* live engagement cards */
+    .engage-live {
+      padding: 20px 22px;
+    }
+
+    .engage-live__top {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 12px;
+    }
+
+    .engage-live__ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 40px;
+    }
+
+    .engage-live__ico svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .engage-live h3 {
+      font-family: var(--ui);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .engage-live .sub {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .engage-live .task {
+      font-size: 14.5px;
+      color: var(--ink);
+      margin: 6px 0 14px;
+      line-height: 1.5;
+    }
+
+    .prog-track {
+      height: 10px;
+      background: var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .prog-track i {
+      display: block;
+      height: 100%;
+      border-radius: 9px;
+      transition: width 1s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .prog-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .prog-meta .reward {
+      color: var(--gold-700);
+      font-weight: 700;
+    }
+
+    .prog-meta .count {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* podium */
+    .podium {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .podium__item {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 16px;
+      text-align: center;
+      position: relative;
+    }
+
+    .podium__rank {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .podium__av {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      margin: 8px auto 10px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .podium__hh {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--navy);
+    }
+
+    .podium__who {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .podium__who b {
+      color: var(--gold-700);
+    }
+
+    .podium__pts {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: 10px;
+    }
+
+    .podium__pts span {
+      font-family: var(--ui);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .podium__item--1 {
+      border-color: var(--gold);
+      box-shadow: 0 10px 30px rgba(238, 155, 28, .18);
+      transform: translateY(-10px);
+    }
+
+    .podium__item--1 .podium__rank {
+      background: var(--gold);
+    }
+
+    .podium__item--1 .podium__av {
+      background: var(--gold);
+    }
+
+    .podium__item--2 .podium__rank {
+      background: #9aa3bd;
+    }
+
+    .podium__item--2 .podium__av {
+      background: #9aa3bd;
+    }
+
+    .podium__item--3 .podium__rank {
+      background: #c98a4b;
+    }
+
+    .podium__item--3 .podium__av {
+      background: #c98a4b;
+    }
+
+    /* rank list */
+    .rank-row {
+      display: grid;
+      grid-template-columns: 34px 44px 1fr auto auto;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+    }
+
+    .rank-row__n {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--faint);
+      text-align: center;
+    }
+
+    .rank-row__av {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .rank-row__hh {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .rank-row__who {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .rank-row__who b {
+      color: var(--gold-700);
+      font-weight: 600;
+    }
+
+    .rank-row__pts {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--navy);
+      text-align: right;
+    }
+
+    .rank-row__pts span {
+      display: block;
+      font-family: var(--ui);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .delta-up {
+      color: var(--teal);
+    }
+
+    .delta-down {
+      color: var(--red);
+    }
+
+    .delta-eq {
+      color: var(--faint);
+    }
+
+    .rank-row.is-you {
+      border-color: var(--gold);
+      background: linear-gradient(0deg, var(--gold-soft), var(--gold-soft)), var(--surface);
+      box-shadow: 0 6px 20px rgba(238, 155, 28, .16);
+    }
+
+    .rank-row.is-you .rank-row__n {
+      color: var(--gold-700);
+    }
+
+    .you-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      color: var(--gold-700);
+      background: #fff;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      padding: 1px 7px;
+      margin-left: 7px;
+    }
+
+    .lvl-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .lvl-boshlovchi {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .lvl-himoyachi {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .lvl-kiber {
+      background: var(--gold-soft);
+      color: var(--gold-700);
+    }
+
+    .lvl-qahramon {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
+    /* earn + levels cards */
+    .earn-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line-2);
+    }
+
+    .earn-row:first-of-type {
+      border-top: 0;
+    }
+
+    .earn-row__ico {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 34px;
+    }
+
+    .earn-row__ico svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .earn-row__t {
+      flex: 1;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .earn-row__p {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--teal);
+    }
+
+    .level-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid var(--line-2);
+    }
+
+    .level-row:first-of-type {
+      border-top: 0;
+    }
+
+    .level-row__dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 12px;
+    }
+
+    .level-row__name {
+      flex: 1;
+      font-weight: 600;
+      font-size: 14.5px;
+      color: var(--ink);
+    }
+
+    .level-row__thr {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .level-row.is-current {
+      background: var(--gold-soft);
+      margin: 0 -12px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-radius: 10px;
+      border-top: 0;
+    }
+
+    /* household mini (dashboard) */
+    .hh-mini__top {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 14px;
+    }
+
+    .hh-mini__av {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--gold);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 18px;
+      flex: 0 0 48px;
+    }
+
+    .hh-mini__hh {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--navy);
+    }
+
+    .hh-mini__who {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hh-mini__who b {
+      color: var(--gold-700);
+    }
+
+    .hh-mini__stats {
+      display: flex;
+      gap: 10px;
+    }
+
+    .hh-mini__stat {
+      flex: 1;
+      background: var(--canvas);
+      border-radius: 12px;
+      padding: 11px 12px;
+      text-align: center;
+    }
+
+    .hh-mini__stat .v {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--navy);
+    }
+
+    .hh-mini__stat .k {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* =========================================================
+   REELS (so'nggi videolar)
+   ========================================================= */
+    .reels {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .reel {
+      position: relative;
+      width: 232px;
+      aspect-ratio: 9/16;
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      border: 0;
+      padding: 0;
+      text-align: left;
+      color: #fff;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .reel:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .reel__bg {
+      position: absolute;
+      inset: 0;
+    }
+
+    .reel__noise {
+      position: absolute;
+      inset: 0;
+      opacity: .5;
+      background:
+        radial-gradient(circle at 78% 18%, rgba(255, 255, 255, .18), transparent 40%),
+        radial-gradient(circle at 20% 85%, rgba(0, 0, 0, .28), transparent 45%);
+    }
+
+    .reel__cat {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      background: rgba(0, 0, 0, .32);
+      backdrop-filter: blur(4px);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .reel__dur {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(0, 0, 0, .42);
+      padding: 3px 8px;
+      border-radius: 7px;
+    }
+
+    .reel__icon {
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: .32;
+    }
+
+    .reel__icon svg {
+      width: 64px;
+      height: 64px;
+    }
+
+    .reel__play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .92);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+      transition: transform .18s ease;
+    }
+
+    .reel:hover .reel__play {
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+
+    .reel__play svg {
+      width: 22px;
+      height: 22px;
+      color: var(--navy);
+      margin-left: 3px;
+    }
+
+    .reel__grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 45%, rgba(8, 12, 28, .86));
+    }
+
+    .reel__info {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 13px;
+    }
+
+    .reel__title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.25;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, .4);
+    }
+
+    .reel__meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, .86);
+    }
+
+    .reel__meta .m {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .reel__meta svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    /* dashboard mini reels */
+    .reels--mini .reel {
+      width: 104px;
+      border-radius: 14px;
+    }
+
+    .reels--mini .reel__title {
+      font-size: 11.5px;
+    }
+
+    .reels--mini .reel__cat,
+    .reels--mini .reel__icon,
+    .reels--mini .reel__meta {
+      display: none;
+    }
+
+    .reels--mini .reel__play {
+      width: 38px;
+      height: 38px;
+    }
+
+    .reels--mini .reel__play svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* reel modal player */
+    .reel-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .reel-modal.is-open {
+      display: flex;
+    }
+
+    .reel-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 12, 28, .78);
+      backdrop-filter: blur(6px);
+    }
+
+    .reel-player {
+      position: relative;
+      width: min(380px, 92vw);
+      aspect-ratio: 9/16;
+      max-height: 86vh;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      color: #fff;
+      animation: viewIn .3s ease both;
+    }
+
+    .reel-player__bg {
+      position: absolute;
+      inset: 0;
+    }
+
+    .reel-player__close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 3;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .4);
+      border: 0;
+      color: #fff;
+      font-size: 20px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .reel-player__icon {
+      position: absolute;
+      top: 38%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: .28;
+    }
+
+    .reel-player__icon svg {
+      width: 96px;
+      height: 96px;
+    }
+
+    .reel-player__center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .92);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .2s ease;
+      z-index: 2;
+    }
+
+    .reel-player__center:hover {
+      transform: translate(-50%, -50%) scale(1.06);
+    }
+
+    .reel-player__center svg {
+      width: 30px;
+      height: 30px;
+      color: var(--navy);
+    }
+
+    .reel-player__center.playing {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .reel-player__grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 40%, rgba(8, 12, 28, .9));
+    }
+
+    .reel-player__info {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2;
+    }
+
+    .reel-player__cat {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, .16);
+      padding: 4px 11px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .reel-player__title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .reel-player__cap {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, .9);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .reel-player__author {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, .78);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .reel-player__author svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+    }
+
+    .reel-player__bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, .18);
+      z-index: 3;
+    }
+
+    .reel-player__bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--gold);
+    }
+
+    /* =========================================================
+   IMTIYOZLAR — spotlight banner, muhr, guvohnoma
+   ========================================================= */
+    /* official seal */
+    .seal {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      flex: 0 0 88px;
+      display: grid;
+      place-items: center;
+    }
+
+    .seal__ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed rgba(238, 155, 28, .55);
+      animation: sealSpin 22s linear infinite;
+    }
+
+    .seal__ring::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      border: 1px solid rgba(238, 155, 28, .3);
+    }
+
+    @keyframes sealSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .seal__core {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 18px rgba(238, 155, 28, .45), inset 0 -3px 8px rgba(0, 0, 0, .12);
+    }
+
+    .seal__core svg {
+      width: 34px;
+      height: 34px;
+      color: var(--navy);
+    }
+
+    /* certificate card */
+    .cert {
+      width: 238px;
+      background: #fbfcfe;
+      border-radius: 16px;
+      padding: 18px 18px 14px;
+      border: 1px solid #e8e4d4;
+      box-shadow: 0 16px 34px rgba(16, 23, 46, .24);
+      position: relative;
+      text-align: center;
+    }
+
+    .cert::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 1.5px solid rgba(238, 155, 28, .55);
+      border-radius: 11px;
+      pointer-events: none;
+    }
+
+    .cert__seal {
+      width: 48px;
+      height: 48px;
+      margin: 2px auto 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 5px 14px rgba(238, 155, 28, .4);
+    }
+
+    .cert__seal svg {
+      width: 25px;
+      height: 25px;
+      color: var(--navy);
+    }
+
+    .cert__kicker {
+      font-family: var(--ui);
+      font-size: 10.5px;
+      letter-spacing: .24em;
+      color: var(--gold-700);
+      font-weight: 700;
+    }
+
+    .cert__name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--navy);
+      margin: 6px 0 4px;
+    }
+
+    .cert__desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+      padding: 0 4px;
+    }
+
+    .cert__sign {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line-2);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.3;
+    }
+
+    .cert__year {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .cert--lg {
+      width: 312px;
+      padding: 26px 24px 20px;
+    }
+
+    .cert--lg .cert__name {
+      font-size: 25px;
+    }
+
+    .cert--lg .cert__seal {
+      width: 60px;
+      height: 60px;
+    }
+
+    .cert--lg .cert__seal svg {
+      width: 31px;
+      height: 31px;
+    }
+
+    .cert--lg .cert__desc {
+      font-size: 13px;
+    }
+
+    /* spotlight banner (dashboard hero) */
+    .spotlight {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(125deg, #1c2649 0%, #0f1730 62%);
+      border: 0;
+      border-radius: var(--r-xl);
+      padding: 26px 30px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 26px;
+      align-items: center;
+      box-shadow: 0 20px 46px rgba(16, 23, 46, .3);
+    }
+
+    .spotlight__glow {
+      position: absolute;
+      right: -8%;
+      top: -70%;
+      width: 55%;
+      height: 230%;
+      background: radial-gradient(circle, rgba(238, 155, 28, .24), transparent 62%);
+      pointer-events: none;
+    }
+
+    .spotlight__live {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .spotlight__live .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 0 rgba(238, 155, 28, .6);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      70% {
+        box-shadow: 0 0 0 9px rgba(238, 155, 28, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(238, 155, 28, 0);
+      }
+    }
+
+    .spotlight__main {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .spotlight__body h2 {
+      color: #fff;
+      font-size: clamp(20px, 2.4vw, 28px);
+      margin: 9px 0 9px;
+      max-width: 26ch;
+      line-height: 1.2;
+    }
+
+    .spotlight__body p {
+      color: #ccd2e8;
+      font-size: 14.5px;
+      max-width: 54ch;
+      line-height: 1.55;
+    }
+
+    .spotlight__body p b {
+      color: var(--gold);
+    }
+
+    .spotlight__cta {
+      display: flex;
+      gap: 10px;
+      margin-top: 17px;
+      flex-wrap: wrap;
+    }
+
+    .spotlight__cert {
+      position: relative;
+      z-index: 1;
+      transform: rotate(2.5deg);
+    }
+
+    /* privileges view */
+    .priv-hero {
+      background: linear-gradient(140deg, #1c2649, #0f1730);
+      border: 0;
+      border-radius: var(--r-xl);
+      padding: 32px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 32px;
+      align-items: center;
+      margin-bottom: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .priv-hero__glow {
+      position: absolute;
+      left: -10%;
+      bottom: -80%;
+      width: 50%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(238, 155, 28, .18), transparent 60%);
+    }
+
+    .priv-hero__cert {
+      position: relative;
+      z-index: 1;
+    }
+
+    .priv-hero__text {
+      position: relative;
+      z-index: 1;
+    }
+
+    .priv-hero__text .eyebrow {
+      color: var(--gold);
+    }
+
+    .priv-hero__text h2 {
+      color: #fff;
+      font-size: clamp(22px, 2.6vw, 30px);
+      margin: 9px 0 12px;
+      max-width: 20ch;
+    }
+
+    .priv-hero__text p {
+      color: #ccd2e8;
+      font-size: 15px;
+      line-height: 1.6;
+      max-width: 54ch;
+    }
+
+    .grant-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 14.5px;
+      padding: 11px 18px;
+      border-radius: 12px;
+      margin: 16px 0 4px;
+      box-shadow: 0 6px 18px rgba(238, 155, 28, .35);
+    }
+
+    .grant-pill svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .reward-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* recipients */
+    .recipient {
+      display: grid;
+      grid-template-columns: 50px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 12px;
+    }
+
+    .recipient__av {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--gold);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex: 0 0 50px;
+    }
+
+    .recipient__who {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .recipient__award {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .recipient__award b {
+      color: var(--gold-700);
+    }
+
+    .recipient__meta {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .recipient__date {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .recipient__issuer {
+      font-size: 11.5px;
+      color: var(--faint);
+      margin-top: 2px;
+    }
+
+    .recipient.is-featured {
+      border-color: var(--gold);
+      background: linear-gradient(0deg, var(--gold-soft), var(--gold-soft)), var(--surface);
+    }
+
+    .recipient.is-featured .recipient__av {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .featured-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--gold-700);
+      background: #fff;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      padding: 1px 8px;
+      margin-left: 8px;
+    }
+
+    /* how-to CTA */
+    .priv-cta {
+      background: var(--canvas);
+      border: 1px dashed var(--line);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .priv-cta__t h3 {
+      font-size: 19px;
+      margin-bottom: 4px;
+    }
+
+    .priv-cta__t p {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 60ch;
+    }
+
+    /* =========================================================
+   IMTIYOZ SHARTI (verification conditions)
+   ========================================================= */
+    .cond-why {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(150deg, var(--navy), #10172e);
+      border: 0;
+      padding: 26px 28px;
+      color: #fff;
+    }
+
+    .cond-why__rays {
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, transparent 40%, rgba(238, 155, 28, .12) 41%, rgba(238, 155, 28, .12) 48%, transparent 49%);
+    }
+
+    .cond-why__inner {
+      position: relative;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .cond-why__ico {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: var(--gold);
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      flex: 0 0 50px;
+    }
+
+    .cond-why__ico svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .cond-why h3 {
+      color: #fff;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .cond-why p {
+      color: #c5cbe6;
+      font-size: 14.5px;
+      line-height: 1.55;
+      max-width: 70ch;
+    }
+
+    .cond-why b {
+      color: #fff;
+    }
+
+    .cond-why__pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .cond-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .14);
+      color: #e7ebf7;
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    .cond-pill svg {
+      width: 14px;
+      height: 14px;
+      color: var(--gold);
+    }
+
+    /* candidate header */
+    .cond-tracker {
+      padding: 24px;
+    }
+
+    .cand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cand__av {
+      width: 54px;
+      height: 54px;
+      border-radius: 15px;
+      background: var(--gold);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 20px;
+      flex: 0 0 54px;
+    }
+
+    .cand__name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--navy);
+    }
+
+    .cand__sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .cand__sub b {
+      color: var(--gold-700);
+    }
+
+    .cand__prog {
+      margin-left: auto;
+      text-align: right;
+      min-width: 140px;
+    }
+
+    .cand__prog .t {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .cand__prog .bar {
+      height: 9px;
+      background: var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .cand__prog .bar i {
+      display: block;
+      height: 100%;
+      background: var(--gold);
+      border-radius: 9px;
+      transition: width .5s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    /* stepper */
+    .cstep {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+    }
+
+    .cstep__rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cstep__dot {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 18px;
+      flex: 0 0 46px;
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--faint);
+      transition: all .25s ease;
+    }
+
+    .cstep__dot svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .cstep__line {
+      width: 2px;
+      flex: 1;
+      background: var(--line);
+      margin: 6px 0;
+      min-height: 18px;
+    }
+
+    .cstep:last-child .cstep__line {
+      display: none;
+    }
+
+    .cstep__card {
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      transition: all .2s ease;
+    }
+
+    .cstep__head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cstep__title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 16.5px;
+      color: var(--navy);
+    }
+
+    .cstep__who {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .cstep__who b {
+      color: var(--ink);
+    }
+
+    .cstep__status {
+      margin-left: auto;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      padding: 4px 11px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .cstep__req {
+      font-size: 14px;
+      color: var(--ink);
+      margin-top: 9px;
+      line-height: 1.5;
+    }
+
+    .cstep__meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--canvas);
+      border-radius: 9px;
+      padding: 7px 12px;
+      color: var(--ink);
+    }
+
+    .cstep__meta svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Q&A */
+    .cstep__qa {
+      margin-top: 14px;
+      background: var(--canvas);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .cstep__qa-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--gold-700);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .cstep__qa-label svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .qa-item {
+      display: flex;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    .qa-item .q-n {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+
+    .cstep__actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn--ok {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .btn--ok:hover {
+      background: #188a75;
+    }
+
+    .btn--fail {
+      background: transparent;
+      color: var(--red);
+      border: 1.5px solid #f0c4c4;
+    }
+
+    .btn--fail:hover {
+      border-color: var(--red);
+    }
+
+    /* status variants */
+    .cstep--done .cstep__dot {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .cstep--done .cstep__line {
+      background: var(--teal);
+    }
+
+    .cstep--done .cstep__card {
+      border-color: var(--teal-soft);
+    }
+
+    .cstep--done .cstep__status {
+      background: var(--teal-soft);
+      color: var(--teal);
+    }
+
+    .cstep--active .cstep__dot {
+      border-color: var(--gold);
+      background: var(--gold-soft);
+      color: var(--gold-700);
+      box-shadow: 0 0 0 5px var(--gold-soft);
+    }
+
+    .cstep--active .cstep__card {
+      border-color: var(--gold);
+      box-shadow: 0 8px 24px rgba(238, 155, 28, .12);
+    }
+
+    .cstep--active .cstep__status {
+      background: var(--gold-soft);
+      color: var(--gold-700);
+    }
+
+    .cstep--grace .cstep__dot {
+      border-color: var(--red);
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .cstep--grace .cstep__card {
+      border-color: #f0c4c4;
+      background: #fef7f7;
+    }
+
+    .cstep--grace .cstep__status {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .cstep--locked {
+      opacity: .6;
+    }
+
+    .cstep--locked .cstep__status {
+      background: var(--canvas);
+      color: var(--faint);
+    }
+
+    .cstep--locked .cstep__title {
+      color: var(--muted);
+    }
+
+    .grace-note {
+      background: #fef7f7;
+      border: 1px solid #f3d2d2;
+      border-radius: 12px;
+      padding: 13px 16px;
+      margin-top: 14px;
+    }
+
+    .grace-note .t {
+      font-weight: 700;
+      color: #a52d2d;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .grace-note .t svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    .grace-note p {
+      font-size: 13.5px;
+      color: #8a3535;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .grace-note .days {
+      font-family: var(--mono);
+      font-weight: 700;
+    }
+
+    /* success */
+    .cond-success {
+      text-align: center;
+      padding: 34px 24px;
+    }
+
+    .cond-success__badge {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: var(--teal-soft);
+      display: grid;
+      place-items: center;
+    }
+
+    .cond-success__badge svg {
+      width: 42px;
+      height: 42px;
+      color: var(--teal);
+    }
+
+    .cond-success h3 {
+      font-size: 24px;
+    }
+
+    .cond-success p {
+      color: var(--muted);
+      max-width: 48ch;
+      margin: 8px auto 20px;
+    }
+
+    .cond-success__chips {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    /* grace + flow cards */
+    .cond-grace {
+      padding: 24px;
+    }
+
+    .cond-grace h3,
+    .cond-flow h3 {
+      font-size: 18px;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 13px;
+      padding: 11px 0;
+      border-top: 1px solid var(--line-2);
+    }
+
+    .flow-step:first-of-type {
+      border-top: 0;
+    }
+
+    .flow-step__n {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 30px;
+    }
+
+    .flow-step__b {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    .flow-step__b b {
+      color: var(--navy);
+    }
+
+    /* =========================================================
+   RESPONSIVE
+   ========================================================= */
+    @media (max-width:1040px) {
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .mod-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .road {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dash-grid,
+      .checker,
+      .reg {
+        grid-template-columns: 1fr;
+      }
+
+      .scam-grid,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #dashExtraRow {
+        grid-template-columns: 1fr !important;
+      }
+
+      #ratingTop {
+        grid-template-columns: 1fr !important;
+      }
+
+      .view[id="view-rating"] .grid[style*="1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      .reward-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .spotlight {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .spotlight__cert {
+        justify-self: center;
+        transform: none;
+      }
+
+      .priv-hero {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        text-align: center;
+      }
+
+      .priv-hero__cert {
+        justify-self: center;
+      }
+
+      .priv-hero__text .grant-pill {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (max-width:820px) {
+      .menu-toggle {
+        display: grid;
+        place-items: center;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .rail {
+        position: fixed;
+        top: var(--bar-h);
+        left: 0;
+        bottom: 0;
+        width: 282px;
+        z-index: 50;
+        transform: translateX(-105%);
+        transition: transform .28s ease;
+        box-shadow: var(--shadow-lg);
+        height: calc(100vh - var(--bar-h));
+      }
+
+      .rail.is-open {
+        transform: none;
+      }
+
+      .rail-scrim {
+        position: fixed;
+        inset: var(--bar-h) 0 0 0;
+        background: rgba(16, 23, 46, .45);
+        z-index: 45;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .25s ease;
+      }
+
+      .rail-scrim.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .brand__tag {
+        display: none;
+      }
+
+      .region-pill {
+        display: none;
+      }
+
+      .reels {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width:540px) {
+
+      .stat-grid,
+      .metrics,
+      .q-choices {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 22px 16px 50px;
+      }
+
+      .topbar {
+        padding: 0 14px;
+        gap: 12px;
+      }
+
+      .btn--cta-text {
+        display: none;
+      }
+
+      .podium {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      .podium__item--1 {
+        transform: none;
+      }
+
+      .rank-row {
+        grid-template-columns: 26px 38px 1fr auto;
+        gap: 10px;
+        padding: 11px 13px;
+      }
+
+      .rank-row .lvl-badge {
+        display: none;
+      }
+
+      .reel {
+        width: calc(50% - 8px);
+      }
+
+      .spotlight__main {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .spotlight__cta {
+        justify-content: center;
+      }
+
+      .recipient {
+        grid-template-columns: 44px 1fr;
+      }
+
+      .recipient__meta {
+        grid-column: 2;
+        text-align: left;
+      }
+
+      .cand__prog {
+        margin-left: 0;
+        width: 100%;
+        text-align: left;
+      }
+
+      .view[id="view-condition"] .grid[style*="1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* reduced motion */
+    @media (prefers-reduced-motion:reduce) {
+      * {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+
+      .shield-sweep {
+        display: none;
+      }
+    }
+
+    /* inline icon size guards (icons injected without a sized container) */
+    .q-scenario .from svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+
+    .post__blocked svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+
+    .verdict__badge svg {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
+    }
+
+    /* focus visibility */
+    :focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle" aria-label="Menyu">☰</button>
+    <a class="brand" href="#dash" data-view="dash">
+      <span class="brand__logo">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 2 4 5v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V5l-8-3Z" fill="#161F3D" />
+          <path d="m8.5 12 2.3 2.4L15.8 9" stroke="#fff" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span>
+        <span class="brand__name">Kiber<b>Ogoh</b> UZ</span>
+        <span class="brand__tag">Mahalla kiber qalqoni</span>
+      </span>
+    </a>
+    <div class="topbar__spacer"></div>
+    <div class="region-pill"><span class="dot"></span> Hudud: <b id="topRegion">Toshkent viloyati</b></div>
+    <button class="btn btn--gold" data-view="reg"><span class="btn--cta-text">Ro'yxatdan o'tish</span></button>
+  </header>
+
+  <div class="rail-scrim" id="railScrim"></div>
+
+  <div class="shell">
+    <!-- ============ SIDEBAR ============ -->
+    <nav class="rail" id="rail" aria-label="Asosiy navigatsiya">
+      <div class="rail__group">
+        <div class="rail__label">Platforma</div>
+        <button class="nav-item is-active" data-view="dash">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1.5" />
+            <rect x="14" y="3" width="7" height="5" rx="1.5" />
+            <rect x="14" y="12" width="7" height="9" rx="1.5" />
+            <rect x="3" y="16" width="7" height="5" rx="1.5" />
+          </svg>
+          Boshqaruv paneli
+        </button>
+        <button class="nav-item" data-view="feed">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z" />
+            <path d="M10.5 20a1.5 1.5 0 0 0 3 0" />
+          </svg>
+          Tahdidlar lentasi
+          <span class="badge" id="feedBadge">3</span>
+        </button>
+        <button class="nav-item" data-view="check">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.2-3.2" />
+          </svg>
+          Tekshirgich
+        </button>
+        <button class="nav-item" data-view="quiz">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9.1 9a3 3 0 1 1 4 2.8c-.9.4-1.6 1.2-1.6 2.2v.5" />
+            <circle cx="11.5" cy="18" r=".5" fill="currentColor" stroke="none" />
+            <rect x="3" y="3" width="18" height="18" rx="4" />
+          </svg>
+          Viktorina
+        </button>
+        <button class="nav-item" data-view="rating">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 21V10M12 21V4M19 21v-7" stroke-linecap="round" />
+            <path d="M9 7.5 12 4l3 3.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Xonadonlar reytingi
+        </button>
+        <button class="nav-item" data-view="privilege">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="9" r="5" />
+            <path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Imtiyozlar
+        </button>
+        <button class="nav-item" data-view="condition">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11.5l2 2 4.5-4.5" />
+            <path d="M5 4h14a1 1 0 0 1 1 1v15l-3.5-2.2L13 20l-1-2-1 2-2.5-2.2L5 20V5a1 1 0 0 1 0-1Z"
+              stroke-linejoin="round" />
+          </svg>
+          Imtiyoz sharti
+        </button>
+      </div>
+      <div class="rail__group">
+        <div class="rail__label">Bilim</div>
+        <button class="nav-item" data-view="video">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="5" width="18" height="14" rx="3" />
+            <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+          </svg>
+          So'nggi videolar
+        </button>
+        <button class="nav-item" data-view="base">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2V5Z" />
+            <path d="M12 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2" />
+          </svg>
+          Firibgarliklar bazasi
+        </button>
+        <button class="nav-item" data-view="jamoa">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6A8.4 8.4 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8v.5Z" />
+          </svg>
+          Jamoa
+        </button>
+        <button class="nav-item" data-view="help">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3" />
+            <circle cx="12" cy="16.5" r=".5" fill="currentColor" stroke="none" />
+          </svg>
+          Yordam
+        </button>
+      </div>
+      <div class="rail__group">
+        <div class="rail__label">Loyiha</div>
+        <button class="nav-item" data-view="reg">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z" />
+            <circle cx="12" cy="11" r="2.5" />
+          </svg>
+          Ro'yxatdan o'tish
+        </button>
+        <button class="nav-item" data-view="about">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5" />
+            <circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none" />
+          </svg>
+          Loyiha haqida
+        </button>
+      </div>
+      <div class="rail__foot">
+        <p><b style="color:var(--navy)">Maxfiylik birinchi o'rinda.</b> Manzilingiz emas — faqat mahalla qamrovi
+          yig'iladi.</p>
+      </div>
+    </nav>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main" id="main">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="view is-active" id="view-dash">
+        <div id="dashSpotlight"></div>
+        <div class="page-head">
+          <span class="eyebrow">Boshqaruv paneli</span>
+          <h1>Mahallangizning kiber holati</h1>
+          <p class="lead">Real vaqtdagi tahdidlar, hududiy qamrov va himoya darajasi — barchasi bitta oynada. Quyidagi
+            ko'rsatkichlar namunaviy (demo) ma'lumotlardir.</p>
+        </div>
+
+        <div class="grid stat-grid" id="statGrid"></div>
+
+        <div class="grid dash-grid" style="margin-top:20px">
+          <div>
+            <div class="section-title">
+              <h2>So'nggi tahdidlar</h2><span class="hint">avtomatik yangilanadi</span>
+            </div>
+            <div class="feed" id="dashFeed"></div>
+            <div style="margin-top:14px"><button class="btn btn--ghost btn--block" data-view="feed">Barcha tahdidlarni
+                ko'rish</button></div>
+          </div>
+          <div class="grid" style="gap:18px">
+            <div class="card shield-card">
+              <span class="eyebrow">Kiber qalqon</span>
+              <h3>Himoya darajasi</h3>
+              <div class="shield-ring">
+                <div class="shield-sweep"></div>
+                <svg viewBox="0 0 120 120">
+                  <circle class="track" cx="60" cy="60" r="52" />
+                  <circle class="prog" id="shieldProg" cx="60" cy="60" r="52" />
+                </svg>
+                <div class="shield-ring__center">
+                  <div>
+                    <div class="pct" id="shieldPct">0%</div>
+                    <div class="cap">Qalqon</div>
+                  </div>
+                </div>
+              </div>
+              <div class="shield-meta">
+                <div>
+                  <div class="v" id="mActive">0</div>
+                  <div class="k">Faol ko'ngilli</div>
+                </div>
+                <div>
+                  <div class="v" id="mBlocked">0</div>
+                  <div class="k">Bloklangan</div>
+                </div>
+                <div>
+                  <div class="v">24/7</div>
+                  <div class="k">Monitoring</div>
+                </div>
+              </div>
+            </div>
+            <div class="card card--pad">
+              <div class="section-title" style="margin:0 0 12px">
+                <h2 style="font-size:18px">Boshqaruv modeli</h2>
+              </div>
+              <div class="pyramid" id="dashPyramid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns:1.25fr 1fr;gap:18px;margin-top:20px" id="dashExtraRow">
+          <div class="card card--pad" id="dashHousehold"></div>
+          <div class="card card--pad" id="dashVideos"></div>
+        </div>
+      </section>
+
+      <!-- ===== THREAT FEED ===== -->
+      <section class="view" id="view-feed">
+        <div class="page-head">
+          <span class="eyebrow">Tahdidlar lentasi</span>
+          <h1>O'zbekistonda aylanayotgan firibgarliklar</h1>
+          <p class="lead">Ko'ngillilar va tizim tasdiqlagan ogohlantirishlar. Toifani tanlab, o'zingizga tegishlisini
+            kuzating.</p>
+        </div>
+        <div class="filters" id="feedFilters"></div>
+        <div class="feed" id="fullFeed"></div>
+      </section>
+
+      <!-- ===== CHECKER ===== -->
+      <section class="view" id="view-check">
+        <div class="page-head">
+          <span class="eyebrow">Tekshirgich</span>
+          <h1>Havola yoki raqamni tekshiring</h1>
+          <p class="lead">Shubhali SMS havolasini, sayt manzilini yoki telefon raqamini joylang. Tizim uni xavf
+            belgilariga qarab tahlil qiladi va tavsiya beradi.</p>
+        </div>
+        <div class="grid checker">
+          <div class="card checker__panel">
+            <label for="checkInput" style="font-weight:600;font-size:14px;color:var(--ink)">Tekshiriladigan matn</label>
+            <div class="checker__input-wrap">
+              <textarea class="checker__input" id="checkInput"
+                placeholder="Masalan: http://click-bonus.xyz/win  yoki  +998 90 000 11 22"></textarea>
+            </div>
+            <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Tez sinash uchun namunalar:</div>
+            <div class="checker__examples" id="checkExamples"></div>
+            <button class="btn btn--gold btn--block btn--lg" id="checkRun">Tekshirish</button>
+          </div>
+          <div class="card scanner" id="scanner">
+            <div class="scanner__head"><span class="lamp"></span><span class="lamp"></span><span
+                class="lamp"></span><span class="title">kiberogoh — tahlil</span></div>
+            <div class="scanner__body" id="scanBody">
+              <div class="scanner__idle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.2-3.2" />
+                </svg>
+                Natija shu yerda ko'rsatiladi.<br>Matn kiriting va “Tekshirish”ni bosing.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== QUIZ ===== -->
+      <section class="view" id="view-quiz">
+        <div class="page-head">
+          <span class="eyebrow">Viktorina — yoshlar burchagi</span>
+          <h1>Firibgarni tani</h1>
+          <p class="lead">Real holatlarni ko'rib, bu firibgarlikmi yoki xavfsizmi — o'zingiz hal qiling. Har to'g'ri
+            javob ball va yangi daraja olib keladi.</p>
+        </div>
+        <div class="quiz" id="quizWrap"></div>
+      </section>
+
+      <!-- ===== SCAM DATABASE ===== -->
+      <section class="view" id="view-base">
+        <div class="page-head">
+          <span class="eyebrow">Firibgarliklar bazasi</span>
+          <h1>O'zbekistonga xos firibgarlik sxemalari</h1>
+          <p class="lead">Har bir sxema qanday ishlashi, qanday tanilishi va nima qilish kerakligi bilan. Qidiring yoki
+            toifa bo'yicha saralang.</p>
+        </div>
+        <div class="search-row">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.2-3.2" />
+            </svg>
+            <input id="scamSearch" type="search" placeholder="Sxema nomi yoki kalit so'z bo'yicha qidirish…">
+          </div>
+        </div>
+        <div class="filters" id="scamFilters"></div>
+        <div class="grid scam-grid" id="scamGrid"></div>
+      </section>
+
+      <!-- ===== COMMUNITY ===== -->
+      <section class="view" id="view-jamoa">
+        <div class="page-head">
+          <span class="eyebrow">Jamoa</span>
+          <h1>Mahalla muhokamasi — nazorat ostida</h1>
+          <p class="lead">Hududingizdagi ogohlantirishlar va savol-javoblar. Shaxsiy yozishmalar yo'q, havolalar
+            avtomatik bloklanadi.</p>
+        </div>
+        <div class="notice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z" />
+            <path d="m9.2 11 2 2 3.6-3.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p><b>Nega shaxsiy xabar (DM) yo'q?</b> Firibgar fuqaroni yakkalab alday olmasligi uchun barcha muloqot ochiq
+            va moderatsiyalanadi. Bu — maxfiylik va himoyaning bir qismi.</p>
+        </div>
+        <div id="jamoaFeed"></div>
+      </section>
+
+      <!-- ===== HELP ===== -->
+      <section class="view" id="view-help">
+        <div class="page-head">
+          <span class="eyebrow">Yordam</span>
+          <h1>Qadama-qadam yo'riqnomalar</h1>
+          <p class="lead">Firibgarlikka uchrasangiz nima qilish kerak, o'zingizni qanday himoya qilish mumkin — eng
+            muhim holatlar bo'yicha sodda ko'rsatmalar.</p>
+        </div>
+        <div class="acc" id="helpAcc"></div>
+      </section>
+
+      <!-- ===== REGISTRATION ===== -->
+      <section class="view" id="view-reg">
+        <div class="page-head">
+          <span class="eyebrow">Ro'yxatdan o'tish</span>
+          <h1>Mahallangizni tanlang</h1>
+          <p class="lead">Ko'cha va uy raqami so'ralmaydi. Faqat hududingizni belgilaysiz — tizim qamrovni shu darajada
+            hisoblaydi.</p>
+        </div>
+        <div class="grid reg">
+          <div class="card reg__form">
+            <div id="regFormBody">
+              <div class="field">
+                <label for="selViloyat">Viloyat <span class="hint">— majburiy</span></label>
+                <div class="select"><select id="selViloyat">
+                    <option value="">Tanlang…</option>
+                  </select></div>
+              </div>
+              <div class="field">
+                <label for="selTuman">Tuman / shahar <span class="hint">— majburiy</span></label>
+                <div class="select"><select id="selTuman" disabled>
+                    <option value="">Avval viloyatni tanlang</option>
+                  </select></div>
+              </div>
+              <div class="field">
+                <label for="selMahalla">Mahalla <span class="hint">— majburiy</span></label>
+                <div class="select"><select id="selMahalla" disabled>
+                    <option value="">Avval tumanni tanlang</option>
+                  </select></div>
+              </div>
+              <button class="btn btn--gold btn--block btn--lg" id="regSubmit" disabled>Mahallaga qo'shilish</button>
+            </div>
+            <div class="reg-success" id="regSuccess">
+              <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg></div>
+              <h3 style="font-size:22px">Xush kelibsiz!</h3>
+              <p style="color:var(--muted);margin-top:6px">Siz quyidagi mahalla qamroviga qo'shildingiz:</p>
+              <div class="where" id="regWhere"></div>
+              <p
+                style="color:var(--muted);font-size:13px;margin-top:14px;max-width:42ch;margin-left:auto;margin-right:auto">
+                Tizimda faqat shu hudud va foydalanuvchilar soni saqlanadi. Aniq manzilingiz hech qaerda yozilmaydi.</p>
+              <button class="btn btn--ghost" id="regReset" style="margin-top:8px">Boshqatdan</button>
+            </div>
+          </div>
+          <div class="card privacy-aside">
+            <span class="eyebrow">Maxfiylik kafolati</span>
+            <h3>Sizning ma'lumotingiz himoyada</h3>
+            <div class="priv-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z" />
+                <circle cx="12" cy="11" r="2.5" />
+              </svg>
+              <div>
+                <h4>Manzil yig'ilmaydi</h4>
+                <p>Faqat mahalla tanlanadi. Ko'cha va uy raqami so'ralmaydi.</p>
+              </div>
+            </div>
+            <div class="priv-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 18V9m5 9V5m5 13v-7m5 7V11" />
+              </svg>
+              <div>
+                <h4>Faqat statistika</h4>
+                <p>Tizim har mahalladagi foydalanuvchilar sonini saqlaydi — shaxs emas.</p>
+              </div>
+            </div>
+            <div class="priv-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="10" width="16" height="11" rx="2" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+              </svg>
+              <div>
+                <h4>Yopiq muloqot</h4>
+                <p>Shaxsiy yozishma o'chirilgan — firibgar sizni yakkalay olmaydi.</p>
+              </div>
+            </div>
+            <div class="priv-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3 4 6v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V6l-8-3Z" />
+              </svg>
+              <div>
+                <h4>Avtomatik himoya</h4>
+                <p>Havolalar bloklanadi, spam va shubhali xabarlar filtrlanadi.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ABOUT (compiled deck) ===== -->
+      <section class="view" id="view-about">
+        <div class="page-head">
+          <span class="eyebrow">Loyiha haqida</span>
+          <h1>KiberOgoh UZ konsepsiyasi</h1>
+        </div>
+
+        <div class="card about-hero">
+          <div class="about-hero__rings"></div>
+          <span class="eyebrow">Asosiy g'oya</span>
+          <h2>Bitta platforma: o'rgan, tekshir, ogohlantir</h2>
+          <p>KiberOgoh UZ — fuqaro o'rganadigan, shubhali xabarni tekshiradigan va jamoaviy ogohlik yaratadigan yagona
+            tizim. Mahalla darajasida ishlaydi, biroq texnik jihatdan markaziy. Har mahallaga mutaxassis emas — bitta
+            platforma va o'qitilgan ko'ngillilar tarmog'i muammoni real va arzon hal qiladi.</p>
+        </div>
+
+        <div class="section-title">
+          <h2>Muammo</h2><span class="hint">nega bu platforma zarur</span>
+        </div>
+        <div class="grid feature-grid" id="aboutProblem"></div>
+
+        <div class="section-title">
+          <h2>Platformaning yettita moduli</h2>
+        </div>
+        <div class="grid mod-grid" id="aboutModules"></div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
+          <div class="card card--pad">
+            <div class="section-title" style="margin:0 0 16px">
+              <h2 style="font-size:19px">Boshqaruv modeli</h2>
+            </div>
+            <p style="color:var(--muted);font-size:14px;margin-bottom:16px">200 mahallaga 200 mutaxassis kerak emas.
+              Mutaxassis faqat yuqori bosqichda, mahallada esa — o'qitilgan ko'ngillilar. Bir viloyatga atigi 15–18
+              nafar professional kuch.</p>
+            <div class="pyramid" id="aboutPyramid"></div>
+          </div>
+          <div class="card card--pad">
+            <div class="section-title" style="margin:0 0 16px">
+              <h2 style="font-size:19px">Maxfiylik tamoyili</h2>
+            </div>
+            <p style="color:var(--muted);font-size:14px;margin-bottom:8px">“Kerakli minimal ma'lumot” — fuqaroni
+              kuzatish emas, qamrovni hisoblash. Himoya tizimining o'zi namuna bo'lishi shart.</p>
+            <div id="aboutPrivacy"></div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <h2>Yo'l xaritasi</h2>
+        </div>
+        <div class="road" id="aboutRoad"></div>
+
+        <div class="section-title">
+          <h2>Maqsadli ko'rsatkichlar</h2><span class="hint">birinchi ikki yil</span>
+        </div>
+        <div class="grid metrics" id="aboutMetrics"></div>
+      </section>
+
+      <!-- ===== XONADONLAR REYTINGI ===== -->
+      <section class="view" id="view-rating">
+        <div class="page-head">
+          <span class="eyebrow">Xonadonlar reytingi</span>
+          <h1>Har xonadondan bitta KiberHimoyachi</h1>
+          <p class="lead">Har bir xonadon o'z KiberHimoyachisini tanlaydi — u oila nomidan ball yig'adi. Masalan,
+            <b>Abdullayevlar xonadonidan Alisher</b>. Mahalla bo'ylab reyting sog'lom raqobat va jamoaviy himoyani
+            rag'batlantiradi.</p>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px" id="ratingTop"></div>
+
+        <div class="section-title">
+          <h2>Yetakchi xonadonlar</h2><span class="hint">bu oy</span>
+        </div>
+        <div class="podium" id="podium"></div>
+
+        <div class="section-title">
+          <h2>Mahalla reytingi</h2><span class="hint">Navbahor MFY · 142 xonadon</span>
+        </div>
+        <div id="rankList"></div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
+          <div class="card card--pad" id="earnCard"></div>
+          <div class="card card--pad" id="levelCard"></div>
+        </div>
+
+        <div class="section-title">
+          <h2>Aholini jalb qilishning boshqa usullari</h2>
+        </div>
+        <div class="grid feature-grid" id="engageGrid"></div>
+      </section>
+
+      <!-- ===== SO'NGGI VIDEOLAR ===== -->
+      <section class="view" id="view-video">
+        <div class="page-head">
+          <span class="eyebrow">So'nggi videolar</span>
+          <h1>Kiberxavfsizlik — qisqa videolar</h1>
+          <p class="lead">Eng so'nggi tahdidlar bo'yicha qisqa, tushunarli videolar. Reels uslubida — bir daqiqada bir
+            foydali odat. Faqat eng oxirgi 3 ta video ko'rsatiladi.</p>
+        </div>
+        <div class="reels" id="reelsFull"></div>
+        <div class="card card--pad"
+          style="margin-top:22px;display:flex;gap:13px;align-items:flex-start;background:var(--blue-soft);border-color:#cfe3fb">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--blue)" stroke-width="2"
+            style="flex:0 0 22px;margin-top:1px">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5" stroke-linecap="round" />
+            <circle cx="12" cy="7.5" r=".6" fill="var(--blue)" stroke="none" />
+          </svg>
+          <p style="font-size:14px;color:#1c4f86">Videolar ekspertlar tomonidan yoziladi va ijtimoiy tarmoqlarga
+            (Instagram, Telegram, YouTube) ham tarqatiladi. Platformada doim faqat eng so'nggi 3 tasi turadi — eskirgani
+            arxivga o'tadi.</p>
+        </div>
+      </section>
+
+      <!-- ===== IMTIYOZLAR ===== -->
+      <section class="view" id="view-privilege">
+        <div class="page-head">
+          <span class="eyebrow">Imtiyozlar</span>
+          <h1>KiberHimoyachilik — real imtiyozlar</h1>
+          <p class="lead">Faol KiberHimoyachilar shunchaki ball emas, rasmiy organlar tomonidan tasdiqlangan haqiqiy
+            imtiyozlarga ega bo'ladi. Aynan shu mahalla ichida sog'lom raqobatni oshiradi va ota-onalarni farzandini
+            jalb qilishga undaydi.</p>
+        </div>
+
+        <div class="card priv-hero" id="privHero"></div>
+
+        <div class="section-title">
+          <h2>Qanday imtiyozlar mavjud</h2>
+        </div>
+        <div class="grid reward-grid" id="rewardGrid"></div>
+
+        <div class="section-title">
+          <h2>So'nggi taqdirlanganlar</h2><span class="hint">mahalla bo'yicha</span>
+        </div>
+        <div id="recipientsList"></div>
+
+        <div class="priv-cta" style="margin-top:24px">
+          <div class="priv-cta__t">
+            <h3>Imtiyozni qanday qo'lga kiritish mumkin?</h3>
+            <p>Yuqori ball — bu boshlanishi. Sovg'a yoki guvohnomani olish uchun nomzod <b>Imtiyoz sharti</b>dan o'tishi
+              shart: o'zi, ota-onasi va qo'shnilari og'zaki savol-javobdan o'tkaziladi.</p>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn--gold btn--lg" data-view="condition">Imtiyoz shartini ko'rish</button>
+            <button class="btn btn--ghost btn--lg" data-view="rating">Reyting</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== IMTIYOZ SHARTI ===== -->
+      <section class="view" id="view-condition">
+        <div class="page-head">
+          <span class="eyebrow">Imtiyoz sharti</span>
+          <h1>Sovg'a — faqat ball uchun emas, real targ'ibot uchun</h1>
+          <p class="lead">Sertifikat yoki vazirlik sovg'asini olish uchun nomzod nafaqat yuqori ball to'plashi, balki
+            bilimini amalda isbotlashi va platformani oilasi hamda qo'shnilariga yetkazgani <b>og'zaki savol-javob</b>
+            orqali tasdiqlanishi shart. Shu tariqa platformadan yosh avlod bilan birga ota-onalar ham foydalanadi.</p>
+        </div>
+
+        <div class="card cond-why" id="condWhyCard">
+          <div class="cond-why__rays"></div>
+          <div class="cond-why__inner" id="condWhy"></div>
+        </div>
+
+        <div class="section-title">
+          <h2>To'rt bosqichli tekshiruv</h2><span class="hint">nomzod taqdirlanishidan oldin</span>
+        </div>
+        <div class="card cond-tracker" id="condTracker"></div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:22px">
+          <div class="card cond-grace" id="condGrace"></div>
+          <div class="card card--pad" id="condFlow"></div>
+        </div>
+      </section>
+
+      <!-- ===== FOOTER ===== -->
+      <footer class="foot">
+        <div class="foot__row">
+          <div>
+            <span class="brand__name" style="color:var(--navy);font-size:16px">Kiber<b
+                style="color:var(--gold-700)">Ogoh</b> UZ</span>
+            <div style="margin-top:4px">Mahalla darajasidagi milliy kiber qalqon platformasi · #KiberXavfsizlik</div>
+          </div>
+          <span class="foot__demo">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 8v5" stroke-linecap="round" />
+              <circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none" />
+            </svg>
+            Konseptual demo · 2026
+          </span>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ===== VIDEO PLEYER MODAL ===== -->
+  <div class="reel-modal" id="reelModal" aria-hidden="true">
+    <div class="reel-modal__backdrop" data-reel-close></div>
+    <div class="reel-player" id="reelPlayer"></div>
+  </div>
+
+  <script>
+    /* =========================================================
+       KiberOgoh UZ — demo logikasi
+       ========================================================= */
+    (function () {
+      "use strict";
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+      const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+
+      /* ---------- icons ---------- */
+      const ICON = {
+        map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>',
+        users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2A3.2 3.2 0 0 1 18 11M20.5 19a5.5 5.5 0 0 0-4-5.3"/></svg>',
+        ban: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg>',
+        spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/><circle cx="12" cy="12" r="3"/></svg>',
+        sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H8l-4 3V5Z"/><path d="M8 10h8M8 13h5"/></svg>',
+        link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 13a4 4 0 0 0 5.6.6l3-3A4 4 0 0 0 12 5l-1.5 1.5"/><path d="M15 11a4 4 0 0 0-5.6-.6l-3 3A4 4 0 0 0 12 19l1.5-1.5"/></svg>',
+        phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z"/></svg>',
+        social: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 11 15.8 7M8.2 13l7.6 4"/></svg>',
+        coin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.6h-3a1.8 1.8 0 0 0 0 3.6h4"/></svg>',
+        gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M4 13h16M12 9v11M12 9C9 4 4 6 7 8c1.5 1 5 1 5 1Zm0 0c3-5 8-3 5-1-1.5 1-5 1-5 1Z"/></svg>',
+        medal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="14" r="6"/><path d="m9 8-3-5M15 8l3-5M10.5 14l1.5 1.5 2.5-3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        shieldCheck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V6l-8-3Z"/><path d="m8.5 12 2.3 2.4L15.8 9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        caret: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+        alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 3 19h18L12 4Z"/><path d="M12 10v4" stroke-linecap="round"/><circle cx="12" cy="16.5" r=".6" fill="currentColor" stroke="none"/></svg>',
+        check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5Z"/></svg>',
+        heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.3-8.4C1 9.3 2.6 6 5.8 6c2 0 3.3 1.2 4.2 2.5C11 7.2 12.2 6 14.2 6 17.4 6 19 9.3 21.3 12.6 19 16.4 12 21 12 21Z"/></svg>',
+        target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>',
+        cert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 8.5h8M8 11.5h5"/><circle cx="12" cy="18" r="2.2"/><path d="m10.4 19.6-.5 2.8 2.1-1.2 2.1 1.2-.5-2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4M5 4h11l-2 4 2 4H5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        invite: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M18 7v6M21 10h-6" stroke-linecap="round"/></svg>',
+        trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5v1A3.5 3.5 0 0 0 8 10.5M17 6h2.5v1A3.5 3.5 0 0 1 16 10.5"/><path d="M12 14v3M9.5 21h5M10 17h4l1 4H9l1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        grad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4Z" stroke-linejoin="round"/><path d="M6.5 10.8V15c0 1.2 2.5 3 5.5 3s5.5-1.8 5.5-3v-4.2"/><path d="M21.5 8.5v5" stroke-linecap="round"/></svg>',
+        building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-3.5h4V21" stroke-linecap="round"/></svg>'
+      };
+
+      /* =========================================================
+         DATA
+         ========================================================= */
+      const STATS = [
+        { ico: ICON.map, cls: "i-gold", num: 200, suffix: "+", label: "Qamrab olingan mahallalar", y2: "2-yil: 2 000+" },
+        { ico: ICON.users, cls: "i-teal", num: 100, suffix: " ming+", label: "Ro'yxatdan o'tgan fuqarolar", y2: "2-yil: 1 mln+" },
+        { ico: ICON.ban, cls: "i-red", num: 5000, suffix: "+", label: "Qora ro'yxatdagi raqamlar", y2: "2-yil: 30 000+" },
+        { ico: ICON.spark, cls: "i-purple", num: 300, suffix: "+", label: "O'qitilgan ko'ngillilar", y2: "2-yil: 3 000+" }
+      ];
+
+      const CATS = {
+        sms: { label: "SMS firibgarlik", ico: ICON.sms, color: "i-red" },
+        fish: { label: "Fishing havola", ico: ICON.link, color: "i-gold" },
+        call: { label: "Qo'ng'iroq aldovi", ico: ICON.phone, color: "i-blue" },
+        social: { label: "Ijtimoiy tarmoq", ico: ICON.social, color: "i-purple" },
+        invest: { label: "Investitsiya", ico: ICON.coin, color: "i-teal" },
+        prize: { label: "Yutuq / sovg'a", ico: ICON.gift, color: "i-gold" }
+      };
+
+      const FEED = [
+        { cat: "sms", sev: "high", title: "Soxta “Click” SMS: hisobingiz bloklandi", body: "“Click hisobingiz bloklandi, qayta tiklash uchun havolaga kiring” — havola rasmiy clik.uz emas. Bosmang.", region: "Chilonzor", time: "5 daqiqa oldin", n: 140 },
+        { cat: "prize", sev: "high", title: "“Avtomobil yutdingiz” qo'ng'irog'i", body: "Notanish raqamdan “lotereyada yutdingiz, soliq uchun pul o'tkazing” deyishadi. Hech qanday yutuq yo'q.", region: "Yunusobod", time: "22 daqiqa oldin", n: 61 },
+        { cat: "fish", sev: "mid", title: "Soxta pochta yetkazib berish havolasi", body: "“Posilkangiz kutmoqda, bojni to'lang” SMS’idagi havola karta ma'lumotini o'g'irlaydi.", region: "Mirzo Ulug'bek", time: "1 soat oldin", n: 88 },
+        { cat: "social", sev: "mid", title: "Telegramda akkaunt “ovoz berish” aldovi", body: "Do'stingiz nomidan “bolam tanlovda, ovoz ber” havolasi — bu akkaunt o'g'irlash usuli.", region: "Sergeli", time: "2 soat oldin", n: 53 },
+        { cat: "call", sev: "high", title: "“Bank xavfsizlik xizmati” qo'ng'irog'i", body: "O'zini bank xodimi deb tanishtirib SMS-kod so'rashadi. Bank hech qachon kod so'ramaydi.", region: "Olmazor", time: "3 soat oldin", n: 97 },
+        { cat: "invest", sev: "mid", title: "“Kuniga 20% foyda” investitsiya kanali", body: "Soxta investitsiya platformasi avval kichik “foyda” to'laydi, keyin katta pul yig'ib yo'qoladi.", region: "Yakkasaroy", time: "5 soat oldin", n: 34 },
+        { cat: "sms", sev: "low", title: "Soxta “nafaqa qo'shildi” xabari", body: "“Sizga davlat yordami tayinlandi, kartani tasdiqlang” — rasmiy xizmatlar bunday SMS yubormaydi.", region: "Uchtepa", time: "8 soat oldin", n: 29 }
+      ];
+
+      // live alerts pool (injected periodically)
+      const LIVE_POOL = [
+        { cat: "fish", sev: "high", title: "Yangi soxta sayt: humo-bonus aldovi", body: "“Humo bonus dasturi” nomidagi soxta sayt karta raqami va kodni so'ramoqda.", region: "Bektemir", n: 12 },
+        { cat: "social", sev: "mid", title: "Instagram “bepul follower” aldovi", body: "Parolingizni so'raydigan “bepul obunachi” xizmati akkauntni o'g'irlaydi.", region: "Shayxontohur", n: 18 },
+        { cat: "call", sev: "high", title: "Soxta “operator” qo'ng'irog'i", body: "“Raqamingiz bloklanadi, kodni ayting” — operator hech qachon kod so'ramaydi.", region: "Yashnobod", n: 21 },
+        { cat: "prize", sev: "mid", title: "“Sovrinli o'yin” havolasi", body: "“Aylantiring va yuting” havolasi shaxsiy ma'lumotni yig'adi.", region: "Qibray", n: 9 }
+      ];
+
+      const SCAMS = [
+        { cat: "sms", name: "Soxta bank/to'lov SMS", how: "Click, Payme, Uzcard yoki Humo nomidan “hisobingiz bloklandi” deb havola yuboriladi.", rec: "Havola rasmiy domen emas (xato yozilgan, .xyz/.top kabi), shoshilishga undaydi.", act: "Bosmang. Ilovani o'zingiz oching yoki rasmiy raqamga qo'ng'iroq qiling." },
+        { cat: "call", name: "Bank xavfsizlik xizmati", how: "O'zini bank xodimi deb tanishtirib, “shubhali harakat” bahonasida SMS-kod yoki karta ma'lumotini so'raydi.", rec: "Bank hech qachon parol, PIN yoki SMS-kod so'ramaydi.", act: "Darhol go'shakni qo'ying va bankka rasmiy raqam orqali o'zingiz qo'ng'iroq qiling." },
+        { cat: "prize", name: "“Yutuq” va lotereya", how: "“Avtomobil/pul yutdingiz, soliq yoki yetkazish uchun avans to'lang” deyishadi.", rec: "Hech qachon ishtirok etmagan o'yiningiz; oldindan to'lov talab qilinadi.", act: "To'lov qilmang. Haqiqiy yutuq oldindan pul so'ramaydi." },
+        { cat: "fish", name: "Soxta yetkazib berish (pochta)", how: "“Posilkangiz kutmoqda, bojni to'lang” SMS havolasi karta sahifasiga olib boradi.", rec: "Kutilmagan posilka; havola g'alati domen; karta ma'lumoti so'raladi.", act: "Havolani ochmang. Pochta xizmatini rasmiy sayt/ilovadan tekshiring." },
+        { cat: "social", name: "Telegram akkaunt o'g'irlash", how: "“Ovoz bering” yoki “sovg'a” havolasi orqali Telegram login-kodi so'raladi.", rec: "Do'st nomidan kelgan kutilmagan havola; kod kiritish talab qilinadi.", act: "Kodingizni hech kimga bermang. Telegramda 2 bosqichli parol yoqing." },
+        { cat: "invest", name: "Soxta investitsiya", how: "“Kuniga 10–20% foyda” va'da qilinadi; avval kichik to'lov qaytariladi, keyin pul yig'iladi.", rec: "Real bo'lmagan yuqori foiz; “tezroq kiring” bosimi; litsenziya yo'q.", act: "Pul kiritmang. Faqat litsenziyali, rasmiy moliya tashkilotlariga ishoning." },
+        { cat: "social", name: "OLX/Telegram oldindan to'lov", how: "“Mahsulotni jo'natdim, avval to'lang” yoki soxta “xavfsiz to'lov” havolasi.", rec: "Yuzma-yuz ko'rishdan qochish; oldindan to'lov; soxta to'lov sayti.", act: "Faqat mahsulotni ko'rib, qo'lma-qo'l yoki ishonchli tizim orqali to'lang." },
+        { cat: "call", name: "“Operator bonusi” aldovi", how: "Beeline/Ucell/Uzmobile nomidan “bonus/internet sovg'asi” uchun kod so'raladi.", rec: "Kod yoki shaxsiy ma'lumot so'rashadi; rasmiy bo'lmagan raqam.", act: "Kodni aytmang. Bonusni operatorning rasmiy ilovasidan tekshiring." },
+        { cat: "fish", name: "Soxta davlat xizmati sayti", how: "“Nafaqa/subsidiya rasmiylashtirish” bahonasida soxta sayt karta so'raydi.", rec: "Domen rasmiy *.gov.uz emas; shoshiltiradi; to'lov talab qiladi.", act: "Faqat rasmiy davlat portallaridan foydalaning, havolani tekshiring." },
+        { cat: "social", name: "Romantik aldov (Telegram/IG)", how: "Tanishib, ishonch qozonib, keyin “favqulodda holat” bahonasida pul so'raydi.", rec: "Tez yaqinlashish; uchrashuvdan qochish; pul so'rovi.", act: "Notanish odamga pul o'tkazmang; yaqinlaringiz bilan maslahatlashing." }
+      ];
+
+      const QUIZ = [
+        {
+          from: "+998 90 *** ** 11", msg: "“CLICK: Hisobingiz vaqtincha bloklandi. Tiklash: clik-uz.xyz/login”", scam: true,
+          explain: "Bu <b>firibgarlik</b>. Domen rasmiy click.uz emas (xato yozilgan + .xyz). Rasmiy xizmatlar SMS’da bunday havola yubormaydi."
+        },
+        {
+          from: "PAYME", msg: "“To'lov muvaffaqiyatli amalga oshirildi. Cheqni ilovadan ko'ring.”", scam: false,
+          explain: "Bu <b>odatiy xabar</b> — havola yo'q, ma'lumot so'ralmaydi. Baribir cheklarni faqat rasmiy ilovadan tekshiring."
+        },
+        {
+          from: "Notanish raqam", msg: "“Tabriklaymiz! Siz Malibu avtomobilini yutdingiz. Soliq uchun 1 200 000 so'm o'tkazing.”", scam: true,
+          explain: "Bu <b>firibgarlik</b>. Hech qanday yutuq oldindan to'lov so'ramaydi; siz o'yinda qatnashmagansiz."
+        },
+        {
+          from: "Do'stingiz (Telegram)", msg: "“Salom! Bolam tanlovda qatnashyapti, ovoz ber: tg-vote.top/win — login kodingni kirit.”", scam: true,
+          explain: "Bu <b>firibgarlik</b>. Telegram login-kodi so'ralyapti — bu akkaunt o'g'irlash. Do'stingiz akkaunti buzilgan bo'lishi mumkin."
+        },
+        {
+          from: "Bank ilovasi (push)", msg: "“Kartangizdan 250 000 so'm yechildi. Bu siz emasmisiz? Ilovadagi “Bloklash” tugmasini bosing.”", scam: false,
+          explain: "Bu <b>haqiqiy bildirishnoma</b> — amal ilovaning o'zida bajariladi, hech qaerga havola yoki kod yuborilmaydi."
+        },
+        {
+          from: "+998 71 *** ** 00", msg: "“Bank xavfsizlik xizmati. Hisobingizni saqlash uchun SMS-kodni ayting.”", scam: true,
+          explain: "Bu <b>firibgarlik</b>. Bank hech qachon SMS-kod so'ramaydi. Go'shakni qo'ying va o'zingiz bankka qo'ng'iroq qiling."
+        },
+        {
+          from: "Investitsiya kanali", msg: "“Kuniga kafolatlangan 18% foyda! Joy cheklangan, hozir kiring.”", scam: true,
+          explain: "Bu <b>firibgarlik</b>. “Kafolatlangan yuqori foyda” va shoshiltirish — klassik investitsiya aldovi belgilari."
+        }
+      ];
+
+      const HELP = [
+        {
+          t: "Firibgarlikka pul o'tkazib yubordingizmi?", body: `<ol>
+        <li><b>Darhol bankka qo'ng'iroq qiling</b> va kartani bloklang — ba'zan to'lovni qaytarish mumkin.</li>
+        <li>Tranzaksiya cheki, raqam va havolani <b>skrinshot</b> qilib saqlang.</li>
+        <li>Eng yaqin <b>IIB (politsiya)</b> bo'limiga ariza bilan murojaat qiling.</li>
+        <li>Hodisani KiberOgoh’dagi mahalla lentasida belgilang — boshqalarni ogohlantirasiz.</li>
+      </ol>` },
+        {
+          t: "Kuchli parol qanday yaratiladi?", body: `<ul>
+        <li>Kamida <b>12 ta belgi</b>: katta-kichik harf, raqam va maxsus belgi aralash.</li>
+        <li>Ism, tug'ilgan sana yoki “12345” kabi oson parollardan voz keching.</li>
+        <li>Har bir ilova uchun <b>alohida parol</b> — bittasi buzilsa, qolgani himoyada qoladi.</li>
+        <li>Parol menejeridan foydalanish eslab qolishni osonlashtiradi.</li>
+      </ul>` },
+        {
+          t: "Ikki bosqichli himoya (2FA) nima?", body: `<p>2FA — parolga qo'shimcha ikkinchi tasdiq (SMS-kod yoki ilova kodi). Parolingiz o'g'irlansa ham, akkauntga kira olmaydilar.</p>
+      <ul><li>Telegram, Gmail, Instagram va bank ilovalarida <b>yoqib qo'ying</b>.</li>
+      <li>Telegramda “Ikki bosqichli parol”ni alohida o'rnating.</li></ul>` },
+        {
+          t: "Telefoningiz xavfsizligini qanday oshirish mumkin?", body: `<ul>
+        <li>Ilovalarni faqat <b>rasmiy do'kondan</b> (Play Market / App Store) o'rnating.</li>
+        <li>Notanish APK fayllar va “mod” ilovalardan saqlaning.</li>
+        <li>Tizim va ilovalarni muntazam <b>yangilab turing</b>.</li>
+        <li>Ekran qulfini (PIN/biometrika) doim yoqib qo'ying.</li>
+      </ul>` },
+        {
+          t: "Bolalar va yoshlarni qanday himoya qilish kerak?", body: `<ul>
+        <li>O'yinda notanish odam <b>parol yoki kod</b> so'rasa — hech qachon bermaslikni o'rgating.</li>
+        <li>“Bepul olmos/skin” havolalari ko'pincha akkaunt o'g'irlash ekanini tushuntiring.</li>
+        <li>Shaxsiy rasm va ma'lumotni notanishlarga yubormaslik qoidasi.</li>
+        <li>Shubhali holatni <b>kattaga aytish</b> — uyaladigan narsa emas.</li>
+      </ul>` }
+      ];
+
+      const JAMOA = [
+        {
+          who: "Dilnoza A.", role: "vol", color: "var(--gold)", meta: "Chilonzor · 12 daqiqa oldin",
+          body: "Diqqat: bugun “Click hisobingiz bloklandi” SMS’i ko'paydi. Havola clik-uz.xyz — rasmiy emas. Hech kim bosmasin!"
+        },
+        {
+          who: "Foydalanuvchi", role: null, color: "var(--blue)", meta: "Yunusobod · 40 daqiqa oldin",
+          body: "Menga shunaqa havola keldi, bossam bo'ladimi? Mana:", blocked: "havola xavfsizlik uchun bloklandi · click-bonus.top/win"
+        },
+        {
+          who: "Sardor K.", role: "mod", color: "var(--teal)", meta: "Moderator · 35 daqiqa oldin",
+          body: "Yo'q, bosmang. Bu fishing havola. Quyida tasdiqlangan javobni qoldiraman.",
+          verified: "Tasdiqlangan javob: Bunday SMS’dagi havolalarni ochmang. Click/Payme’ni faqat rasmiy ilovadan oching. Shubha bo'lsa — Tekshirgichdan o'tkazing."
+        },
+        {
+          who: "Akmal R.", role: "vol", color: "var(--purple)", meta: "Sergeli · 1 soat oldin",
+          body: "Keksa ota-onalaringizga eslatib qo'ying: bank xodimi SMS-kod so'ramaydi. Qo'ng'iroqda kod so'rashsa — bu firibgar."
+        },
+        {
+          who: "Nigora T.", role: null, color: "var(--red)", meta: "Olmazor · 2 soat oldin",
+          body: "Rahmat, shu guruh tufayli onam aldanmay qoldi. “Avtomobil yutdingiz” qo'ng'irog'ini darhol tanidi."
+        }
+      ];
+
+      const PROBLEM = [
+        { ico: ICON.eye, cls: "i-red", t: "Tanimaslik", p: "Ko'pchilik soxta SMS, fishing havola va “sovg'a yutdingiz” aldovlarini ajrata olmaydi." },
+        { ico: ICON.map, cls: "i-gold", t: "Tarqoqlik", p: "Ogohlantirishlar turli idora va tarmoqlarga bo'linib ketgan — yagona ishonchli manba yo'q." },
+        { ico: ICON.users, cls: "i-purple", t: "Yolg'izlik", p: "Aldangan fuqaro nima qilishni bilmaydi va ko'pincha uyalib hech kimga aytmaydi." },
+        { ico: ICON.spark, cls: "i-blue", t: "Yetib bormaslik", p: "Kiber savodxonlikni mahalla darajasiga yetkazadigan tizimli mexanizm yo'q." }
+      ];
+
+      const MODULES = [
+        { ico: ICON.alert, cls: "i-red", t: "Tahdidlar lentasi", p: "Real vaqtdagi ogohlantirishlar", view: "feed" },
+        { ico: ICON.map, cls: "i-gold", t: "Ro'yxatdan o'tish", p: "Mahalla qamrovi", view: "reg" },
+        { ico: ICON.link, cls: "i-teal", t: "Tekshirgich", p: "Havola va raqamni tekshirish", view: "check" },
+        { ico: ICON.spark, cls: "i-purple", t: "Viktorina", p: "Firibgarni tanish o'yini", view: "quiz" },
+        { ico: ICON.shieldCheck, cls: "i-blue", t: "Firibgarliklar bazasi", p: "O'zbekistonga xos sxemalar", view: "base" },
+        { ico: ICON.check, cls: "i-teal", t: "Yordam", p: "Qadama-qadam yo'riqnoma", view: "help" },
+        { ico: ICON.social, cls: "i-purple", t: "Jamoa (yopiq)", p: "Moderatsiyali muhokama", view: "jamoa" },
+        { ico: ICON.users, cls: "i-gold", t: "Boshqaruv paneli", p: "Hududiy statistika", view: "dash" }
+      ];
+
+      const PYRAMID = [
+        { c: "pyr-1", lvl: "Markaz", desc: "1 jamoa · respublika uchun" },
+        { c: "pyr-2", lvl: "Viloyat", desc: "2–3 mutaxassis · 200 mahalla nazorati" },
+        { c: "pyr-3", lvl: "Tuman", desc: "12–15 koordinator · moderatsiya" },
+        { c: "pyr-4", lvl: "Mahalla", desc: "300–400 “Kiber faol” ko'ngilli" }
+      ];
+
+      const ROAD = [
+        { n: 1, when: "1–3 oy", t: "Pilot", p: "Bitta tuman (10–15 mahalla). Yadro, kontent va ko'ngillilarni o'qitish." },
+        { n: 2, when: "4–8 oy", t: "Viloyat", p: "Bir viloyat bo'ylab kengaytirish; moderatsiya tarmog'ini sinash." },
+        { n: 3, when: "9–14 oy", t: "Mintaqalar", p: "Bir nechta viloyat; tahdidlar bazasini va avtomatikani kuchaytirish." },
+        { n: 4, when: "15–24 oy", t: "Milliy qamrov", p: "Butun respublika; davlat tizimlari bilan integratsiya." }
+      ];
+
+      const METRICS = [
+        { big: "200+", y2: "2-yil: 2 000+", lab: "Qamrab olingan mahallalar" },
+        { big: "100 ming+", y2: "2-yil: 1 mln+", lab: "Ro'yxatdan o'tgan fuqarolar" },
+        { big: "300+", y2: "2-yil: 3 000+", lab: "O'qitilgan ko'ngillilar" },
+        { big: "5 000+", y2: "2-yil: 30 000+", lab: "Qora ro'yxatdagi raqamlar" }
+      ];
+
+      const REGIONS = {
+        "Toshkent shahri": ["Bektemir", "Chilonzor", "Mirobod", "Mirzo Ulug'bek", "Olmazor", "Sergeli", "Shayxontohur", "Uchtepa", "Yakkasaroy", "Yashnobod", "Yunusobod", "Yangihayot"],
+        "Toshkent viloyati": ["Angren", "Bekobod", "Bo'ka", "Chinoz", "Qibray", "Ohangaron", "Oqqo'rg'on", "Parkent", "Piskent", "Yangiyo'l", "Zangiota", "Chirchiq"],
+        "Andijon": ["Andijon shahri", "Asaka", "Baliqchi", "Izboskan", "Marhamat", "Oltinko'l", "Paxtaobod", "Shahrixon", "Xo'jaobod"],
+        "Farg'ona": ["Farg'ona shahri", "Marg'ilon", "Qo'qon", "Quva", "Rishton", "Beshariq", "Oltiariq", "Furqat"],
+        "Namangan": ["Namangan shahri", "Chust", "Pop", "To'raqo'rg'on", "Uchqo'rg'on", "Kosonsoy", "Mingbuloq"],
+        "Samarqand": ["Samarqand shahri", "Kattaqo'rg'on", "Urgut", "Bulung'ur", "Jomboy", "Ishtixon", "Payariq"],
+        "Buxoro": ["Buxoro shahri", "Kogon", "G'ijduvon", "Vobkent", "Romitan", "Shofirkon", "Olot"],
+        "Xorazm": ["Urganch", "Xiva", "Hazorasp", "Gurlan", "Shovot", "Yangiariq", "Bog'ot"],
+        "Qashqadaryo": ["Qarshi", "Shahrisabz", "Kitob", "G'uzor", "Koson", "Muborak", "Yakkabog'"],
+        "Surxondaryo": ["Termiz", "Denov", "Sho'rchi", "Sariosiyo", "Boysun", "Jarqo'rg'on", "Qumqo'rg'on"],
+        "Jizzax": ["Jizzax shahri", "G'allaorol", "Zomin", "Forish", "Do'stlik", "Paxtakor"],
+        "Sirdaryo": ["Guliston", "Yangiyer", "Sirdaryo", "Boyovut", "Sayxunobod", "Mirzaobod"],
+        "Navoiy": ["Navoiy shahri", "Zarafshon", "Karmana", "Konimex", "Nurota", "Uchquduq"],
+        "Qoraqalpog'iston": ["Nukus", "Xo'jayli", "Chimboy", "To'rtko'l", "Beruniy", "Qo'ng'irot", "Mo'ynoq"]
+      };
+      const MFY_POOL = ["Bunyodkor MFY", "Navbahor MFY", "Do'stlik MFY", "Yangiobod MFY", "Guliston MFY", "Birlik MFY", "Istiqlol MFY", "Obod MFY", "Mustaqillik MFY", "Bog'bon MFY"];
+
+      /* ---- xonadonlar reytingi ---- */
+      const HOUSEHOLDS = [
+        { hh: "Tolipovlar", who: "Bobur", pts: 2140, lvl: "qahramon", delta: 1 },
+        { hh: "Karimovlar", who: "Jasur", pts: 1820, lvl: "qahramon", delta: 1 },
+        { hh: "To'xtayevlar", who: "Dilshod", pts: 1640, lvl: "kiber", delta: 1 },
+        { hh: "Rahimovlar", who: "Madina", pts: 1510, lvl: "kiber", delta: -2 },
+        { hh: "Abdullayevlar", who: "Alisher", pts: 1240, lvl: "kiber", delta: 2, you: true },
+        { hh: "Yusupovlar", who: "Sevara", pts: 1180, lvl: "himoyachi", delta: 1 },
+        { hh: "Ergashevlar", who: "Bekzod", pts: 1050, lvl: "himoyachi", delta: 0 },
+        { hh: "Sodiqovlar", who: "Nilufar", pts: 920, lvl: "himoyachi", delta: -2 },
+        { hh: "Olimovlar", who: "Sardor", pts: 760, lvl: "himoyachi", delta: 1 },
+        { hh: "Qodirovlar", who: "Gulnoza", pts: 610, lvl: "himoyachi", delta: 3 }
+      ];
+      const LEVELS = [
+        { key: "boshlovchi", name: "Boshlovchi", min: 0, dot: "var(--blue)" },
+        { key: "himoyachi", name: "Himoyachi", min: 600, dot: "var(--teal)" },
+        { key: "kiber", name: "KiberHimoyachi", min: 1200, dot: "var(--gold)" },
+        { key: "qahramon", name: "Mahalla qahramoni", min: 1700, dot: "var(--purple)" }
+      ];
+      const levelName = k => (LEVELS.find(l => l.key === k) || {}).name || k;
+      const EARN = [
+        { ico: ICON.spark, cls: "i-purple", a: "Viktorinani yakunlash", p: 50 },
+        { ico: ICON.alert, cls: "i-red", a: "Firibgarlikni xabar qilish (tasdiqlangan)", p: 40 },
+        { ico: ICON.users, cls: "i-blue", a: "Qo'shnini ogohlantirish", p: 25 },
+        { ico: ICON.check, cls: "i-teal", a: "Yo'riqnomani o'qish", p: 15 },
+        { ico: ICON.link, cls: "i-gold", a: "Havola yoki raqamni tekshirish", p: 10 },
+        { ico: ICON.shieldCheck, cls: "i-teal", a: "Kunlik kirish (streak)", p: 5 },
+        { ico: ICON.invite, cls: "i-gold", a: "Yangi xonadonni taklif qilish", p: 100 }
+      ];
+      const ENGAGE = [
+        { ico: ICON.medal, cls: "i-gold", t: "Xonadon reytingi", p: "Har xonadon KiberHimoyachisi ball yig'adi — mahalla bo'ylab sog'lom raqobat." },
+        { ico: ICON.target, cls: "i-purple", t: "Haftalik vazifa", p: "Har hafta yangi amaliy challenge: “3 qo'shningizni ogohlantiring” kabi." },
+        { ico: ICON.flag, cls: "i-teal", t: "Mahalla maqsadi", p: "Xonadonlarning 80%i qo'shilsa, mahalla “Himoyalangan” maqomini oladi." },
+        { ico: ICON.shieldCheck, cls: "i-blue", t: "Kunlik maslahat va streak", p: "Har kuni 1 ta foydali maslahat; ketma-ket kirish qo'shimcha ball beradi." },
+        { ico: ICON.cert, cls: "i-gold", t: "Oylik eng faol KiberHimoyachi", p: "Har oy eng faol himoyachi davlat nomidan sertifikat va e'tirof oladi." },
+        { ico: ICON.invite, cls: "i-purple", t: "Qo'shnini taklif qilish", p: "Yangi xonadonni taklif qilsangiz, ikkalangiz ham ball olasiz." },
+        { ico: ICON.gift, cls: "i-red", t: "Raqamli nishonlar", p: "Har daraja uchun raqamli nishon va bosib chiqariladigan sertifikat." },
+        { ico: ICON.eye, cls: "i-blue", t: "Oilaviy himoya rejimi", p: "Keksa ota-onangiz uchun soddalashtirilgan rejim va eslatmalar." }
+      ];
+      const WEEKLY = { title: "Bu haftaning vazifasi", sub: "Yopiladi: 3 kundan keyin", task: "3 ta qo'shningizni soxta “Click bloklandi” SMS haqida ogohlantiring.", done: 2, total: 3, reward: "+75 ball" };
+      const MGOAL = { title: "Mahalla maqsadi", sub: "“Himoyalangan mahalla” maqomi", current: 96, total: 142 };
+
+      /* ---- so'nggi videolar ---- */
+      const VIDEOS = [
+        {
+          id: 1, cat: "Tahdid", c1: "#E25555", c2: "#7d1f1f", ico: ICON.sms, title: "Soxta “Click bloklandi” SMS'ni 10 soniyada tanish", dur: "0:45", views: "12.4K", likes: "1.2K", author: "KiberOgoh UZ",
+          cap: "Rasmiy SMS hech qachon havola yubormaydi. Domenni tekshiring: click.uz to'g'ri, clik-uz.xyz soxta. Shubha bo'lsa — ilovani o'zingiz oching."
+        },
+        {
+          id: 2, cat: "Himoya", c1: "#3A86D8", c2: "#163f73", ico: ICON.shieldCheck, title: "Telegram akkauntni o'g'irlatmang: ikki bosqichli parol", dur: "1:02", views: "9.8K", likes: "940", author: "KiberOgoh UZ",
+          cap: "Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash. Parolingiz o'g'irlansa ham, akkauntga begona kira olmaydi."
+        },
+        {
+          id: 3, cat: "Aldov", c1: "#F0A92E", c2: "#9a6207", ico: ICON.phone, title: "Bank kodi aldovi: nega hech qachon kod aytmaslik kerak", dur: "0:38", views: "15.1K", likes: "1.6K", author: "KiberOgoh UZ",
+          cap: "Bank xodimi hech qachon SMS-kod, parol yoki PIN so'ramaydi. Kim so'rasa — firibgar. Darhol go'shakni qo'ying."
+        }
+      ];
+
+      const fmtN = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      const avPalette = ["var(--purple)", "var(--blue)", "var(--teal)", "var(--red)", "var(--gold)", "var(--navy-3)"];
+
+      /* ---- imtiyozlar ---- */
+      const SPOTLIGHT = { hh: "Tolipovlar", rep: "Bobur", repFull: "Bobur Tolipov", month: "Iyun oyi", issuer: "Ichki Ishlar Boshqarmasi", benefit: "Temurbek litseyiga grant asosida qabul" };
+      const PRIVILEGES = [
+        { ico: ICON.cert, cls: "i-gold", t: "IIB rasmiy guvohnomasi", p: "Eng faol KiberHimoyachilar Ichki Ishlar Boshqarmasi tomonidan rasmiy sertifikat bilan taqdirlanadi." },
+        { ico: ICON.medal, cls: "i-purple", t: "Litsey va universitetga grant", p: "Yillik yetakchilar nufuzli litsey yoki universitetlarga grant asosida o'qishga tavsiya etiladi." },
+        { ico: ICON.coin, cls: "i-teal", t: "Hokimiyat pul mukofoti", p: "Tuman va shahar hokimligi tomonidan yetakchi xonadonlarga rag'bat puli va e'tirof beriladi." },
+        { ico: ICON.shieldCheck, cls: "i-blue", t: "“Eng xavfsiz mahalla” maqomi", p: "Eng faol mahalla rasmiy maqom va bayroq oladi — butun jamoa uchun g'urur." },
+        { ico: ICON.spark, cls: "i-gold", t: "IT Park va bepul kurslar", p: "Yosh himoyachilar IT Park dasturlari va bepul kiberxavfsizlik kurslariga yo'llanma oladi." },
+        { ico: ICON.gift, cls: "i-red", t: "Hamkor chegirma va sovg'alari", p: "Hamkor do'kon, banklar va internet-provayderlardan maxsus chegirma va sovg'alar." }
+      ];
+      const RECIPIENTS = [
+        { hh: "Tolipovlar", rep: "Bobur", award: "IIB guvohnomasi + Temurbek litseyiga grant", date: "Iyun 2026", issuer: "Ichki Ishlar Boshqarmasi", featured: true },
+        { hh: "Karimovlar", rep: "Jasur", award: "Hokimiyat pul mukofoti va sertifikat", date: "May 2026", issuer: "Tuman hokimligi" },
+        { hh: "Sodiqovlar", rep: "Nilufar", award: "IT Park kursiga bepul yo'llanma", date: "Aprel 2026", issuer: "IT Park" }
+      ];
+      function certHtml(name, desc, big) {
+        return `<div class="cert ${big ? 'cert--lg' : ''}">
+      <div class="cert__seal">${ICON.shieldCheck}</div>
+      <div class="cert__kicker">GUVOHNOMA</div>
+      <div class="cert__name">${name}</div>
+      <div class="cert__desc">${desc}</div>
+      <div class="cert__sign"><span>Ichki Ishlar<br>Boshqarmasi</span><span class="cert__year">2026</span></div>
+    </div>`;
+      }
+      const SEAL = `<div class="seal"><span class="seal__ring"></span><span class="seal__core">${ICON.shieldCheck}</span></div>`;
+
+      /* ---- imtiyoz sharti (verification) ---- */
+      const CANDIDATE = { rep: "Alisher", hh: "Abdullayevlar", pts: 1240 };
+      const CONDITIONS = [
+        {
+          id: "self", icon: ICON.shieldCheck, title: "Shaxsiy bilim sinovi", who: "Nomzodning o'zi",
+          req: "Nomzod kiberxavfsizlik asoslarini biladimi — komissiya og'zaki savol-javob orqali tekshiradi. Bu ball haqiqiy bilim ekanini tasdiqlaydi.",
+          asker: "Komissiya nomzoddan so'raydi:",
+          meta: { ico: ICON.spark, t: "To'plangan ball: 1 240" },
+          q: ["Soxta SMS havolasini qanday tanaysiz?", "Bank xodimi qo'ng'iroqda SMS-kod so'rasa, nima qilasiz?", "Kuchli parol qanday bo'lishi kerak?"]
+        },
+        {
+          id: "parent", icon: ICON.users, title: "Ota-onani jalb qilish", who: "Nomzodning ota-onasi",
+          req: "Nomzod kamida bitta ota-onasini platformaga ro'yxatdan o'tkazgan bo'lishi shart. So'ng ota-onadan og'zaki savol-javob olinadi — ular haqiqatan foydalanayotganini tekshirish uchun.",
+          asker: "Komissiya ota-onadan so'raydi:",
+          meta: { ico: ICON.users, t: "Ro'yxatdan o'tgan ota-ona: 1 ✓" },
+          q: ["Farzandingiz sizga qaysi kiber xavf haqida gapirdi?", "Ilovada tahdidlar lentasini ochib ko'rsata olasizmi?", "“Yutdingiz” degan SMS kelsa nima qilasiz?"]
+        },
+        {
+          id: "neighbor", icon: ICON.social, title: "Qo'shnilarni targ'ib qilish", who: "Tasodifiy qo'shni",
+          req: "Nomzod platformani kamida 3 ta qo'shni xonadonga tanishtirgan bo'lishi shart. Komissiya tasodifiy qo'shnini tanlab, undan og'zaki savol-javob oladi.",
+          asker: "Komissiya qo'shnidan so'raydi:",
+          meta: { ico: ICON.social, t: "Jalb qilingan qo'shni xonadonlar: 3 / 3" },
+          q: ["Bu platforma haqida sizga kim aytdi?", "Bitta foydali kiber maslahatni eslay olasizmi?", "O'zingiz ro'yxatdan o'tdingizmi?"]
+        },
+        {
+          id: "commission", icon: ICON.cert, title: "Komissiya yakuniy tasdig'i", who: "IIB komissiyasi",
+          req: "Barcha bosqichlar muvaffaqiyatli o'tilsa, Ichki Ishlar Boshqarmasi komissiyasi sertifikat va sovg'ani rasmiy tasdiqlaydi.",
+          asker: "", meta: null, q: []
+        }
+      ];
+      const GRACE_DAYS = 14;
+
+      /* =========================================================
+         NAVIGATION
+         ========================================================= */
+      const VIEW_TITLES = {
+        dash: "Boshqaruv paneli", feed: "Tahdidlar lentasi", check: "Tekshirgich", quiz: "Viktorina",
+        base: "Firibgarliklar bazasi", jamoa: "Jamoa", help: "Yordam", reg: "Ro'yxatdan o'tish", about: "Loyiha haqida",
+        rating: "Xonadonlar reytingi", video: "So'nggi videolar", priv: "Imtiyozlar", privilege: "Imtiyozlar", condition: "Imtiyoz sharti"
+      };
+      let dashAnimated = false, quizBuilt = false;
+
+      function showView(v) {
+        $$(".view").forEach(s => s.classList.toggle("is-active", s.id === "view-" + v));
+        $$(".nav-item").forEach(b => b.classList.toggle("is-active", b.dataset.view === v));
+        document.title = VIEW_TITLES[v] + " · KiberOgoh UZ";
+        $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
+        closeRail();
+        if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
+        if (v === "quiz" && !quizBuilt) { startQuiz(); quizBuilt = true; }
+      }
+      function bindNav() {
+        $$("[data-view]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); showView(b.dataset.view); }));
+      }
+
+      // mobile rail
+      function openRail() { $("#rail").classList.add("is-open"); $("#railScrim").classList.add("is-open"); }
+      function closeRail() { $("#rail").classList.remove("is-open"); $("#railScrim").classList.remove("is-open"); }
+      $("#menuToggle").addEventListener("click", () => $("#rail").classList.contains("is-open") ? closeRail() : openRail());
+      $("#railScrim").addEventListener("click", closeRail);
+
+      /* =========================================================
+         DASHBOARD
+         ========================================================= */
+      function renderStats() {
+        const g = $("#statGrid");
+        STATS.forEach(s => {
+          const c = el("div", "card stat");
+          c.innerHTML = `<div class="stat__ico ${s.cls}">${s.ico}</div>
+        <div class="stat__num" data-target="${s.num}" data-suffix="${s.suffix}">0${s.suffix}</div>
+        <div class="stat__label">${s.label}</div>
+        <div class="stat__target">▲ ${s.y2}</div>`;
+          g.appendChild(c);
+        });
+      }
+      function animateDash() {
+        // count-up
+        $$(".stat__num").forEach(n => {
+          const target = +n.dataset.target, suf = n.dataset.suffix; let cur = 0;
+          const steps = 38, inc = target / steps; let i = 0;
+          const fmt = x => (x >= 1000 ? Math.round(x).toLocaleString("ru-RU").replace(/,/g, " ") : Math.round(x));
+          const tick = () => { i++; cur = Math.min(target, cur + inc); n.textContent = fmt(cur) + suf; if (i < steps) requestAnimationFrame(tick); else n.textContent = fmt(target) + suf; };
+          requestAnimationFrame(tick);
+        });
+        // shield ring
+        const C = 2 * Math.PI * 52, pct = 0.86;
+        const ring = $("#shieldProg");
+        ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C;
+        setTimeout(() => { ring.style.strokeDashoffset = C * (1 - pct); }, 150);
+        let p = 0; const pe = $("#shieldPct");
+        const pt = () => { p = Math.min(86, p + 2); pe.textContent = p + "%"; if (p < 86) requestAnimationFrame(pt); };
+        setTimeout(() => requestAnimationFrame(pt), 150);
+        $("#mActive").textContent = "312"; $("#mBlocked").textContent = "5 240";
+      }
+      function alertNode(a, isNew) {
+        const cat = CATS[a.cat];
+        const sevTxt = { high: "Yuqori xavf", mid: "O'rtacha", low: "Past" }[a.sev];
+        const n = el("div", "alert" + (isNew ? " is-new" : ""));
+        n.innerHTML = `<div class="alert__ico ${cat.color}">${cat.ico}</div>
+      <div class="alert__body">
+        <h4>${a.title}</h4><p>${a.body}</p>
+        <div class="alert__tags"><span class="tag">${cat.label}</span><span class="tag tag--region">📍 ${a.region}</span><span class="tag">${a.n} ta xabar</span></div>
+      </div>
+      <div class="alert__side"><span class="sev sev--${a.sev}">${sevTxt}</span><div class="alert__time">${a.time || "hozir"}</div></div>`;
+        return n;
+      }
+      function renderDashFeed() {
+        const f = $("#dashFeed"); f.innerHTML = "";
+        FEED.slice(0, 3).forEach(a => f.appendChild(alertNode(a)));
+      }
+      function renderPyramid(target) {
+        const p = $(target); p.innerHTML = "";
+        PYRAMID.forEach(r => { const row = el("div", "pyr-row " + r.c); row.innerHTML = `<div class="lvl">${r.lvl}</div><div class="desc">${r.desc}</div>`; p.appendChild(row); });
+      }
+
+      /* =========================================================
+         THREAT FEED
+         ========================================================= */
+      let feedFilter = "all", liveTimer = null, liveIndex = 0;
+      function renderFeedFilters() {
+        const wrap = $("#feedFilters"); wrap.innerHTML = "";
+        const opts = [["all", "Barchasi"]].concat(Object.keys(CATS).map(k => [k, CATS[k].label]));
+        opts.forEach(([k, lab]) => {
+          const c = el("button", "chip" + (k === feedFilter ? " is-active" : ""), lab);
+          c.addEventListener("click", () => { feedFilter = k; renderFeedFilters(); renderFullFeed(); });
+          wrap.appendChild(c);
+        });
+      }
+      function renderFullFeed() {
+        const f = $("#fullFeed"); f.innerHTML = "";
+        FEED.filter(a => feedFilter === "all" || a.cat === feedFilter).forEach(a => f.appendChild(alertNode(a)));
+      }
+      function startLive() {
+        if (liveTimer) return;
+        liveTimer = setInterval(() => {
+          const a = Object.assign({}, LIVE_POOL[liveIndex % LIVE_POOL.length], { time: "hozir" });
+          liveIndex++;
+          FEED.unshift(a);
+          if (FEED.length > 14) FEED.pop();
+          const badge = $("#feedBadge");
+          badge.textContent = Math.min(99, (+badge.textContent || 0) + 1);
+          if ($("#view-feed").classList.contains("is-active")) {
+            if (feedFilter === "all" || a.cat === feedFilter) $("#fullFeed").prepend(alertNode(a, true));
+          }
+          if ($("#view-dash").classList.contains("is-active")) renderDashFeed();
+        }, 14000);
+      }
+
+      /* =========================================================
+         TEKSHIRGICH (checker)
+         ========================================================= */
+      const BRANDS = ["click", "payme", "uzcard", "humo", "beeline", "ucell", "uzmobile", "mygov", "soliq", "pochta", "olx", "uzum", "apelsin", "kapitalbank", "ipoteka", "anorbank", "tbc"];
+      const OFFICIAL = { click: "click.uz", payme: "payme.uz", uzcard: "uzcard.uz", humo: "humocard.uz", beeline: "beeline.uz", ucell: "ucell.uz", uzmobile: "uzmobile.uz", olx: "olx.uz", uzum: "uzum.uz" };
+      const BAD_TLD = ["xyz", "top", "club", "online", "site", "click", "link", "work", "gq", "tk", "ml", "cf", "buzz", "icu", "rest", "fit", "cyou"];
+      const SHORTENERS = ["bit.ly", "tinyurl.com", "cutt.ly", "goo.gl", "is.gd", "t.co", "clck.ru", "rb.gy"];
+      const KEYWORDS = ["win", "bonus", "prize", "free", "gift", "login", "verify", "secure", "update", "wallet", "sovga", "yutuq", "yutdingiz", "bepul", "parol", "karta", "blok", "pul", "kod"];
+      const DEMO_BAD_PHONES = ["+998900001122", "+998711234567", "+79991234567"];
+
+      function classify(text) {
+        const t = text.trim();
+        const digits = t.replace(/[^\d+]/g, "");
+        const phoneLike = /^[+\d][\d\s\-()]{6,}$/.test(t) && digits.replace(/\D/g, "").length >= 7 && !/[a-z]{2,}/i.test(t);
+        const urlLike = /(https?:\/\/|www\.)/i.test(t) || /\b[a-z0-9-]+\.[a-z]{2,}(\/|\?|$)/i.test(t);
+        if (phoneLike && !urlLike) return "phone";
+        if (urlLike) return "url";
+        return "text";
+      }
+      function extractHost(url) {
+        let u = url.trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+        u = u.split(/[\/?#]/)[0];
+        return u.toLowerCase();
+      }
+      function analyze(text) {
+        const type = classify(text);
+        const signals = []; let score = 0;
+        if (type === "url") {
+          const lower = text.toLowerCase();
+          const host = extractHost(text);
+          const tld = host.split(".").pop();
+          const isHttps = /^https:\/\//i.test(text.trim());
+          const isIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host);
+          signals.push({ l: "info", t: "Tahlil turi: havola (URL)" });
+          signals.push({ l: "info", t: "Domen: " + host });
+
+          if (isIp) { score += 45; signals.push({ l: "bad", t: "Domen o'rniga IP-manzil — rasmiy saytlar bunday qilmaydi" }); }
+          if (!isHttps && !isIp) { score += 12; signals.push({ l: "warn", t: "Ulanish himoyalanmagan (http://) — qulf belgisi yo'q" }); }
+          else if (isHttps) signals.push({ l: "ok", t: "HTTPS ulanish mavjud (lekin bu o'zi kafolat emas)" });
+
+          let brandHit = null;
+          BRANDS.forEach(b => { if (host.includes(b)) brandHit = b; });
+          if (brandHit) {
+            const off = OFFICIAL[brandHit];
+            if (off && host !== off && !host.endsWith("." + off)) {
+              score += 40; signals.push({ l: "bad", t: `“${brandHit}” nomi ishlatilgan, lekin domen rasmiy (${off}) emas — soxta` });
+            } else if (off) signals.push({ l: "ok", t: `Rasmiy domenga mos: ${off}` });
+          }
+          if (BAD_TLD.includes(tld)) { score += 28; signals.push({ l: "bad", t: `Shubhali domen oxiri: .${tld} — firibgarlikda ko'p uchraydi` }); }
+          if (SHORTENERS.some(s => host === s || host.endsWith("." + s))) { score += 22; signals.push({ l: "warn", t: "Qisqartirilgan havola — asl manzil yashirilgan" }); }
+          if (host.startsWith("xn--") || /xn--/.test(host)) { score += 30; signals.push({ l: "bad", t: "Punycode domen — harflar soxtalashtirilgan bo'lishi mumkin" }); }
+          const kw = KEYWORDS.filter(k => lower.includes(k));
+          if (kw.length) { score += Math.min(24, kw.length * 8); signals.push({ l: "warn", t: "Xavfli kalit so'zlar: " + kw.slice(0, 4).join(", ") }); }
+          const hcount = (host.match(/-/g) || []).length;
+          if (hcount >= 2) { score += 10; signals.push({ l: "warn", t: "Domende ko'p tire (-) belgilari" }); }
+          if (/\d/.test(host) && !isIp) { score += 6; signals.push({ l: "warn", t: "Domende raqamlar bor" }); }
+          if (signals.filter(s => s.l === "bad" || s.l === "warn").length === 0) signals.push({ l: "ok", t: "Aniq texnik xavf belgilari topilmadi" });
+
+        } else if (type === "phone") {
+          const norm = "+" + text.replace(/[^\d]/g, "").replace(/^00/, "");
+          signals.push({ l: "info", t: "Tahlil turi: telefon raqami" });
+          signals.push({ l: "info", t: "Raqam: " + norm });
+          if (DEMO_BAD_PHONES.includes(norm)) { score += 70; signals.push({ l: "bad", t: "Bu raqam qora ro'yxatda (demo bazasi)" }); }
+          if (/^\+998/.test(norm)) {
+            signals.push({ l: "ok", t: "O'zbekiston (+998) raqami" });
+            if (norm.replace(/\D/g, "").length !== 12) { score += 18; signals.push({ l: "warn", t: "Raqam uzunligi standart emas (+998 + 9 raqam bo'lishi kerak)" }); }
+          } else if (/^\+7/.test(norm)) { score += 20; signals.push({ l: "warn", t: "Xorijiy (+7) raqam — kutilmagan bo'lsa ehtiyot bo'ling" }); }
+          else { score += 16; signals.push({ l: "warn", t: "Xorijiy yoki notanish kod" }); }
+          const d = norm.replace(/\D/g, "");
+          if (d.length <= 5) { score += 10; signals.push({ l: "warn", t: "Qisqa kod — rasmiy SMS jo'natuvchi bo'lishi ham mumkin, matnga e'tibor bering" }); }
+          signals.push({ l: "warn", t: "Eslatma: bank/operator hech qachon qo'ng'iroqda parol yoki SMS-kod so'ramaydi" });
+
+        } else {
+          signals.push({ l: "info", t: "Tahlil turi: matn" });
+          const lower = text.toLowerCase();
+          const kw = KEYWORDS.filter(k => lower.includes(k));
+          const urgent = ["shoshil", "tezda", "hoziroq", "blok", "bloklan", "oxirgi", "cheklangan", "kafolat"].filter(k => lower.includes(k));
+          if (kw.length) { score += Math.min(30, kw.length * 9); signals.push({ l: "warn", t: "Shubhali so'zlar: " + kw.slice(0, 4).join(", ") }); }
+          if (urgent.length) { score += 18; signals.push({ l: "warn", t: "Shoshiltiruvchi ohang aniqlandi — firibgarlik belgisi" }); }
+          if (/(https?:\/\/|www\.)/i.test(text)) { score += 14; signals.push({ l: "warn", t: "Matn ichida havola bor — alohida tekshiring" }); }
+          if (!kw.length && !urgent.length) signals.push({ l: "ok", t: "Aniq firibgarlik iborasi topilmadi" });
+        }
+
+        score = Math.min(100, score);
+        let verdict, advice, vClass;
+        if (score >= 55) {
+          verdict = "Xavfli"; vClass = "bad";
+          advice = "Bu yuqori ehtimol bilan firibgarlik. Havolani ochmang, raqamga ishonmang, hech qanday ma'lumot va to'lov bermang.";
+        } else if (score >= 28) {
+          verdict = "Ehtiyot bo'ling"; vClass = "warn";
+          advice = "Bir nechta shubhali belgi bor. Manbani rasmiy ilova yoki rasmiy raqam orqali mustaqil tekshiring.";
+        } else {
+          verdict = "Aniq xavf topilmadi"; vClass = "ok";
+          advice = "Texnik xavf belgilari kam. Shunga qaramay, kutilmagan xabar bo'lsa, doim manbani rasmiy yo'l bilan tasdiqlang.";
+        }
+        return { type, score, signals, verdict, advice, vClass };
+      }
+
+      function runChecker() {
+        const text = $("#checkInput").value.trim();
+        const body = $("#scanBody");
+        if (!text) { body.innerHTML = `<div class="scanner__idle">Avval tekshiriladigan matnni kiriting.</div>`; return; }
+        const res = analyze(text);
+        body.innerHTML = `<div class="scan-bar"><i id="scanBar"></i></div><div id="scanLines" style="margin-top:14px"></div>`;
+        const bar = $("#scanBar"), lines = $("#scanLines");
+        const steps = ["Matn turi aniqlanmoqda…", "Domen/raqam tuzilishi tekshirilmoqda…", "Qora ro'yxat va belgilar solishtirilmoqda…", "Xulosa shakllantirilmoqda…"];
+        let prog = 0;
+        const bint = setInterval(() => { prog = Math.min(100, prog + 7); bar.style.width = prog + "%"; if (prog >= 100) clearInterval(bint); }, 60);
+
+        let i = 0;
+        const showStep = () => {
+          if (i < steps.length) {
+            const ln = el("div", "scan-line", `<span class="warn">›</span><span>${steps[i]}</span>`);
+            ln.style.animationDelay = "0s"; lines.appendChild(ln); i++; setTimeout(showStep, 280);
+          } else { revealSignals(); }
+        };
+        const revealSignals = () => {
+          lines.innerHTML = "";
+          res.signals.forEach((s, idx) => {
+            const mark = s.l === "bad" ? '<span class="bad">✗</span>' : s.l === "warn" ? '<span class="warn">!</span>' : s.l === "ok" ? '<span class="ok">✓</span>' : '<span style="color:#5b648c">·</span>';
+            const ln = el("div", "scan-line", `${mark}<span>${s.t}</span>`);
+            ln.style.animationDelay = (idx * 0.06) + "s";
+            lines.appendChild(ln);
+          });
+          // verdict
+          const old = $(".verdict", $("#scanner")); if (old) old.remove();
+          const v = el("div", "verdict verdict--" + res.vClass);
+          const icon = res.vClass === "ok" ? ICON.check : ICON.alert;
+          v.innerHTML = `<div class="verdict__badge">${icon}<span>${res.verdict} · xavf ${res.score}%</span></div>
+        <div class="verdict__advice">${res.advice}</div>`;
+          $("#scanner").appendChild(v);
+        };
+        setTimeout(showStep, 200);
+      }
+      function renderCheckExamples() {
+        const ex = ["http://clik-uz.xyz/login", "https://click.uz", "+998 90 000 11 22", "Tabriklaymiz! Bepul sovg'a yutdingiz, hoziroq havolani bosing"];
+        const wrap = $("#checkExamples");
+        ex.forEach(e => { const c = el("button", "ex-chip", e.length > 34 ? e.slice(0, 32) + "…" : e); c.title = e; c.addEventListener("click", () => { $("#checkInput").value = e; runChecker(); }); wrap.appendChild(c); });
+      }
+
+      /* =========================================================
+         VIKTORINA (quiz)
+         ========================================================= */
+      let qi = 0, qScore = 0;
+      function levelFor(pct) {
+        if (pct >= 90) return "Kiber Qahramon";
+        if (pct >= 70) return "Kiber faol";
+        if (pct >= 40) return "Hushyor fuqaro";
+        return "Yangi boshlovchi";
+      }
+      function startQuiz() { qi = 0; qScore = 0; renderQuestion(); }
+      function renderQuestion() {
+        const wrap = $("#quizWrap");
+        if (qi >= QUIZ.length) return renderQuizResult();
+        const q = QUIZ[qi];
+        const pct = Math.round((qi / QUIZ.length) * 100);
+        wrap.innerHTML = `
+      <div class="quiz__progress">
+        <div class="quiz__bar"><i style="width:${pct}%"></i></div>
+        <div><span class="quiz__score">${qScore}/${QUIZ.length}</span> · <span class="quiz__level">${levelFor(Math.round(qScore / QUIZ.length * 100))}</span></div>
+      </div>
+      <div class="card q-card">
+        <div style="font-size:13px;color:var(--muted);font-weight:600">Savol ${qi + 1} / ${QUIZ.length}</div>
+        <div class="q-scenario">
+          <div class="from">${ICON.sms.replace('width="2"', 'width="1.8"')} ${q.from}</div>
+          <div class="msg">${q.msg}</div>
+        </div>
+        <div class="q-ask">Bu firibgarlikmi yoki xavfsizmi?</div>
+        <div class="q-choices">
+          <button class="q-choice" data-ans="true">🚨 Firibgarlik</button>
+          <button class="q-choice" data-ans="false">✅ Xavfsiz</button>
+        </div>
+        <div class="q-explain" id="qExplain"></div>
+        <div class="q-actions"><button class="btn btn--gold" id="qNext" style="display:none">Keyingi savol</button></div>
+      </div>`;
+        $$(".q-choice", wrap).forEach(b => b.addEventListener("click", () => answerQuestion(b.dataset.ans === "true", b)));
+        $("#qNext").addEventListener("click", () => { qi++; renderQuestion(); });
+      }
+      function answerQuestion(ans, btn) {
+        const q = QUIZ[qi];
+        const correct = ans === q.scam;
+        if (correct) qScore++;
+        $$(".q-choice").forEach(b => {
+          b.disabled = true;
+          const isScamBtn = b.dataset.ans === "true";
+          if (isScamBtn === q.scam) b.classList.add("correct");
+          else if (b === btn) b.classList.add("wrong");
+        });
+        const ex = $("#qExplain");
+        ex.className = "q-explain show " + (correct ? "good" : "bad");
+        ex.innerHTML = `<b>${correct ? "To'g'ri! ✓" : "Noto'g'ri."}</b> ${q.explain}`;
+        $("#qNext").style.display = "inline-flex";
+        $("#qNext").textContent = qi + 1 >= QUIZ.length ? "Natijani ko'rish" : "Keyingi savol";
+      }
+      function renderQuizResult() {
+        const pct = Math.round(qScore / QUIZ.length * 100);
+        const lvl = levelFor(pct);
+        $("#quizWrap").innerHTML = `
+      <div class="card quiz-result">
+        <div class="medal">${ICON.medal}</div>
+        <h2>${qScore} / ${QUIZ.length} to'g'ri</h2>
+        <div class="lvl">Darajangiz: ${lvl}</div>
+        <p>${pct >= 70 ? "Ajoyib! Siz firibgarlik belgilarini yaxshi tanidingiz." : "Yaxshi boshlanish. Firibgarliklar bazasini ko'rib, yana urinib ko'ring."}</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn--gold" id="qRestart">Qayta o'ynash</button>
+          <button class="btn btn--ghost" data-view="base">Firibgarliklar bazasi</button>
+        </div>
+      </div>`;
+        $("#qRestart").addEventListener("click", startQuiz);
+        $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("base"); });
+      }
+
+      /* =========================================================
+         BAZA (scam database)
+         ========================================================= */
+      let scamFilter = "all", scamQuery = "";
+      function renderScamFilters() {
+        const wrap = $("#scamFilters"); wrap.innerHTML = "";
+        const opts = [["all", "Barchasi"]].concat(Object.keys(CATS).map(k => [k, CATS[k].label]));
+        opts.forEach(([k, lab]) => {
+          const c = el("button", "chip" + (k === scamFilter ? " is-active" : ""), lab);
+          c.addEventListener("click", () => { scamFilter = k; renderScamFilters(); renderScams(); });
+          wrap.appendChild(c);
+        });
+      }
+      function renderScams() {
+        const g = $("#scamGrid"); g.innerHTML = "";
+        const q = scamQuery.toLowerCase();
+        const list = SCAMS.filter(s =>
+          (scamFilter === "all" || s.cat === scamFilter) &&
+          (!q || (s.name + s.how + s.rec + s.act).toLowerCase().includes(q)));
+        if (!list.length) { g.innerHTML = `<div class="card card--pad" style="grid-column:1/-1;color:var(--muted)">Hech narsa topilmadi. Boshqa so'z bilan qidiring.</div>`; return; }
+        list.forEach(s => {
+          const cat = CATS[s.cat];
+          const c = el("div", "card scam");
+          c.innerHTML = `<div class="scam__top">
+          <div class="scam__ico ${cat.color}">${cat.ico}</div>
+          <div><h3>${s.name}</h3><div class="scam__cat">${cat.label}</div></div>
+        </div>
+        <dl>
+          <dt>Qanday ishlaydi</dt><dd>${s.how}</dd>
+          <dt>Qanday tanish</dt><dd class="warn">${s.rec}</dd>
+          <dt>Nima qilish kerak</dt><dd class="do">${s.act}</dd>
+        </dl>`;
+          g.appendChild(c);
+        });
+      }
+
+      /* =========================================================
+         JAMOA (community)
+         ========================================================= */
+      function renderJamoa() {
+        const wrap = $("#jamoaFeed"); wrap.innerHTML = "";
+        JAMOA.forEach(p => {
+          const initials = p.who.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+          const roleBadge = p.role === "vol" ? `<span class="role-badge role-badge--vol">Kiber faol</span>` :
+            p.role === "mod" ? `<span class="role-badge role-badge--mod">Moderator</span>` : "";
+          const blocked = p.blocked ? `<div class="post__blocked">${ICON.ban} ${p.blocked}</div>` : "";
+          const verified = p.verified ? `<div class="post__verified">${ICON.check}<span>${p.verified}</span></div>` : "";
+          const c = el("div", "card post");
+          c.innerHTML = `<div class="post__head">
+          <div class="post__av" style="background:${p.color}">${initials}</div>
+          <div><div class="post__who">${p.who} ${roleBadge}</div><div class="post__meta">${p.meta}</div></div>
+        </div>
+        <div class="post__body">${p.body}</div>${blocked}${verified}`;
+          wrap.appendChild(c);
+        });
+      }
+
+      /* =========================================================
+         YORDAM (help accordion)
+         ========================================================= */
+      function renderHelp() {
+        const acc = $("#helpAcc"); acc.innerHTML = "";
+        HELP.forEach((h, i) => {
+          const item = el("div", "acc__item" + (i === 0 ? " open" : ""));
+          item.innerHTML = `<button class="acc__btn">
+          <span class="num">${String(i + 1).padStart(2, "0")}</span>
+          <span class="t">${h.t}</span>
+          <span class="caret">${ICON.caret}</span>
+        </button>
+        <div class="acc__panel"><div class="acc__panel-inner">${h.body}</div></div>`;
+          const panel = $(".acc__panel", item);
+          $(".acc__btn", item).addEventListener("click", () => {
+            const isOpen = item.classList.contains("open");
+            $$(".acc__item", acc).forEach(it => { it.classList.remove("open"); $(".acc__panel", it).style.maxHeight = null; });
+            if (!isOpen) { item.classList.add("open"); panel.style.maxHeight = panel.scrollHeight + "px"; }
+          });
+          acc.appendChild(item);
+          if (i === 0) requestAnimationFrame(() => { panel.style.maxHeight = panel.scrollHeight + "px"; });
+        });
+      }
+
+      /* =========================================================
+         RO'YXATDAN O'TISH (registration cascade)
+         ========================================================= */
+      function fillSelect(sel, items, placeholder) {
+        sel.innerHTML = `<option value="">${placeholder}</option>` + items.map(i => `<option value="${i}">${i}</option>`).join("");
+      }
+      function setupReg() {
+        const v = $("#selViloyat"), t = $("#selTuman"), m = $("#selMahalla"), btn = $("#regSubmit");
+        fillSelect(v, Object.keys(REGIONS), "Tanlang…");
+        v.addEventListener("change", () => {
+          if (v.value) { fillSelect(t, REGIONS[v.value], "Tumanni tanlang…"); t.disabled = false; }
+          else { t.innerHTML = `<option value="">Avval viloyatni tanlang</option>`; t.disabled = true; }
+          m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; btn.disabled = true;
+        });
+        t.addEventListener("change", () => {
+          if (t.value) {
+            const pool = MFY_POOL.slice(0, 6 + (t.value.length % 4));
+            fillSelect(m, pool, "Mahallani tanlang…"); m.disabled = false;
+          } else { m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; }
+          btn.disabled = true;
+        });
+        m.addEventListener("change", () => { btn.disabled = !m.value; });
+        btn.addEventListener("click", () => {
+          $("#regFormBody").style.display = "none";
+          $("#regSuccess").classList.add("show");
+          $("#regWhere").textContent = `${v.value} → ${t.value} → ${m.value}`;
+          $("#topRegion").textContent = v.value;
+        });
+        $("#regReset").addEventListener("click", () => {
+          $("#regSuccess").classList.remove("show");
+          $("#regFormBody").style.display = "";
+          v.value = ""; t.innerHTML = `<option value="">Avval viloyatni tanlang</option>`; t.disabled = true;
+          m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; btn.disabled = true;
+        });
+      }
+
+      /* =========================================================
+         ABOUT (compiled deck)
+         ========================================================= */
+      function renderAbout() {
+        const pr = $("#aboutProblem");
+        PROBLEM.forEach(x => { const c = el("div", "card feature"); c.innerHTML = `<div class="feature__ico ${x.cls}">${x.ico}</div><div><h4>${x.t}</h4><p>${x.p}</p></div>`; pr.appendChild(c); });
+        const mo = $("#aboutModules");
+        MODULES.forEach(x => { const c = el("button", "card mod"); c.innerHTML = `<div class="mod__ico ${x.cls}">${x.ico}</div><h4>${x.t}</h4><p>${x.p}</p>`; c.addEventListener("click", () => showView(x.view)); mo.appendChild(c); });
+        renderPyramid("#aboutPyramid");
+        const pv = $("#aboutPrivacy");
+        [["Manzil yig'ilmaydi", "Faqat mahalla tanlanadi — ko'cha va uy raqami so'ralmaydi."],
+        ["Faqat statistika", "Tizim foydalanuvchilar sonini saqlaydi, shaxsni emas."],
+        ["Yopiq muloqot", "Shaxsiy yozishma o'chirilgan — firibgar yakkalay olmaydi."],
+        ["Avtomatik himoya", "Havolalar bloklanadi, spam filtrlanadi."]].forEach(([t, p]) => {
+          const r = el("div", "", `<div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line-2)"><span style="color:var(--teal);flex:0 0 18px">${ICON.check}</span><div><b style="font-size:14px">${t}</b><div style="font-size:13px;color:var(--muted)">${p}</div></div></div>`);
+          pv.appendChild(r);
+        });
+        const rd = $("#aboutRoad");
+        ROAD.forEach(s => { const c = el("div", "card road__step"); c.innerHTML = `<div class="road__n">${s.n}</div><div class="road__when">${s.when}</div><h4>${s.t}</h4><p>${s.p}</p>`; rd.appendChild(c); });
+        const me = $("#aboutMetrics");
+        METRICS.forEach(x => { const c = el("div", "card metric"); c.innerHTML = `<div class="big">${x.big}</div><div class="y2">▲ ${x.y2}</div><div class="lab">${x.lab}</div>`; me.appendChild(c); });
+      }
+
+      /* =========================================================
+         XONADONLAR REYTINGI (leaderboard)
+         ========================================================= */
+      function renderRatingTop() {
+        const wrap = $("#ratingTop"); if (!wrap) return;
+        const wDone = Math.round(WEEKLY.done / WEEKLY.total * 100);
+        const gPct = Math.round(MGOAL.current / MGOAL.total * 100);
+        wrap.innerHTML = `
+      <div class="card engage-live">
+        <div class="engage-live__top"><div class="engage-live__ico i-purple">${ICON.target}</div>
+          <div><h3>${WEEKLY.title}</h3><div class="sub">${WEEKLY.sub}</div></div></div>
+        <div class="task">${WEEKLY.task}</div>
+        <div class="prog-track"><i style="width:${wDone}%;background:var(--purple)"></i></div>
+        <div class="prog-meta"><span class="count">${WEEKLY.done}/${WEEKLY.total} bajarildi</span><span class="reward">Mukofot: ${WEEKLY.reward}</span></div>
+      </div>
+      <div class="card engage-live">
+        <div class="engage-live__top"><div class="engage-live__ico i-teal">${ICON.flag}</div>
+          <div><h3>${MGOAL.title}</h3><div class="sub">${MGOAL.sub}</div></div></div>
+        <div class="task">Xonadonlarning 80%i platformaga qo'shilsa, butun mahalla rasmiy “Himoyalangan mahalla” maqomini oladi.</div>
+        <div class="prog-track"><i style="width:${gPct}%;background:var(--teal)"></i></div>
+        <div class="prog-meta"><span class="count">${MGOAL.current} / ${MGOAL.total} xonadon</span><span class="reward">${gPct}% · maqsad 80%</span></div>
+      </div>`;
+      }
+      function renderPodium() {
+        const p = $("#podium"); if (!p) return;
+        const order = [1, 0, 2]; // 2-o'rin, 1-o'rin (markaz), 3-o'rin
+        p.innerHTML = "";
+        order.forEach(i => {
+          const h = HOUSEHOLDS[i]; const rank = i + 1;
+          const init = (h.hh[0] + h.who[0]).toUpperCase();
+          const item = el("div", "podium__item podium__item--" + rank);
+          item.innerHTML = `<div class="podium__rank">${rank}</div>
+        <div class="podium__av">${init}</div>
+        <div class="podium__hh">${h.hh}</div>
+        <div class="podium__who">Vakil: <b>${h.who}</b></div>
+        <div class="podium__pts">${fmtN(h.pts)} <span>ball</span></div>`;
+          p.appendChild(item);
+        });
+      }
+      function deltaHtml(d) {
+        if (d > 0) return `<span class="delta-up">▲ ${d}</span>`;
+        if (d < 0) return `<span class="delta-down">▼ ${Math.abs(d)}</span>`;
+        return `<span class="delta-eq">—</span>`;
+      }
+      function renderRankList() {
+        const list = $("#rankList"); if (!list) return;
+        list.innerHTML = "";
+        HOUSEHOLDS.forEach((h, idx) => {
+          const init = (h.hh[0] + h.who[0]).toUpperCase();
+          const av = h.you ? "var(--gold)" : avPalette[idx % avPalette.length];
+          const row = el("div", "rank-row" + (h.you ? " is-you" : ""));
+          row.innerHTML = `
+        <div class="rank-row__n">${idx + 1}</div>
+        <div class="rank-row__av" style="background:${av}">${init}</div>
+        <div>
+          <div class="rank-row__hh">${h.hh} xonadoni${h.you ? '<span class="you-tag">SIZ</span>' : ''}</div>
+          <div class="rank-row__who">KiberHimoyachi: <b>${h.who}</b></div>
+        </div>
+        <span class="lvl-badge lvl-${h.lvl}">${levelName(h.lvl)}</span>
+        <div class="rank-row__pts">${fmtN(h.pts)}<span>${deltaHtml(h.delta)}</span></div>`;
+          list.appendChild(row);
+        });
+      }
+      function renderEarn() {
+        const c = $("#earnCard"); if (!c) return;
+        c.innerHTML = `<div class="section-title" style="margin:0 0 8px"><h2 style="font-size:18px">Qanday ball yig'iladi</h2></div>` +
+          EARN.map(e => `<div class="earn-row"><div class="earn-row__ico ${e.cls}">${e.ico}</div><div class="earn-row__t">${e.a}</div><div class="earn-row__p">+${e.p}</div></div>`).join("");
+      }
+      function renderLevels() {
+        const c = $("#levelCard"); if (!c) return;
+        const you = HOUSEHOLDS.find(h => h.you);
+        const next = LEVELS.find(l => l.min > you.pts);
+        const note = next ? `Keyingi daraja (“${next.name}”) uchun yana <b>${fmtN(next.min - you.pts)}</b> ball kerak.` : `Eng yuqori darajadasiz! 🎉`;
+        c.innerHTML = `<div class="section-title" style="margin:0 0 8px"><h2 style="font-size:18px">Darajalar</h2></div>` +
+          LEVELS.map(l => `<div class="level-row ${l.key === you.lvl ? 'is-current' : ''}">
+        <span class="level-row__dot" style="background:${l.dot}"></span>
+        <span class="level-row__name">${l.name}</span>
+        <span class="level-row__thr">${fmtN(l.min)}+ ball</span></div>`).join("") +
+          `<p style="font-size:13px;color:var(--muted);margin-top:14px">Sizning xonadoningiz: <b style="color:var(--gold-700)">KiberHimoyachi</b> (${fmtN(you.pts)} ball). ${note}</p>`;
+      }
+      function renderEngage() {
+        const g = $("#engageGrid"); if (!g) return;
+        g.innerHTML = "";
+        ENGAGE.forEach(x => { const c = el("div", "card feature"); c.innerHTML = `<div class="feature__ico ${x.cls}">${x.ico}</div><div><h4>${x.t}</h4><p>${x.p}</p></div>`; g.appendChild(c); });
+      }
+      function renderHouseholdMini() {
+        const c = $("#dashHousehold"); if (!c) return;
+        const you = HOUSEHOLDS.find(h => h.you); const rank = HOUSEHOLDS.indexOf(you) + 1;
+        const init = (you.hh[0] + you.who[0]).toUpperCase();
+        c.innerHTML = `
+      <div class="section-title" style="margin:0 0 14px"><h2 style="font-size:18px">Xonadoningiz reytingi</h2></div>
+      <div class="hh-mini__top">
+        <div class="hh-mini__av">${init}</div>
+        <div><div class="hh-mini__hh">${you.hh} xonadoni</div>
+        <div class="hh-mini__who">KiberHimoyachi: <b>${you.who}</b> <span class="lvl-badge lvl-kiber" style="margin-left:4px">KiberHimoyachi</span></div></div>
+      </div>
+      <div class="hh-mini__stats">
+        <div class="hh-mini__stat"><div class="v">#${rank}</div><div class="k">Mahalla o'rni</div></div>
+        <div class="hh-mini__stat"><div class="v">${fmtN(you.pts)}</div><div class="k">Ball</div></div>
+        <div class="hh-mini__stat"><div class="v" style="color:var(--teal)">▲ 165</div><div class="k">Bu hafta</div></div>
+      </div>
+      <button class="btn btn--ghost btn--block" data-view="rating" style="margin-top:14px">To'liq reytingni ko'rish</button>`;
+        c.querySelector("[data-view]").addEventListener("click", e => { e.preventDefault(); showView("rating"); });
+      }
+
+      /* =========================================================
+         REELS (so'nggi videolar)
+         ========================================================= */
+      function reelCard(v, mini) {
+        return `<button class="reel" data-reel="${v.id}" aria-label="${v.title}">
+      <div class="reel__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"></div>
+      <div class="reel__noise"></div>
+      <span class="reel__cat">${v.cat}</span>
+      <span class="reel__dur">${v.dur}</span>
+      <span class="reel__icon">${v.ico}</span>
+      <div class="reel__grad"></div>
+      <span class="reel__play">${ICON.play}</span>
+      <div class="reel__info">
+        <div class="reel__title">${v.title}</div>
+        <div class="reel__meta"><span class="m">${ICON.eye}${v.views}</span><span class="m">${ICON.heart}${v.likes}</span></div>
+      </div>
+    </button>`;
+      }
+      function renderReels(target, mini) {
+        const t = $(target); if (!t) return;
+        t.innerHTML = VIDEOS.map(v => reelCard(v, mini)).join("");
+      }
+      function renderDashVideos() {
+        const c = $("#dashVideos"); if (!c) return;
+        c.innerHTML = `
+      <div class="section-title" style="margin:0 0 14px"><h2 style="font-size:18px">So'nggi videolar</h2><span class="hint">Reels</span></div>
+      <div class="reels reels--mini" id="dashReels"></div>
+      <button class="btn btn--ghost btn--block" data-view="video" style="margin-top:14px">Barcha videolar</button>`;
+        renderReels("#dashReels", true);
+        c.querySelector("[data-view]").addEventListener("click", e => { e.preventDefault(); showView("video"); });
+      }
+
+      /* ---- video pleyer (simulyatsiya) ---- */
+      let reelRAF = null, reelStart = null, reelElapsed = 0, reelPaused = true, reelBar = null, reelCenter = null;
+      const REEL_DUR = 7000;
+      function reelTick(ts) {
+        if (reelPaused) { reelRAF = null; return; }
+        if (reelStart == null) reelStart = ts - reelElapsed;
+        reelElapsed = ts - reelStart;
+        const p = Math.min(1, reelElapsed / REEL_DUR);
+        if (reelBar) reelBar.style.width = (p * 100) + "%";
+        if (p >= 1) { reelPaused = true; reelElapsed = 0; reelStart = null; reelRAF = null; if (reelCenter) reelCenter.classList.remove("playing"); return; }
+        reelRAF = requestAnimationFrame(reelTick);
+      }
+      function reelToggle() {
+        if (reelPaused) { reelPaused = false; reelStart = null; if (reelCenter) reelCenter.classList.add("playing"); if (!reelRAF) reelRAF = requestAnimationFrame(reelTick); }
+        else { reelPaused = true; reelRAF = null; if (reelCenter) reelCenter.classList.remove("playing"); }
+      }
+      function openReel(id) {
+        const v = VIDEOS.find(x => x.id === +id); if (!v) return;
+        const modal = $("#reelModal"), player = $("#reelPlayer");
+        player.innerHTML = `
+      <div class="reel-player__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"></div>
+      <button class="reel-player__close" data-reel-close aria-label="Yopish">&times;</button>
+      <div class="reel-player__icon">${v.ico}</div>
+      <button class="reel-player__center" id="reelCenter">${ICON.play}</button>
+      <div class="reel-player__grad"></div>
+      <div class="reel-player__info">
+        <span class="reel-player__cat">${v.cat} · ${v.dur}</span>
+        <div class="reel-player__title">${v.title}</div>
+        <div class="reel-player__cap">${v.cap}</div>
+        <div class="reel-player__author">${ICON.shieldCheck} ${v.author} · ${v.views} ko'rishlar · ${v.likes} like</div>
+      </div>
+      <div class="reel-player__bar"><i id="reelBar"></i></div>`;
+        reelBar = $("#reelBar"); reelCenter = $("#reelCenter");
+        reelPaused = true; reelElapsed = 0; reelStart = null; if (reelRAF) { cancelAnimationFrame(reelRAF); reelRAF = null; }
+        modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
+        // toggle play on player / center; stop on close & info
+        player.onclick = (e) => { if (e.target.closest("[data-reel-close]") || e.target.closest(".reel-player__info")) return; reelToggle(); };
+        reelCenter.onclick = (e) => { e.stopPropagation(); reelToggle(); };
+        setTimeout(reelToggle, 250); // auto-start
+      }
+      function closeReel() {
+        const modal = $("#reelModal");
+        reelPaused = true; if (reelRAF) cancelAnimationFrame(reelRAF); reelRAF = null; reelElapsed = 0; reelStart = null;
+        modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true");
+      }
+      function setupReelModal() {
+        document.addEventListener("click", (e) => {
+          const r = e.target.closest("[data-reel]");
+          if (r) { openReel(r.dataset.reel); return; }
+          if (e.target.closest("[data-reel-close]")) closeReel();
+        });
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeReel(); });
+      }
+
+      /* =========================================================
+         IMTIYOZLAR (spotlight + privileges)
+         ========================================================= */
+      function wireViewBtns(scope) {
+        scope.querySelectorAll("[data-view]").forEach(b =>
+          b.addEventListener("click", e => { e.preventDefault(); showView(b.dataset.view); }));
+      }
+      function renderSpotlight() {
+        const c = $("#dashSpotlight"); if (!c) return;
+        c.innerHTML = `
+      <div class="card spotlight">
+        <div class="spotlight__glow"></div>
+        <div class="spotlight__main">
+          ${SEAL}
+          <div class="spotlight__body">
+            <span class="spotlight__live"><span class="pulse"></span>IIB e'tirofi · ${SPOTLIGHT.month} KiberHimoyachisi</span>
+            <h2>${SPOTLIGHT.hh} xonadoni vakili ${SPOTLIGHT.rep} taqdirlandi</h2>
+            <p>${SPOTLIGHT.issuer} tomonidan rasmiy guvohnoma topshirildi. Endi u <b>${SPOTLIGHT.benefit}</b> qilinadi.</p>
+            <div class="spotlight__cta">
+              <button class="btn btn--gold" data-view="privilege">Barcha imtiyozlar</button>
+              <button class="btn btn--ghost-light" data-view="rating">Siz ham KiberHimoyachi bo'ling</button>
+            </div>
+          </div>
+        </div>
+        <div class="spotlight__cert">${certHtml(SPOTLIGHT.repFull, "Mahalla kiberxavfsizligiga qo'shgan hissasi uchun")}</div>
+      </div>`;
+        wireViewBtns(c);
+      }
+      function renderPrivileges() {
+        const hero = $("#privHero");
+        if (hero) {
+          hero.innerHTML = `
+        <div class="priv-hero__glow"></div>
+        <div class="priv-hero__cert">${certHtml(SPOTLIGHT.repFull, "Mahalla kiberxavfsizligiga qo'shgan hissasi uchun", true)}</div>
+        <div class="priv-hero__text">
+          <span class="eyebrow">${SPOTLIGHT.month} · ${SPOTLIGHT.issuer}</span>
+          <h2>${SPOTLIGHT.hh} xonadoni vakili ${SPOTLIGHT.rep} taqdirlandi</h2>
+          <p>Mahalla kiberxavfsizligiga qo'shgan hissasi uchun ${SPOTLIGHT.issuer} tomonidan rasmiy guvohnoma berildi.</p>
+          <div class="grant-pill">${ICON.medal} ${SPOTLIGHT.benefit}</div>
+          <p style="font-size:13.5px;margin-top:10px;color:#aeb6d4">Aynan shunday rag'batlar tufayli mahalla ichida raqobat oshadi va ota-onalar farzandini KiberHimoyachilikka jalb qiladi.</p>
+        </div>`;
+        }
+        const rg = $("#rewardGrid");
+        if (rg) { rg.innerHTML = ""; PRIVILEGES.forEach(x => { const c = el("div", "card feature"); c.innerHTML = `<div class="feature__ico ${x.cls}">${x.ico}</div><div><h4>${x.t}</h4><p>${x.p}</p></div>`; rg.appendChild(c); }); }
+        const rl = $("#recipientsList");
+        if (rl) {
+          rl.innerHTML = "";
+          RECIPIENTS.forEach(r => {
+            const init = (r.hh[0] + r.rep[0]).toUpperCase();
+            const row = el("div", "recipient" + (r.featured ? " is-featured" : ""));
+            row.innerHTML = `
+          <div class="recipient__av">${init}</div>
+          <div>
+            <div class="recipient__who">${r.hh} xonadoni — ${r.rep}${r.featured ? '<span class="featured-tag">YANGI</span>' : ''}</div>
+            <div class="recipient__award">${r.award}</div>
+          </div>
+          <div class="recipient__meta"><div class="recipient__date">${r.date}</div><div class="recipient__issuer">${r.issuer}</div></div>`;
+            rl.appendChild(row);
+          });
+        }
+        const cta = $("#view-privilege .priv-cta [data-view]");
+        if (cta) cta.addEventListener("click", e => { e.preventDefault(); showView("rating"); });
+      }
+
+      /* =========================================================
+         IMTIYOZ SHARTI (verification flow)
+         ========================================================= */
+      // status per condition: 'done' | 'active' | 'grace' | 'locked'
+      let condState = ["done", "active", "locked", "locked"];
+
+      function renderCondStatic() {
+        const why = $("#condWhy");
+        if (why) why.innerHTML = `
+      <div class="cond-why__ico">${ICON.trophy}</div>
+      <div class="cond-why__body">
+        <h3>Targ'ibot — sovg'aning asosiy sharti</h3>
+        <p>Nomzod sovg'ani faqat ko'p ball uchun emas, balki platformani <b>oilasi va qo'shnilariga</b> yetkazgani uchun oladi. Komissiya buni <b>og'zaki savol-javob</b> orqali tekshiradi: avval nomzodning o'zidan, so'ng ota-onasidan, o'rni kelsa qo'shnisidan ham. Shu tariqa platformadan yoshlar bilan birga <b>ota-onalar ham foydalanadi</b>.</p>
+        <div class="cond-why__pills">
+          <span class="cond-pill">${ICON.check}Nomzod — bilim sinovi</span>
+          <span class="cond-pill">${ICON.check}Ota-ona — jalb + savol-javob</span>
+          <span class="cond-pill">${ICON.check}Qo'shni — targ'ibot tekshiruvi</span>
+        </div>
+      </div>`;
+
+        const grace = $("#condGrace");
+        if (grace) grace.innerHTML = `
+      <div class="section-title" style="margin:0 0 10px"><h2 style="font-size:18px">Agar shartdan o'tilmasa?</h2></div>
+      <div class="grace-note">
+        <div class="t">${ICON.alert} Muddat beriladi — ${GRACE_DAYS} kun</div>
+        <p>Nomzod biror bosqichdan o'tolmasa (masalan, ota-ona yoki qo'shni savollarga javob bera olmasa), unga <span class="days">${GRACE_DAYS} kun</span> qo'shimcha muddat beriladi.</p>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-top:14px;line-height:1.55">Shu muddat ichida nomzod targ'ibot ishlarini qaytadan amalga oshiradi — ota-onasi va qo'shnilariga platformani yana tushuntiradi, ularga foydalanishni o'rgatadi. So'ng tekshiruv <b style="color:var(--navy)">qayta o'tkaziladi</b>. Bu — sovg'a faqat haqiqiy hissa uchun berilishini kafolatlaydi.</p>`;
+
+        const flow = $("#condFlow");
+        if (flow) flow.innerHTML = `
+      <div class="section-title" style="margin:0 0 12px"><h2 style="font-size:18px">Jarayon qanday kechadi</h2></div>
+      <div class="flow-step"><span class="flow-step__n">1</span><div class="flow-step__b">Nomzod reytingda yuqori o'ringa chiqadi va taqdirlashga <b>tavsiya etiladi</b>.</div></div>
+      <div class="flow-step"><span class="flow-step__n">2</span><div class="flow-step__b">Komissiya <b>og'zaki savol-javob</b> o'tkazadi: nomzod → ota-ona → qo'shni.</div></div>
+      <div class="flow-step"><span class="flow-step__n">3</span><div class="flow-step__b">Hammasidan o'tsa — <b>sertifikat va sovg'a</b> topshiriladi.</div></div>
+      <div class="flow-step"><span class="flow-step__n">4</span><div class="flow-step__b">O'tmasa — <b>${GRACE_DAYS} kun</b> muddat, targ'ibot qayta qilinadi va tekshiruv takrorlanadi.</div></div>`;
+      }
+
+      const STATUS_LABEL = { done: "Tasdiqlandi", active: "Jarayonda", grace: "Muddat berildi", locked: "Navbatda" };
+
+      function renderCondTracker() {
+        const wrap = $("#condTracker"); if (!wrap) return;
+        const doneCount = condState.filter(s => s === "done").length;
+        const allDone = doneCount === CONDITIONS.length;
+
+        if (allDone) {
+          wrap.innerHTML = `
+        <div class="cond-success">
+          <div class="cond-success__badge">${ICON.cert}</div>
+          <h3>Barcha shartlar bajarildi!</h3>
+          <p><b>${CANDIDATE.rep}</b> (${CANDIDATE.hh} xonadoni) o'zi, ota-onasi va qo'shnilari savol-javobidan muvaffaqiyatli o'tdi. Endi u sertifikat va sovg'ani olishga tayyor.</p>
+          <div class="cond-success__chips">
+            <span class="spot-chip spot-chip--gold">${ICON.cert}IIB guvohnomasi</span>
+            <span class="spot-chip spot-chip--purple">${ICON.grad}Temurbek litseyiga grant</span>
+          </div>
+          <button class="btn btn--ghost" id="condReset">Jarayonni boshqatdan ko'rish</button>
+        </div>`;
+          $("#condReset").addEventListener("click", () => { condState = ["done", "active", "locked", "locked"]; renderCandHeader(); renderCondTracker(); });
+          renderCandHeader();
+          return;
+        }
+
+        let steps = "";
+        CONDITIONS.forEach((c, i) => {
+          const st = condState[i];
+          const meta = c.meta ? `<div class="cstep__meta">${c.meta.ico}${c.meta.t}</div>` : "";
+          let detail = "";
+          if (st === "active" || st === "grace") {
+            const qa = c.q.length ? `
+          <div class="cstep__qa">
+            <div class="cstep__qa-label">${ICON.sms}${c.asker}</div>
+            ${c.q.map((q, k) => `<div class="qa-item"><span class="q-n">${k + 1}.</span><span>${q}</span></div>`).join("")}
+          </div>` : "";
+            let actions = "";
+            if (st === "active") {
+              if (c.id === "commission") {
+                actions = `<div class="cstep__actions"><button class="btn btn--ok" data-cond-pass="${i}">${ICON.check} Komissiya tasdig'ini berish</button></div>`;
+              } else {
+                actions = `<div class="cstep__actions">
+              <button class="btn btn--ok" data-cond-pass="${i}">Savol-javobdan o'tdi</button>
+              <button class="btn btn--fail" data-cond-fail="${i}">O'tmadi</button></div>`;
+              }
+            } else { // grace
+              actions = `
+            <div class="grace-note">
+              <div class="t">${ICON.alert} ${GRACE_DAYS} kun muddat berildi</div>
+              <p>Nomzod ushbu bosqichdan o'tolmadi. Targ'ibot ishlarini qaytadan amalga oshirib, tekshiruvni takrorlashi kerak.</p>
+            </div>
+            <div class="cstep__actions"><button class="btn btn--gold" data-cond-retry="${i}">Targ'ibotni qayta boshlash</button></div>`;
+            }
+            detail = qa + actions;
+          }
+          const dotInner = st === "done" ? ICON.check : st === "locked" ? "" : (i + 1);
+          const lockIco = st === "locked" ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>` : "";
+          steps += `
+        <div class="cstep cstep--${st}">
+          <div class="cstep__rail">
+            <div class="cstep__dot">${st === "locked" ? lockIco : dotInner}</div>
+            <div class="cstep__line"></div>
+          </div>
+          <div class="cstep__card">
+            <div class="cstep__head">
+              <span class="cstep__title">${i + 1}. ${c.title}</span>
+              <span class="cstep__who">Tekshiriladi: <b>${c.who}</b></span>
+              <span class="cstep__status">${STATUS_LABEL[st]}</span>
+            </div>
+            <div class="cstep__req">${c.req}</div>
+            ${meta}
+            ${detail}
+          </div>
+        </div>`;
+        });
+
+        wrap.innerHTML = `<div class="cand" id="candHeader"></div><div class="cond-stepper">${steps}</div>`;
+        renderCandHeader();
+
+        wrap.querySelectorAll("[data-cond-pass]").forEach(b => b.addEventListener("click", () => condPass(+b.dataset.condPass)));
+        wrap.querySelectorAll("[data-cond-fail]").forEach(b => b.addEventListener("click", () => condFail(+b.dataset.condFail)));
+        wrap.querySelectorAll("[data-cond-retry]").forEach(b => b.addEventListener("click", () => condRetry(+b.dataset.condRetry)));
+      }
+
+      function renderCandHeader() {
+        const h = $("#candHeader"); if (!h) return;
+        const init = (CANDIDATE.hh[0] + CANDIDATE.rep[0]).toUpperCase();
+        const done = condState.filter(s => s === "done").length;
+        const pct = Math.round(done / CONDITIONS.length * 100);
+        h.innerHTML = `
+      <div class="cand__av">${init}</div>
+      <div>
+        <div class="cand__name">Nomzod: ${CANDIDATE.rep}</div>
+        <div class="cand__sub">${CANDIDATE.hh} xonadoni · KiberHimoyachi · <b>${fmtN(CANDIDATE.pts)} ball</b></div>
+      </div>
+      <div class="cand__prog">
+        <div class="t">${done} / ${CONDITIONS.length} shart bajarildi</div>
+        <div class="bar"><i style="width:${pct}%"></i></div>
+      </div>`;
+      }
+
+      function condPass(i) {
+        condState[i] = "done";
+        if (i + 1 < condState.length && condState[i + 1] === "locked") condState[i + 1] = "active";
+        renderCondTracker();
+      }
+      function condFail(i) { condState[i] = "grace"; renderCondTracker(); }
+      function condRetry(i) { condState[i] = "active"; renderCondTracker(); }
+
+      /* =========================================================
+         INIT
+         ========================================================= */
+      function init() {
+        bindNav();
+        renderStats();
+        renderDashFeed();
+        renderPyramid("#dashPyramid");
+        renderFeedFilters();
+        renderFullFeed();
+        renderCheckExamples();
+        $("#checkRun").addEventListener("click", runChecker);
+        renderScamFilters();
+        renderScams();
+        $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
+        renderJamoa();
+        renderHelp();
+        setupReg();
+        renderAbout();
+        // yangi bo'limlar
+        renderHouseholdMini();
+        renderDashVideos();
+        renderRatingTop();
+        renderPodium();
+        renderRankList();
+        renderEarn();
+        renderLevels();
+        renderEngage();
+        renderReels("#reelsFull", false);
+        setupReelModal();
+        renderSpotlight();
+        renderPrivileges();
+        renderCondStatic();
+        renderCondTracker();
+        animateDash(); dashAnimated = true;
+        startLive();
+      }
+      document.addEventListener("DOMContentLoaded", init);
+    })();
+
+  </script>
+</body>
+
+</html>
