@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KiberOgoh UZ — Mahalla kiber qalqoni</title>
+<meta name="description" content="KiberOgoh UZ — mahalla darajasidagi milliy kiber qalqon platformasi. Fuqarolarni onlayn firibgarlik va kiber tahdidlardan himoya qiladi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <button class="menu-toggle" id="menuToggle" aria-label="Menyu">☰</button>
+  <a class="brand" href="#dash" data-view="dash">
+    <span class="brand__logo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 4 5v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V5l-8-3Z" fill="#161F3D"/><path d="m8.5 12 2.3 2.4L15.8 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <span>
+      <span class="brand__name">Kiber<b>Ogoh</b> UZ</span>
+      <span class="brand__tag">Mahalla kiber qalqoni</span>
+    </span>
+  </a>
+  <div class="topbar__spacer"></div>
+  <div class="role-switch" id="roleSwitch" role="tablist" aria-label="Rol">
+    <button data-role="superadmin" class="is-active">Superadmin</button>
+    <button data-role="raisi">Yoshlar yetakchisi</button>
+    <button data-role="user">User</button>
+  </div>
+  <div class="region-pill"><span class="dot"></span> Hudud: <b id="topRegion">Toshkent viloyati</b></div>
+  <button class="btn btn--gold" data-view="reg"><span class="btn--cta-text">Ro'yxatdan o'tish</span></button>
+</header>
+
+<div class="rail-scrim" id="railScrim"></div>
+
+<div class="shell">
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="rail" id="rail" aria-label="Asosiy navigatsiya">
+    <div class="rail__group" data-admin-group>
+      <div class="rail__label">Boshqaruv</div>
+      <button class="nav-item" data-view="admin" data-role="superadmin">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+        Superadmin paneli
+      </button>
+      <button class="nav-item" data-view="mahalla" data-role="superadmin raisi">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/></svg>
+        Mahalla paneli
+        <span class="badge" id="mahallaBadge">2</span>
+      </button>
+    </div>
+    <div class="rail__group">
+      <div class="rail__label">Platforma</div>
+      <button class="nav-item is-active" data-view="dash">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Boshqaruv paneli
+      </button>
+      <button class="nav-item" data-view="feed">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
+        Tahdidlar lentasi
+        <span class="badge" id="feedBadge">3</span>
+      </button>
+      <button class="nav-item" data-view="check">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        Tekshirgich
+      </button>
+      <button class="nav-item" data-view="quiz">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.1 9a3 3 0 1 1 4 2.8c-.9.4-1.6 1.2-1.6 2.2v.5"/><circle cx="11.5" cy="18" r=".5" fill="currentColor" stroke="none"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
+        Viktorina
+      </button>
+      <button class="nav-item" data-view="rating">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V10M12 21V4M19 21v-7" stroke-linecap="round"/><path d="M9 7.5 12 4l3 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Xonadonlar reytingi
+      </button>
+      <button class="nav-item" data-view="privilege">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Imtiyozlar
+      </button>
+      <button class="nav-item" data-view="condition">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11.5l2 2 4.5-4.5"/><path d="M5 4h14a1 1 0 0 1 1 1v15l-3.5-2.2L13 20l-1-2-1 2-2.5-2.2L5 20V5a1 1 0 0 1 0-1Z" stroke-linejoin="round"/></svg>
+        Imtiyoz sharti
+      </button>
+    </div>
+    <div class="rail__group">
+      <div class="rail__label">Bilim</div>
+      <button class="nav-item" data-view="video">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/></svg>
+        So'nggi videolar
+      </button>
+      <button class="nav-item" data-view="base">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2V5Z"/><path d="M12 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2"/></svg>
+        Firibgarliklar bazasi
+      </button>
+      <button class="nav-item" data-view="ai">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4" stroke-linecap="round"/><path d="M13 4l2.4 5.6L21 12l-5.6 2.4L13 20l-2.4-5.6L5 12l5.6-2.4L13 4Z" stroke-linejoin="round"/></svg>
+        AI tahlil
+      </button>
+      <button class="nav-item" data-view="help">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor" stroke="none"/></svg>
+        Yordam
+      </button>
+    </div>
+    <div class="rail__group">
+      <div class="rail__label">Loyiha</div>
+      <button class="nav-item" data-view="reg">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
+        Ro'yxatdan o'tish
+      </button>
+      <button class="nav-item" data-view="about">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg>
+        Loyiha haqida
+      </button>
+    </div>
+    <div class="rail__foot">
+      <p><b style="color:var(--navy)">Maxfiylik birinchi o'rinda.</b> Manzilingiz emas — faqat mahalla qamrovi yig'iladi.</p>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main" id="main">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="view is-active" id="view-dash">
+      <div id="dashSpotlight"></div>
+      <div class="page-head">
+        <span class="eyebrow">Boshqaruv paneli</span>
+        <h1>Mahallangizning kiber holati</h1>
+        <p class="lead">Real vaqtdagi tahdidlar, hududiy qamrov va himoya darajasi — barchasi bitta oynada. Quyidagi ko'rsatkichlar namunaviy (demo) ma'lumotlardir.</p>
+      </div>
+
+      <div class="grid stat-grid" id="statGrid"></div>
+
+      <div class="grid dash-grid" style="margin-top:20px">
+        <div>
+          <div class="section-title"><h2>So'nggi tahdidlar</h2><span class="hint">avtomatik yangilanadi</span></div>
+          <div class="feed" id="dashFeed"></div>
+          <div style="margin-top:14px"><button class="btn btn--ghost btn--block" data-view="feed">Barcha tahdidlarni ko'rish</button></div>
+        </div>
+        <div class="grid" style="gap:18px">
+          <div class="card shield-card">
+            <span class="eyebrow">Kiber qalqon</span>
+            <h3>Himoya darajasi</h3>
+            <div class="shield-ring">
+              <div class="shield-sweep"></div>
+              <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="shieldProg" cx="60" cy="60" r="52"/></svg>
+              <div class="shield-ring__center"><div><div class="pct" id="shieldPct">0%</div><div class="cap">Qalqon</div></div></div>
+            </div>
+            <div class="shield-meta">
+              <div><div class="v" id="mActive">0</div><div class="k">Faol ko'ngilli</div></div>
+              <div><div class="v" id="mBlocked">0</div><div class="k">Bloklangan</div></div>
+              <div><div class="v">24/7</div><div class="k">Monitoring</div></div>
+            </div>
+          </div>
+          <div class="card card--pad">
+            <div class="section-title" style="margin:0 0 12px"><h2 style="font-size:18px">Boshqaruv modeli</h2></div>
+            <div class="pyramid" id="dashPyramid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.25fr 1fr;gap:18px;margin-top:20px" id="dashExtraRow">
+        <div class="card card--pad" id="dashHousehold"></div>
+        <div class="card card--pad" id="dashVideos"></div>
+      </div>
+    </section>
+
+    <!-- ===== THREAT FEED ===== -->
+    <section class="view" id="view-feed">
+      <div class="page-head">
+        <span class="eyebrow">Tahdidlar lentasi</span>
+        <h1>O'zbekistonda aylanayotgan firibgarliklar</h1>
+        <p class="lead">Ko'ngillilar va tizim tasdiqlagan ogohlantirishlar. Toifani tanlab, o'zingizga tegishlisini kuzating.</p>
+      </div>
+      <div class="filters" id="feedFilters"></div>
+      <div class="feed" id="fullFeed"></div>
+    </section>
+
+    <!-- ===== CHECKER ===== -->
+    <section class="view" id="view-check">
+      <div class="page-head">
+        <span class="eyebrow">Tekshirgich</span>
+        <h1>Havola yoki raqamni tekshiring</h1>
+        <p class="lead">Shubhali SMS havolasini, sayt manzilini yoki telefon raqamini joylang. Tizim uni xavf belgilariga qarab tahlil qiladi va tavsiya beradi.</p>
+      </div>
+      <div class="grid checker">
+        <div class="card checker__panel">
+          <label for="checkInput" style="font-weight:600;font-size:14px;color:var(--ink)">Tekshiriladigan matn</label>
+          <div class="checker__input-wrap">
+            <textarea class="checker__input" id="checkInput" placeholder="Masalan: http://click-bonus.xyz/win  yoki  +998 90 000 11 22"></textarea>
+          </div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px">Tez sinash uchun namunalar:</div>
+          <div class="checker__examples" id="checkExamples"></div>
+          <button class="btn btn--gold btn--block btn--lg" id="checkRun">Tekshirish</button>
+        </div>
+        <div class="card scanner" id="scanner">
+          <div class="scanner__head"><span class="lamp"></span><span class="lamp"></span><span class="lamp"></span><span class="title">kiberogoh — tahlil</span></div>
+          <div class="scanner__body" id="scanBody">
+            <div class="scanner__idle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+              Natija shu yerda ko'rsatiladi.<br>Matn kiriting va “Tekshirish”ni bosing.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section class="view" id="view-quiz">
+      <div class="page-head">
+        <span class="eyebrow">Viktorina — yoshlar burchagi</span>
+        <h1>Firibgarni tani</h1>
+        <p class="lead">Real holatlarni ko'rib, bu firibgarlikmi yoki xavfsizmi — o'zingiz hal qiling. Har to'g'ri javob ball va yangi daraja olib keladi.</p>
+      </div>
+      <div class="quiz" id="quizWrap"></div>
+    </section>
+
+    <!-- ===== SCAM DATABASE ===== -->
+    <section class="view" id="view-base">
+      <div class="page-head">
+        <span class="eyebrow">Firibgarliklar bazasi</span>
+        <h1>O'zbekistonga xos firibgarlik sxemalari</h1>
+        <p class="lead">Har bir sxema qanday ishlashi, qanday tanilishi va nima qilish kerakligi bilan. Qidiring yoki toifa bo'yicha saralang.</p>
+      </div>
+      <div class="search-row">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+          <input id="scamSearch" type="search" placeholder="Sxema nomi yoki kalit so'z bo'yicha qidirish…">
+        </div>
+      </div>
+      <div class="filters" id="scamFilters"></div>
+      <div class="grid scam-grid" id="scamGrid"></div>
+    </section>
+
+    <!-- ===== AI TAHLIL ===== -->
+    <section class="view" id="view-ai">
+      <div class="page-head">
+        <span class="eyebrow">AI tahlil</span>
+        <h1>Ma'lumotlar — yo'nalish ko'rsatadi</h1>
+        <p class="lead">Sun'iy intellekt platformadagi barcha faollikni <b>anonim va umumlashtirilgan</b> ko'rinishda tahlil qiladi: qaysi mavzular ko'p so'ralmoqda, qaysi hududlarda qanday muammolar o'smoqda, qaysi yosh toifasi nimani kam biladi. Bu — yangi o'quv materiallari va profilaktikani rejalashtirishga yordam beradi.</p>
+      </div>
+      <div class="card ai-insight" id="aiInsight"></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px" id="aiRow">
+        <div class="card card--pad" id="aiTopics"></div>
+        <div class="card card--pad" id="aiRegions"></div>
+      </div>
+      <div class="section-title"><h2>Yosh toifalari bo'yicha bilim tahlili</h2><span class="hint">past foiz = ko'proq xavf</span></div>
+      <div class="grid ai-ages" id="aiAges"></div>
+      <div class="section-title"><h2>AI tavsiyalari</h2><span class="hint">o'quv va profilaktika uchun</span></div>
+      <div class="grid feature-grid" id="aiRecs"></div>
+      <div class="ai-note" id="aiNote"></div>
+    </section>
+
+    <!-- ===== HELP ===== -->
+    <section class="view" id="view-help">
+      <div class="page-head">
+        <span class="eyebrow">Yordam</span>
+        <h1>Qadama-qadam yo'riqnomalar</h1>
+        <p class="lead">Firibgarlikka uchrasangiz nima qilish kerak, o'zingizni qanday himoya qilish mumkin — eng muhim holatlar bo'yicha sodda ko'rsatmalar.</p>
+      </div>
+      <div class="acc" id="helpAcc"></div>
+    </section>
+
+    <!-- ===== REGISTRATION ===== -->
+    <section class="view" id="view-reg">
+      <div class="page-head">
+        <span class="eyebrow">Ro'yxatdan o'tish</span>
+        <h1>Mahallangizni tanlang</h1>
+        <p class="lead">Ko'cha va uy raqami so'ralmaydi. Faqat hududingizni belgilaysiz — tizim qamrovni shu darajada hisoblaydi.</p>
+      </div>
+      <div class="grid reg">
+        <div class="card reg__form">
+          <div id="regFormBody">
+            <div class="field">
+              <label for="selViloyat">Viloyat <span class="hint">— majburiy</span></label>
+              <div class="select"><select id="selViloyat"><option value="">Tanlang…</option></select></div>
+            </div>
+            <div class="field">
+              <label for="selTuman">Tuman / shahar <span class="hint">— majburiy</span></label>
+              <div class="select"><select id="selTuman" disabled><option value="">Avval viloyatni tanlang</option></select></div>
+            </div>
+            <div class="field">
+              <label for="selMahalla">Mahalla <span class="hint">— majburiy</span></label>
+              <div class="select"><select id="selMahalla" disabled><option value="">Avval tumanni tanlang</option></select></div>
+            </div>
+            <button class="btn btn--gold btn--block btn--lg" id="regSubmit" disabled>Mahallaga qo'shilish</button>
+          </div>
+          <div class="reg-success" id="regSuccess">
+            <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3 style="font-size:22px">Xush kelibsiz!</h3>
+            <p style="color:var(--muted);margin-top:6px">Siz quyidagi mahalla qamroviga qo'shildingiz:</p>
+            <div class="where" id="regWhere"></div>
+            <p style="color:var(--muted);font-size:13px;margin-top:14px;max-width:42ch;margin-left:auto;margin-right:auto">Tizimda faqat shu hudud va foydalanuvchilar soni saqlanadi. Aniq manzilingiz hech qaerda yozilmaydi.</p>
+            <button class="btn btn--ghost" id="regReset" style="margin-top:8px">Boshqatdan</button>
+          </div>
+        </div>
+        <div class="card privacy-aside">
+          <span class="eyebrow">Maxfiylik kafolati</span>
+          <h3>Sizning ma'lumotingiz himoyada</h3>
+          <div class="priv-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            <div><h4>Manzil yig'ilmaydi</h4><p>Faqat mahalla tanlanadi. Ko'cha va uy raqami so'ralmaydi.</p></div>
+          </div>
+          <div class="priv-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18V9m5 9V5m5 13v-7m5 7V11"/></svg>
+            <div><h4>Faqat statistika</h4><p>Tizim har mahalladagi foydalanuvchilar sonini saqlaydi — shaxs emas.</p></div>
+          </div>
+          <div class="priv-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            <div><h4>Yopiq muloqot</h4><p>Shaxsiy yozishma o'chirilgan — firibgar sizni yakkalay olmaydi.</p></div>
+          </div>
+          <div class="priv-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V6l-8-3Z"/></svg>
+            <div><h4>Avtomatik himoya</h4><p>Havolalar bloklanadi, spam va shubhali xabarlar filtrlanadi.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT (compiled deck) ===== -->
+    <section class="view" id="view-about">
+      <div class="page-head">
+        <span class="eyebrow">Loyiha haqida</span>
+        <h1>KiberOgoh UZ konsepsiyasi</h1>
+      </div>
+
+      <div class="card about-hero">
+        <div class="about-hero__rings"></div>
+        <span class="eyebrow">Asosiy g'oya</span>
+        <h2>Bitta platforma: o'rgan, tekshir, ogohlantir</h2>
+        <p>KiberOgoh UZ — fuqaro o'rganadigan, shubhali xabarni tekshiradigan va jamoaviy ogohlik yaratadigan yagona tizim. Mahalla darajasida ishlaydi, biroq texnik jihatdan markaziy. Har mahallaga mutaxassis emas — bitta platforma va o'qitilgan ko'ngillilar tarmog'i muammoni real va arzon hal qiladi.</p>
+      </div>
+
+      <div class="section-title"><h2>Muammo</h2><span class="hint">nega bu platforma zarur</span></div>
+      <div class="grid feature-grid" id="aboutProblem"></div>
+
+      <div class="section-title"><h2>Platformaning yettita moduli</h2></div>
+      <div class="grid mod-grid" id="aboutModules"></div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
+        <div class="card card--pad">
+          <div class="section-title" style="margin:0 0 16px"><h2 style="font-size:19px">Boshqaruv modeli</h2></div>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:16px">200 mahallaga 200 mutaxassis kerak emas. Mutaxassis faqat yuqori bosqichda, mahallada esa — o'qitilgan ko'ngillilar. Bir viloyatga atigi 15–18 nafar professional kuch.</p>
+          <div class="pyramid" id="aboutPyramid"></div>
+        </div>
+        <div class="card card--pad">
+          <div class="section-title" style="margin:0 0 16px"><h2 style="font-size:19px">Maxfiylik tamoyili</h2></div>
+          <p style="color:var(--muted);font-size:14px;margin-bottom:8px">“Kerakli minimal ma'lumot” — fuqaroni kuzatish emas, qamrovni hisoblash. Himoya tizimining o'zi namuna bo'lishi shart.</p>
+          <div id="aboutPrivacy"></div>
+        </div>
+      </div>
+
+      <div class="section-title"><h2>Yo'l xaritasi</h2></div>
+      <div class="road" id="aboutRoad"></div>
+
+      <div class="section-title"><h2>Maqsadli ko'rsatkichlar</h2><span class="hint">birinchi ikki yil</span></div>
+      <div class="grid metrics" id="aboutMetrics"></div>
+    </section>
+
+    <!-- ===== XONADONLAR REYTINGI ===== -->
+    <section class="view" id="view-rating">
+      <div class="page-head">
+        <span class="eyebrow">Xonadonlar reytingi</span>
+        <h1>Har xonadondan bitta KiberHimoyachi</h1>
+        <p class="lead">Har bir xonadon o'z KiberHimoyachisini tanlaydi — u oila nomidan ball yig'adi. Masalan, <b>Abdullayevlar xonadonidan Alisher</b>. Mahalla bo'ylab reyting sog'lom raqobat va jamoaviy himoyani rag'batlantiradi.</p>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px" id="ratingTop"></div>
+
+      <div class="section-title"><h2>Yetakchi xonadonlar</h2><span class="hint">bu oy</span></div>
+      <div class="podium" id="podium"></div>
+
+      <div class="section-title"><h2>Mahalla reytingi</h2><span class="hint">Navbahor MFY · 142 xonadon</span></div>
+      <div id="rankList"></div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
+        <div class="card card--pad" id="earnCard"></div>
+        <div class="card card--pad" id="levelCard"></div>
+      </div>
+
+      <div class="section-title"><h2>Aholini jalb qilishning boshqa usullari</h2></div>
+      <div class="grid feature-grid" id="engageGrid"></div>
+    </section>
+
+    <!-- ===== SO'NGGI VIDEOLAR ===== -->
+    <section class="view" id="view-video">
+      <div class="page-head">
+        <span class="eyebrow">So'nggi videolar</span>
+        <h1>Kiberxavfsizlik — qisqa videolar</h1>
+        <p class="lead">Eng so'nggi tahdidlar bo'yicha qisqa, tushunarli videolar. Reels uslubida — bir daqiqada bir foydali odat. Faqat eng oxirgi 3 ta video ko'rsatiladi.</p>
+      </div>
+      <div class="reels" id="reelsFull"></div>
+      <div class="card card--pad" style="margin-top:22px;display:flex;gap:13px;align-items:flex-start;background:var(--blue-soft);border-color:#cfe3fb">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--blue)" stroke-width="2" style="flex:0 0 22px;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="7.5" r=".6" fill="var(--blue)" stroke="none"/></svg>
+        <p style="font-size:14px;color:#1c4f86">Videolar ekspertlar tomonidan yoziladi va ijtimoiy tarmoqlarga (Instagram, Telegram, YouTube) ham tarqatiladi. Platformada doim faqat eng so'nggi 3 tasi turadi — eskirgani arxivga o'tadi.</p>
+      </div>
+    </section>
+
+    <!-- ===== IMTIYOZLAR ===== -->
+    <section class="view" id="view-privilege">
+      <div class="page-head">
+        <span class="eyebrow">Imtiyozlar</span>
+        <h1>KiberHimoyachilik — real imtiyozlar</h1>
+        <p class="lead">Faol KiberHimoyachilar shunchaki ball emas, rasmiy organlar tomonidan tasdiqlangan haqiqiy imtiyozlarga ega bo'ladi. Aynan shu mahalla ichida sog'lom raqobatni oshiradi va ota-onalarni farzandini jalb qilishga undaydi.</p>
+      </div>
+
+      <div class="card priv-hero" id="privHero"></div>
+
+      <div class="section-title"><h2>Qanday imtiyozlar mavjud</h2></div>
+      <div class="grid reward-grid" id="rewardGrid"></div>
+
+      <div class="section-title"><h2>So'nggi taqdirlanganlar</h2><span class="hint">mahalla bo'yicha</span></div>
+      <div id="recipientsList"></div>
+
+      <div class="priv-cta" style="margin-top:24px">
+        <div class="priv-cta__t">
+          <h3>Imtiyozni qanday qo'lga kiritish mumkin?</h3>
+          <p>Yuqori ball — bu boshlanishi. Sovg'a yoki guvohnomani olish uchun nomzod <b>Imtiyoz sharti</b>dan o'tishi shart: o'zi, ota-onasi va qo'shnilari og'zaki savol-javobdan o'tkaziladi.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn--gold btn--lg" data-view="condition">Imtiyoz shartini ko'rish</button>
+          <button class="btn btn--ghost btn--lg" data-view="rating">Reyting</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== IMTIYOZ SHARTI ===== -->
+    <section class="view" id="view-condition">
+      <div class="page-head">
+        <span class="eyebrow">Imtiyoz sharti</span>
+        <h1>Sovg'a — faqat ball uchun emas, real targ'ibot uchun</h1>
+        <p class="lead">Sertifikat yoki vazirlik sovg'asini olish uchun nomzod nafaqat yuqori ball to'plashi, balki bilimini amalda isbotlashi va platformani oilasi hamda qo'shnilariga yetkazgani <b>og'zaki savol-javob</b> orqali tasdiqlanishi shart. Shu tariqa platformadan yosh avlod bilan birga ota-onalar ham foydalanadi.</p>
+      </div>
+
+      <div class="card cond-why" id="condWhyCard">
+        <div class="cond-why__rays"></div>
+        <div class="cond-why__inner" id="condWhy"></div>
+      </div>
+
+      <div class="section-title"><h2>Besh bosqichli tekshiruv</h2><span class="hint">nomzod taqdirlanishidan oldin</span></div>
+      <div class="card cond-tracker" id="condTracker"></div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:22px">
+        <div class="card cond-grace" id="condGrace"></div>
+        <div class="card card--pad" id="condFlow"></div>
+      </div>
+    </section>
+
+    <!-- ===== SUPERADMIN PANELI ===== -->
+    <section class="view" id="view-admin">
+      <div class="page-head">
+        <span class="eyebrow">Superadmin paneli</span>
+        <h1>Butun platforma — bir oynada</h1>
+      </div>
+      <div class="scope-banner scope-banner--admin" id="adminScope"></div>
+      <div class="grid stat-grid" id="adminStats"></div>
+      <div class="section-title"><h2>Mahallalar va raislar</h2><span class="hint">namunaviy ro'yxat · barchasi ko'rinadi</span></div>
+      <div class="card" style="padding:10px 6px"><div id="adminMahallalar"></div></div>
+      <div class="section-title"><h2>Rollar va ruxsatlar (RBAC)</h2></div>
+      <div class="card card--pad" id="permMatrix"></div>
+    </section>
+
+    <!-- ===== MAHALLA PANELI ===== -->
+    <section class="view" id="view-mahalla">
+      <div class="page-head">
+        <span class="eyebrow">Mahalla paneli</span>
+        <h1>Mahallangiz foydalanuvchilari</h1>
+      </div>
+      <div class="scope-banner scope-banner--raisi" id="mahallaScope"></div>
+      <div class="grid stat-grid" id="mahallaStats"></div>
+      <div class="section-title"><h2>Test ruxsatnomalari</h2><span class="hint">onlayn testdan o'tgan fuqarolar · faqat sizga ko'rinadi</span></div>
+      <div id="permitsList" style="margin-bottom:6px"></div>
+      <div class="section-title"><h2>Foydalanuvchilar</h2><span class="hint" id="mahallaUserHint"></span></div>
+      <div class="card" style="padding:10px 6px"><div id="mahallaUsers"></div></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:22px">
+        <div class="card card--pad" id="mahallaTasks"></div>
+        <div class="card card--pad" id="mahallaLocked"></div>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="foot">
+      <div class="foot__row">
+        <div>
+          <span class="brand__name" style="color:var(--navy);font-size:16px">Kiber<b style="color:var(--gold-700)">Ogoh</b> UZ</span>
+          <div style="margin-top:4px">Mahalla darajasidagi milliy kiber qalqon platformasi · #KiberXavfsizlik</div>
+        </div>
+        <span class="foot__demo">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5" stroke-linecap="round"/><circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none"/></svg>
+          Konseptual demo · 2026
+        </span>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<!-- ===== VIDEO PLEYER MODAL ===== -->
+<div class="reel-modal" id="reelModal" aria-hidden="true">
+  <div class="reel-modal__backdrop" data-reel-close></div>
+  <div class="reel-player" id="reelPlayer"></div>
+</div>
+
+<!-- ===== RUXSATNOMA MODAL ===== -->
+<div class="permit-modal" id="permitModal" aria-hidden="true">
+  <div class="permit-modal__backdrop" data-permit-close></div>
+  <div class="permit-doc" id="permitDoc"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

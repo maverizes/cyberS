@@ -33,7 +33,12 @@
     invite: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M18 7v6M21 10h-6" stroke-linecap="round"/></svg>',
     trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5v1A3.5 3.5 0 0 0 8 10.5M17 6h2.5v1A3.5 3.5 0 0 1 16 10.5"/><path d="M12 14v3M9.5 21h5M10 17h4l1 4H9l1-4Z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     grad: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4 2.5 8.5 12 13l9.5-4.5L12 4Z" stroke-linejoin="round"/><path d="M6.5 10.8V15c0 1.2 2.5 3 5.5 3s5.5-1.8 5.5-3v-4.2"/><path d="M21.5 8.5v5" stroke-linecap="round"/></svg>',
-    building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-3.5h4V21" stroke-linecap="round"/></svg>'
+    building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-3.5h4V21" stroke-linecap="round"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 2.6 15.4 0 18M12 3c-2.6 2.6-2.6 15.4 0 18"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+    exam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2.2h6V3" stroke-linejoin="round"/><path d="M8.5 11.5l1.4 1.4 2.6-2.8M8.5 16.5h7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    tg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z" stroke-linejoin="round"/></svg>',
+    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" stroke-linecap="round"/></svg>'
   };
 
   /* =========================================================
@@ -133,19 +138,36 @@
       </ul>` }
   ];
 
-  const JAMOA = [
-    { who:"Dilnoza A.", role:"vol", color:"var(--gold)", meta:"Chilonzor · 12 daqiqa oldin",
-      body:"Diqqat: bugun “Click hisobingiz bloklandi” SMS’i ko'paydi. Havola clik-uz.xyz — rasmiy emas. Hech kim bosmasin!" },
-    { who:"Foydalanuvchi", role:null, color:"var(--blue)", meta:"Yunusobod · 40 daqiqa oldin",
-      body:"Menga shunaqa havola keldi, bossam bo'ladimi? Mana:", blocked:"havola xavfsizlik uchun bloklandi · click-bonus.top/win" },
-    { who:"Sardor K.", role:"mod", color:"var(--teal)", meta:"Moderator · 35 daqiqa oldin",
-      body:"Yo'q, bosmang. Bu fishing havola. Quyida tasdiqlangan javobni qoldiraman.",
-      verified:"Tasdiqlangan javob: Bunday SMS’dagi havolalarni ochmang. Click/Payme’ni faqat rasmiy ilovadan oching. Shubha bo'lsa — Tekshirgichdan o'tkazing." },
-    { who:"Akmal R.", role:"vol", color:"var(--purple)", meta:"Sergeli · 1 soat oldin",
-      body:"Keksa ota-onalaringizga eslatib qo'ying: bank xodimi SMS-kod so'ramaydi. Qo'ng'iroqda kod so'rashsa — bu firibgar." },
-    { who:"Nigora T.", role:null, color:"var(--red)", meta:"Olmazor · 2 soat oldin",
-      body:"Rahmat, shu guruh tufayli onam aldanmay qoldi. “Avtomobil yutdingiz” qo'ng'irog'ini darhol tanidi." }
+  /* ---- AI tahlil (anonim, umumlashtirilgan) ---- */
+  const AI_SUMMARY = { analyzed:"8 420", topThreat:"soxta Click/Payme SMS havolalari", topDelta:9, weakGroup:"60+ yosh", weakArea:"bank kartasi aldovlari", hotRegions:5 };
+  const AI_TOPICS = [
+    { t:"Soxta “Click/Payme” SMS havolalari", pct:34, delta:9 },
+    { t:"Telegram akkaunt o'g'irlash", pct:22, delta:4 },
+    { t:"Bank kartasi / kod aldovi", pct:18, delta:-3 },
+    { t:"“Pul yutdingiz” firibgarligi", pct:14, delta:6 },
+    { t:"Ijtimoiy tarmoq qalbaki profillari", pct:12, delta:2 }
   ];
+  const AI_REGIONS = [
+    { r:"Toshkent shahri", threat:"Fishing havolalar", delta:28, lvl:"yuqori" },
+    { r:"Samarqand", threat:"Telefon orqali aldov", delta:41, lvl:"yuqori" },
+    { r:"Farg'ona", threat:"Soxta ish e'lonlari", delta:19, lvl:"orta" },
+    { r:"Andijon", threat:"Telegram akkaunt o'g'irlash", delta:15, lvl:"orta" },
+    { r:"Buxoro", threat:"“Pul yutdingiz” SMS", delta:12, lvl:"past" }
+  ];
+  const AI_AGES = [
+    { age:"14–18", weak:"Qalbaki profil va shaxsiy ma'lumot", score:64 },
+    { age:"19–30", weak:"Fishing havolalar", score:72 },
+    { age:"31–45", weak:"Bank kartasi aldovi", score:58 },
+    { age:"46–60", weak:"Soxta SMS havolalar", score:46 },
+    { age:"60+", weak:"Telefon aldovi va bank kodi", score:38 }
+  ];
+  const AI_RECS = [
+    { ico:ICON.grad, cls:"i-gold", t:"60+ yosh uchun maxsus material", p:"Bank kartasi va telefon aldovi bo'yicha sodda, yirik shriftli video tayyorlang — bu toifa eng kam himoyalangan (38%)." },
+    { ico:ICON.building, cls:"i-teal", t:"Samarqandda profilaktika seminari", p:"Telefon orqali aldov 41% oshgan — mahalla markazlarida yuzma-yuz uchrashuv rejalashtiring." },
+    { ico:ICON.sms, cls:"i-red", t:"“Soxta Click SMS” kampaniyasi", p:"Eng ko'p so'ralgan mavzu (34%, ↑9). Yangi Reels va viktorina savollarini qo'shing." },
+    { ico:ICON.social, cls:"i-purple", t:"Yoshlar uchun qalbaki profil darsi", p:"14–18 yoshlilar shaxsiy ma'lumot himoyasini sust biladi (64%)." }
+  ];
+
 
   const PROBLEM = [
     { ico:ICON.eye,   cls:"i-red",   t:"Tanimaslik", p:"Ko'pchilik soxta SMS, fishing havola va “sovg'a yutdingiz” aldovlarini ajrata olmaydi." },
@@ -161,7 +183,7 @@
     { ico:ICON.spark, cls:"i-purple",t:"Viktorina", p:"Firibgarni tanish o'yini", view:"quiz" },
     { ico:ICON.shieldCheck, cls:"i-blue", t:"Firibgarliklar bazasi", p:"O'zbekistonga xos sxemalar", view:"base" },
     { ico:ICON.check, cls:"i-teal",  t:"Yordam", p:"Qadama-qadam yo'riqnoma", view:"help" },
-    { ico:ICON.social,cls:"i-purple",t:"Jamoa (yopiq)", p:"Moderatsiyali muhokama", view:"jamoa" },
+    { ico:ICON.spark,cls:"i-purple",t:"AI tahlil", p:"Anonim tendentsiya tahlili", view:"ai" },
     { ico:ICON.users, cls:"i-gold",  t:"Boshqaruv paneli", p:"Hududiy statistika", view:"dash" }
   ];
 
@@ -259,6 +281,34 @@
   const fmtN = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   const avPalette = ["var(--purple)","var(--blue)","var(--teal)","var(--red)","var(--gold)","var(--navy-3)"];
 
+  // namoyish uchun QR-ko'rinishidagi SVG (haqiqiy skaner emas, demo)
+  function fakeQR(seed, n) {
+    n = n || 25;
+    let s = 0; for (const ch of String(seed)) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
+    const rand = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    const cell = 8, quiet = 2, dim = (n + quiet * 2) * cell;
+    const finder = (r, c, br, bc) => { const rr = r - br, cc = c - bc; const edge = rr === 0 || rr === 6 || cc === 0 || cc === 6; const core = rr >= 2 && rr <= 4 && cc >= 2 && cc <= 4; return edge || core; };
+    const inBox = (r, c, br, bc) => r >= br && r < br + 7 && c >= bc && c < bc + 7;
+    let rects = "";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      let on;
+      if (inBox(r, c, 0, 0)) on = finder(r, c, 0, 0);
+      else if (inBox(r, c, 0, n - 7)) on = finder(r, c, 0, n - 7);
+      else if (inBox(r, c, n - 7, 0)) on = finder(r, c, n - 7, 0);
+      else if ((r === 7 && c < 8) || (c === 7 && r < 8) || (r === 7 && c >= n - 8) || (c === n - 8 && r < 8) || (r === n - 8 && c < 8)) on = false; // separators
+      else on = rand() > 0.52;
+      if (on) rects += `<rect x="${(c + quiet) * cell}" y="${(r + quiet) * cell}" width="${cell}" height="${cell}"/>`;
+    }
+    return `<svg viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg" class="qr"><rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#10162e">${rects}</g></svg>`;
+  }
+
+  // onlayn testdan o'tib, ruxsatnomasi tayyor bo'lgan fuqarolar (faqat yetakchiga ko'rinadi)
+  const PERMITS = [
+    { rep:"Alisher", hh:"Abdullayevlar", full:"Alisher Abdullayev", code:"RX-2026-0142", date:"27.06.2026", isNew:true },
+    { rep:"Madina", hh:"Rahimovlar", full:"Madina Rahimova", code:"RX-2026-0138", date:"25.06.2026", isNew:true },
+    { rep:"Bekzod", hh:"Ergashevlar", full:"Bekzod Ergashev", code:"RX-2026-0131", date:"21.06.2026", isNew:false }
+  ];
+
   /* ---- imtiyozlar ---- */
   const SPOTLIGHT = { hh:"Tolipovlar", rep:"Bobur", repFull:"Bobur Tolipov", month:"Iyun oyi", issuer:"Ichki Ishlar Boshqarmasi", benefit:"Temurbek litseyiga grant asosida qabul" };
   const PRIVILEGES = [
@@ -303,26 +353,68 @@
       asker:"Komissiya qo'shnidan so'raydi:",
       meta:{ ico:ICON.social, t:"Jalb qilingan qo'shni xonadonlar: 3 / 3" },
       q:["Bu platforma haqida sizga kim aytdi?","Bitta foydali kiber maslahatni eslay olasizmi?","O'zingiz ro'yxatdan o'tdingizmi?"] },
+    { id:"offline", icon:ICON.exam, title:"Offlayn bilim testi", who:"Mahalla markazi · komissiya", type:"test",
+      req:"Nomzod shu paytgacha platformada o'rgangan bilimlarini sinash uchun offlayn (yuzma-yuz) testdan o'tadi. Test mahalla kesimida — mahalla markazida, barcha nomzodlar uchun bir vaqtda o'tkaziladi.",
+      test:{ joy:"Mahalla markazi (offlayn)", vaqt:"Shanba, soat 10:00", format:"20 ta yopiq savol · 30 daqiqa", otish:"O'tish bali: kamida 70%",
+        mavzular:["Firibgarlik turlari","Fishing havolalar","Parol xavfsizligi","Bank/karta aldovlari","Ijtimoiy tarmoq xavfsizligi"] },
+      asker:"Namunaviy test savollari:",
+      meta:{ ico:ICON.users, t:"Mahalladan ro'yxatga olingan nomzodlar: 12" },
+      q:["“Kartangiz bloklandi” SMS'idagi havolani bossangiz nima bo'ladi?","Berilgan 4 havoladan qaysi biri soxta (rasmiy emas)?","Ikki bosqichli himoya (2FA) qanday vazifani bajaradi?"] },
     { id:"commission", icon:ICON.cert, title:"Komissiya yakuniy tasdig'i", who:"IIB komissiyasi",
-      req:"Barcha bosqichlar muvaffaqiyatli o'tilsa, Ichki Ishlar Boshqarmasi komissiyasi sertifikat va sovg'ani rasmiy tasdiqlaydi.",
+      req:"Barcha bosqichlar — savol-javoblar va offlayn test muvaffaqiyatli o'tilsa, Ichki Ishlar Boshqarmasi komissiyasi sertifikat va sovg'ani rasmiy tasdiqlaydi.",
       asker:"", meta:null, q:[] }
   ];
   const GRACE_DAYS = 14;
+
+  /* ---- RBAC: rollar, mahallalar, ruxsatlar ---- */
+  const ROLE_META = {
+    superadmin: { name:"Superadmin", scope:"Butun platforma" },
+    raisi:      { name:"Yoshlar yetakchisi", scope:"Navbahor MFY" },
+    user:       { name:"User", scope:"Faqat o'zingiz" }
+  };
+  const MY_MAHALLA = "Navbahor MFY";
+  const MAHALLALAR = [
+    { name:"Navbahor MFY", region:"Toshkent sh. · Chilonzor", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
+    { name:"Do'stlik MFY", region:"Toshkent sh. · Sergeli", raisi:"Sevara Olimova", users:165, active:110, avg:1340 },
+    { name:"Bunyodkor MFY", region:"Toshkent sh. · Yunusobod", raisi:"Dilshod Karimov", users:128, active:74, avg:1020 },
+    { name:"Guliston MFY", region:"Andijon · Asaka", raisi:"Nilufar Sodiqova", users:113, active:81, avg:1090 },
+    { name:"Birlik MFY", region:"Farg'ona · Marg'ilon", raisi:"Sardor To'xtayev", users:134, active:69, avg:960 },
+    { name:"Istiqlol MFY", region:"Samarqand · Urgut", raisi:"Bekzod Rahimov", users:98, active:52, avg:880 },
+    { name:"Obod MFY", region:"Buxoro · Kogon", raisi:"Gulnoza Nazarova", users:87, active:45, avg:790 }
+  ];
+  const PERM_ROWS = [
+    { r:"O'z profili, statistikasi va ballari", s:"y", a:"y", u:"y" },
+    { r:"O'z mahallasidagi foydalanuvchilar statistikasi", s:"y", a:"y", u:"n" },
+    { r:"Boshqa mahallalar va ularning userlari", s:"y", a:"n", u:"n" },
+    { r:"Barcha mahalla va raislarni boshqarish", s:"y", a:"n", u:"n" },
+    { r:"Rol biriktirish (yetakchi tayinlash)", s:"y", a:"n", u:"n" },
+    { r:"Kontent moderatsiyasi", s:"y", a:"own", u:"n" },
+    { r:"Imtiyoz shartini tasdiqlash", s:"y", a:"own", u:"n" }
+  ];
+  // mahalla foydalanuvchilari = HOUSEHOLDS vakillari (Navbahor MFY)
+  const vStatusFor = i => i === 0 ? { c:"vb-done", t:"Taqdirlangan" } : i <= 2 ? { c:"vb-nom", t:"Nomzod" } : { c:"vb-act", t:"Faol" };
 
   /* =========================================================
      NAVIGATION
      ========================================================= */
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Viktorina",
-    base:"Firibgarliklar bazasi", jamoa:"Jamoa", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
-    rating:"Xonadonlar reytingi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti"
+    base:"Firibgarliklar bazasi", ai:"AI tahlil", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
+    rating:"Xonadonlar reytingi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
+    admin:"Superadmin paneli", mahalla:"Mahalla paneli"
   };
   let dashAnimated = false, quizBuilt = false;
 
+  /* ---- RBAC state ---- */
+  let currentRole = "superadmin";
+  const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"] };
+  const canSeeView = v => !RESTRICTED[v] || RESTRICTED[v].includes(currentRole);
+
   function showView(v) {
+    if (!canSeeView(v)) v = "dash"; // RBAC: ruxsat bo'lmasa, asosiy panelga qaytadi
     $$(".view").forEach(s => s.classList.toggle("is-active", s.id === "view-" + v));
     $$(".nav-item").forEach(b => b.classList.toggle("is-active", b.dataset.view === v));
-    document.title = VIEW_TITLES[v] + " · KiberOgoh UZ";
+    document.title = (VIEW_TITLES[v] || "KiberOgoh UZ") + " · KiberOgoh UZ";
     $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
@@ -330,6 +422,30 @@
   }
   function bindNav() {
     $$("[data-view]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); showView(b.dataset.view); }));
+  }
+
+  // RBAC: rolga qarab navigatsiyani va ko'rinishni boshqaradi
+  function applyRole(role) {
+    currentRole = role;
+    $$("#roleSwitch button").forEach(b => b.classList.toggle("is-active", b.dataset.role === role));
+    // rolga tegishli nav elementlarini ko'rsatish/yashirish
+    $$(".nav-item[data-role]").forEach(b => {
+      const allowed = b.dataset.role.split(/\s+/).includes(role);
+      b.style.display = allowed ? "" : "none";
+    });
+    // "Boshqaruv" guruhini bo'sh bo'lsa yashirish
+    const grp = $("[data-admin-group]");
+    if (grp) {
+      const anyVisible = $$(".nav-item[data-role]", grp).some(b => b.style.display !== "none");
+      grp.style.display = anyVisible ? "" : "none";
+    }
+    // agar joriy ko'rinish endi yopiq bo'lsa, asosiy panelga qaytadi
+    const active = ($(".view.is-active") || {}).id || "";
+    const v = active.replace("view-", "");
+    if (!canSeeView(v)) showView("dash");
+  }
+  function bindRoleSwitch() {
+    $$("#roleSwitch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
   }
 
   // mobile rail
@@ -353,8 +469,8 @@
     });
   }
   function animateDash() {
-    // count-up
-    $$(".stat__num").forEach(n => {
+    // count-up (faqat dashboard kartalari)
+    $$("#statGrid .stat__num").forEach(n => {
       const target = +n.dataset.target, suf = n.dataset.suffix; let cur = 0;
       const steps = 38, inc = target / steps; let i = 0;
       const fmt = x => (x >= 1000 ? Math.round(x).toLocaleString("ru-RU").replace(/,/g, " ") : Math.round(x));
@@ -674,24 +790,74 @@
   }
 
   /* =========================================================
-     JAMOA (community)
+     AI TAHLIL (anonim, umumlashtirilgan analitika)
      ========================================================= */
-  function renderJamoa() {
-    const wrap = $("#jamoaFeed"); wrap.innerHTML = "";
-    JAMOA.forEach(p => {
-      const initials = p.who.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
-      const roleBadge = p.role === "vol" ? `<span class="role-badge role-badge--vol">Kiber faol</span>` :
-                        p.role === "mod" ? `<span class="role-badge role-badge--mod">Moderator</span>` : "";
-      const blocked = p.blocked ? `<div class="post__blocked">${ICON.ban} ${p.blocked}</div>` : "";
-      const verified = p.verified ? `<div class="post__verified">${ICON.check}<span>${p.verified}</span></div>` : "";
-      const c = el("div", "card post");
-      c.innerHTML = `<div class="post__head">
-          <div class="post__av" style="background:${p.color}">${initials}</div>
-          <div><div class="post__who">${p.who} ${roleBadge}</div><div class="post__meta">${p.meta}</div></div>
-        </div>
-        <div class="post__body">${p.body}</div>${blocked}${verified}`;
-      wrap.appendChild(c);
-    });
+  function aiDelta(d) {
+    if (d > 0) return `<span class="ai-up">↑${d}%</span>`;
+    if (d < 0) return `<span class="ai-down">↓${Math.abs(d)}%</span>`;
+    return `<span class="ai-eq">0%</span>`;
+  }
+  function renderAI() {
+    const s = AI_SUMMARY;
+    const hero = $("#aiInsight");
+    if (hero) hero.innerHTML = `
+      <div class="ai-insight__glow"></div>
+      <span class="ai-badge">${ICON.spark} AI tahlil · anonim</span>
+      <h2 class="ai-insight__title">AI bu oy <b>${s.analyzed}</b> ta savol va faollikni tahlil qildi</h2>
+      <p class="ai-insight__sum">Eng tez o'sayotgan tahdid — <b>${s.topThreat}</b> (↑${s.topDelta}%). Eng zaif toifa — <b>${s.weakGroup}</b> (${s.weakArea}). Asosiy tavsiya: shu yo'nalishlarda yangi o'quv materiallari va profilaktikani kuchaytiring.</p>
+      <div class="ai-insight__stats">
+        <div><div class="v">${s.analyzed}</div><div class="k">Tahlil qilingan savol</div></div>
+        <div><div class="v">↑34%</div><div class="k">Soxta SMS so'rovlari</div></div>
+        <div><div class="v">${s.hotRegions}</div><div class="k">Yuqori xavfli hudud</div></div>
+      </div>`;
+
+    const topics = $("#aiTopics");
+    if (topics) {
+      const max = Math.max(...AI_TOPICS.map(t => t.pct));
+      topics.innerHTML = `<div class="section-title" style="margin:0 0 14px"><h2 style="font-size:18px">Eng ko'p so'ralgan mavzular</h2></div>` +
+        AI_TOPICS.map(t => `
+          <div class="tbar">
+            <div class="tbar__top"><span class="tbar__label">${t.t}</span><span class="tbar__val">${t.pct}% ${aiDelta(t.delta)}</span></div>
+            <div class="tbar__track"><i style="width:${Math.round(t.pct / max * 100)}%"></i></div>
+          </div>`).join("");
+    }
+
+    const regions = $("#aiRegions");
+    if (regions) {
+      const lbl = { yuqori:"Yuqori", orta:"O'rta", past:"Past" };
+      regions.innerHTML = `<div class="section-title" style="margin:0 0 14px"><h2 style="font-size:18px">Hududlar bo'yicha o'sayotgan muammolar</h2></div>` +
+        AI_REGIONS.map(x => `
+          <div class="rgn-row">
+            <div class="rgn-row__main"><div class="rgn-row__r">${x.r}</div><div class="rgn-row__t">${x.threat}</div></div>
+            <span class="rgn-row__delta">↑ ${x.delta}%</span>
+            <span class="rgn-lvl rgn-${x.lvl}">${lbl[x.lvl]}</span>
+          </div>`).join("");
+    }
+
+    const ages = $("#aiAges");
+    if (ages) {
+      ages.innerHTML = AI_AGES.map(a => {
+        const col = a.score < 50 ? "var(--red)" : a.score < 70 ? "var(--gold)" : "var(--teal)";
+        return `<div class="card age-card">
+          <div class="age-card__age">${a.age} <span>yosh</span></div>
+          <div class="age-card__weak"><span class="k">Eng zaif mavzu</span>${a.weak}</div>
+          <div class="age-card__bar"><i style="width:${a.score}%;background:${col}"></i></div>
+          <div class="age-card__score">Bilim darajasi: <b style="color:${col}">${a.score}%</b></div>
+        </div>`;
+      }).join("");
+    }
+
+    const recs = $("#aiRecs");
+    if (recs) {
+      recs.innerHTML = "";
+      AI_RECS.forEach(r => { const c = el("div", "card rec-card");
+        c.innerHTML = `<div class="rec-card__ico ${r.cls}">${r.ico}</div><div><h4>${r.t}</h4><p>${r.p}</p></div>`;
+        recs.appendChild(c);
+      });
+    }
+
+    const note = $("#aiNote");
+    if (note) note.innerHTML = `${ICON.lock}<span>Barcha ma'lumotlar <b>anonim va umumlashtirilgan</b> — shaxsiy ma'lumotlar, ism yoki manzil tahlil qilinmaydi. AI faqat umumiy tendentsiyalarni ko'rsatadi.</span>`;
   }
 
   /* =========================================================
@@ -977,9 +1143,8 @@
   }
   function renderSpotlight() {
     const c = $("#dashSpotlight"); if (!c) return;
-    c.innerHTML = `
-      <div class="card spotlight">
-        <div class="spotlight__glow"></div>
+    const slide1 = `
+      <div class="carousel__slide">
         <div class="spotlight__main">
           ${SEAL}
           <div class="spotlight__body">
@@ -994,7 +1159,57 @@
         </div>
         <div class="spotlight__cert">${certHtml(SPOTLIGHT.repFull, "Mahalla kiberxavfsizligiga qo'shgan hissasi uchun")}</div>
       </div>`;
+    const tgUrl = "https://t.me/TV_ISHGA_QABUL";
+    const slide2 = `
+      <div class="carousel__slide">
+        <div class="spotlight__main">
+          <div class="vac-emblem">${ICON.briefcase}</div>
+          <div class="spotlight__body">
+            <span class="spotlight__live spotlight__live--blue"><span class="pulse"></span>Vakansiya · IIV</span>
+            <h2>Ichki Ishlar Vazirligiga ishga qabul ochiq</h2>
+            <p>Kiberxavfsizlik va IT yo'nalishida vakant o'rinlar. Faol yoshlar uchun imkoniyat — ariza va batafsil ma'lumot rasmiy Telegram kanalda.</p>
+            <div class="spotlight__cta">
+              <a class="btn btn--gold" href="${tgUrl}" target="_blank" rel="noopener">Vakansiyalarni ko'rish</a>
+            </div>
+          </div>
+        </div>
+        <a class="spotlight__cert spotlight__cert--flat vac-card" href="${tgUrl}" target="_blank" rel="noopener">
+          <div class="vac-card__tg">${ICON.tg}</div>
+          <div class="vac-card__handle">@TV_ISHGA_QABUL</div>
+          <div class="vac-card__label">Rasmiy ishga qabul kanali</div>
+          <div class="vac-card__cta">Telegram'da ochish →</div>
+        </a>
+      </div>`;
+    const slides = [slide1, slide2];
+    const dots = slides.map((_, i) => `<button class="carousel__dot${i === 0 ? " is-active" : ""}" data-spot="${i}" aria-label="Slayd ${i + 1}"></button>`).join("");
+    c.innerHTML = `
+      <div class="card spotlight spotlight--carousel" id="spotCarousel">
+        <div class="spotlight__glow"></div>
+        <div class="carousel__viewport"><div class="carousel__track" id="spotTrack">${slides.join("")}</div></div>
+        <div class="carousel__ctl">
+          <button class="carousel__arrow" id="spotPrev" aria-label="Oldingi">${ICON.caret}</button>
+          <div class="carousel__dots">${dots}</div>
+          <button class="carousel__arrow" id="spotNext" aria-label="Keyingi">${ICON.caret}</button>
+        </div>
+      </div>`;
     wireViewBtns(c);
+    setupSpotCarousel();
+  }
+  function setupSpotCarousel() {
+    const track = $("#spotTrack"); if (!track) return;
+    const n = track.children.length;
+    const dots = $$("#spotCarousel .carousel__dot");
+    let idx = 0, timer = null;
+    const go = i => { idx = (i + n) % n; track.style.transform = `translateX(-${idx * 100}%)`; dots.forEach((d, k) => d.classList.toggle("is-active", k === idx)); };
+    const next = () => go(idx + 1), prev = () => go(idx - 1);
+    const start = () => { clearInterval(timer); timer = setInterval(next, 6500); };
+    dots.forEach((d, k) => d.addEventListener("click", () => { go(k); start(); }));
+    $("#spotNext").addEventListener("click", () => { next(); start(); });
+    $("#spotPrev").addEventListener("click", () => { prev(); start(); });
+    const car = $("#spotCarousel");
+    car.addEventListener("mouseenter", () => clearInterval(timer));
+    car.addEventListener("mouseleave", start);
+    go(0); start();
   }
   function renderPrivileges() {
     const hero = $("#privHero");
@@ -1036,7 +1251,7 @@
      IMTIYOZ SHARTI (verification flow)
      ========================================================= */
   // status per condition: 'done' | 'active' | 'grace' | 'locked'
-  let condState = ["done", "active", "locked", "locked"];
+  let condState = ["done", "active", "locked", "locked", "locked"];
 
   function renderCondStatic() {
     const why = $("#condWhy");
@@ -1049,6 +1264,7 @@
           <span class="cond-pill">${ICON.check}Nomzod — bilim sinovi</span>
           <span class="cond-pill">${ICON.check}Ota-ona — jalb + savol-javob</span>
           <span class="cond-pill">${ICON.check}Qo'shni — targ'ibot tekshiruvi</span>
+          <span class="cond-pill">${ICON.check}Offlayn test — mahalla markazida</span>
         </div>
       </div>`;
 
@@ -1066,8 +1282,9 @@
       <div class="section-title" style="margin:0 0 12px"><h2 style="font-size:18px">Jarayon qanday kechadi</h2></div>
       <div class="flow-step"><span class="flow-step__n">1</span><div class="flow-step__b">Nomzod reytingda yuqori o'ringa chiqadi va taqdirlashga <b>tavsiya etiladi</b>.</div></div>
       <div class="flow-step"><span class="flow-step__n">2</span><div class="flow-step__b">Komissiya <b>og'zaki savol-javob</b> o'tkazadi: nomzod → ota-ona → qo'shni.</div></div>
-      <div class="flow-step"><span class="flow-step__n">3</span><div class="flow-step__b">Hammasidan o'tsa — <b>sertifikat va sovg'a</b> topshiriladi.</div></div>
-      <div class="flow-step"><span class="flow-step__n">4</span><div class="flow-step__b">O'tmasa — <b>${GRACE_DAYS} kun</b> muddat, targ'ibot qayta qilinadi va tekshiruv takrorlanadi.</div></div>`;
+      <div class="flow-step"><span class="flow-step__n">3</span><div class="flow-step__b">Nomzod mahalla markazida <b>offlayn bilim testi</b>dan o'tadi (mahalla kesimida).</div></div>
+      <div class="flow-step"><span class="flow-step__n">4</span><div class="flow-step__b">Hammasidan o'tsa — komissiya tasdig'idan so'ng <b>sertifikat va sovg'a</b> topshiriladi.</div></div>
+      <div class="flow-step"><span class="flow-step__n">5</span><div class="flow-step__b">O'tmasa — <b>${GRACE_DAYS} kun</b> muddat, takroriy targ'ibot yoki keyingi testga yozilish.</div></div>`;
   }
 
   const STATUS_LABEL = { done:"Tasdiqlandi", active:"Jarayonda", grace:"Muddat berildi", locked:"Navbatda" };
@@ -1082,14 +1299,14 @@
         <div class="cond-success">
           <div class="cond-success__badge">${ICON.cert}</div>
           <h3>Barcha shartlar bajarildi!</h3>
-          <p><b>${CANDIDATE.rep}</b> (${CANDIDATE.hh} xonadoni) o'zi, ota-onasi va qo'shnilari savol-javobidan muvaffaqiyatli o'tdi. Endi u sertifikat va sovg'ani olishga tayyor.</p>
+          <p><b>${CANDIDATE.rep}</b> (${CANDIDATE.hh} xonadoni) savol-javoblar va mahalla offlayn testidan muvaffaqiyatli o'tdi. Endi u sertifikat va sovg'ani olishga tayyor.</p>
           <div class="cond-success__chips">
             <span class="spot-chip spot-chip--gold">${ICON.cert}IIB guvohnomasi</span>
             <span class="spot-chip spot-chip--purple">${ICON.grad}Temurbek litseyiga grant</span>
           </div>
           <button class="btn btn--ghost" id="condReset">Jarayonni boshqatdan ko'rish</button>
         </div>`;
-      $("#condReset").addEventListener("click", () => { condState = ["done","active","locked","locked"]; renderCandHeader(); renderCondTracker(); });
+      $("#condReset").addEventListener("click", () => { condState = ["done","active","locked","locked","locked"]; renderCandHeader(); renderCondTracker(); });
       renderCandHeader();
       return;
     }
@@ -1098,31 +1315,57 @@
     CONDITIONS.forEach((c, i) => {
       const st = condState[i];
       const meta = c.meta ? `<div class="cstep__meta">${c.meta.ico}${c.meta.t}</div>` : "";
+      const isTest = c.type === "test";
       let detail = "";
       if (st === "active" || st === "grace") {
+        const gate = isTest ? `
+          <div class="test-gate">
+            <div class="test-gate__head">${ICON.shieldCheck}<span>Eslatma — testga kirish ruxsatnomasi</span></div>
+            <p>Ruxsatnoma onlayn testlar muvaffaqiyatli yakunlangach tizim tomonidan beriladi va yoshlar yetakchisi orqali rasmiylashtiriladi.</p>
+          </div>` : "";
+        const testInfo = isTest ? `
+          <div class="test-info">
+            <div class="test-info__banner">${ICON.exam}<span><b>Offlayn imtihon</b> — mahalla markazida, yuzma-yuz o'tkaziladi</span></div>
+            <div class="test-info__grid">
+              <div><span class="k">Joy</span><span class="v">${c.test.joy}</span></div>
+              <div><span class="k">Vaqt</span><span class="v">${c.test.vaqt}</span></div>
+              <div><span class="k">Format</span><span class="v">${c.test.format}</span></div>
+              <div><span class="k">Natija</span><span class="v">${c.test.otish}</span></div>
+            </div>
+            <div class="test-info__topics"><span class="tlabel">Qamralgan mavzular:</span>
+              ${c.test.mavzular.map(m => `<span class="tchip">${m}</span>`).join("")}</div>
+          </div>` : "";
         const qa = c.q.length ? `
           <div class="cstep__qa">
-            <div class="cstep__qa-label">${ICON.sms}${c.asker}</div>
+            <div class="cstep__qa-label">${isTest ? ICON.exam : ICON.sms}${c.asker}</div>
             ${c.q.map((q, k) => `<div class="qa-item"><span class="q-n">${k + 1}.</span><span>${q}</span></div>`).join("")}
           </div>` : "";
         let actions = "";
         if (st === "active") {
           if (c.id === "commission") {
             actions = `<div class="cstep__actions"><button class="btn btn--ok" data-cond-pass="${i}">${ICON.check} Komissiya tasdig'ini berish</button></div>`;
+          } else if (isTest) {
+            actions = `<div class="cstep__actions">
+              <button class="btn btn--ok" data-cond-pass="${i}">Testdan o'tdi · 78%</button>
+              <button class="btn btn--fail" data-cond-fail="${i}">Yiqildi</button></div>`;
           } else {
             actions = `<div class="cstep__actions">
               <button class="btn btn--ok" data-cond-pass="${i}">Savol-javobdan o'tdi</button>
               <button class="btn btn--fail" data-cond-fail="${i}">O'tmadi</button></div>`;
           }
         } else { // grace
+          const graceTxt = isTest
+            ? `Nomzod offlayn testdan kerakli balni to'play olmadi. Bilimini mustahkamlab, keyingi mahalla testiga qayta yozilishi kerak.`
+            : `Nomzod ushbu bosqichdan o'tolmadi. Targ'ibot ishlarini qaytadan amalga oshirib, tekshiruvni takrorlashi kerak.`;
+          const retryTxt = isTest ? "Keyingi testga yozilish" : "Targ'ibotni qayta boshlash";
           actions = `
             <div class="grace-note">
               <div class="t">${ICON.alert} ${GRACE_DAYS} kun muddat berildi</div>
-              <p>Nomzod ushbu bosqichdan o'tolmadi. Targ'ibot ishlarini qaytadan amalga oshirib, tekshiruvni takrorlashi kerak.</p>
+              <p>${graceTxt}</p>
             </div>
-            <div class="cstep__actions"><button class="btn btn--gold" data-cond-retry="${i}">Targ'ibotni qayta boshlash</button></div>`;
+            <div class="cstep__actions"><button class="btn btn--gold" data-cond-retry="${i}">${retryTxt}</button></div>`;
         }
-        detail = qa + actions;
+        detail = gate + testInfo + qa + actions;
       }
       const dotInner = st === "done" ? ICON.check : st === "locked" ? "" : (i + 1);
       const lockIco = st === "locked" ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>` : "";
@@ -1179,6 +1422,181 @@
   function condRetry(i) { condState[i] = "active"; renderCondTracker(); }
 
   /* =========================================================
+     SUPERADMIN PANELI
+     ========================================================= */
+  function renderAdmin() {
+    const sc = $("#adminScope");
+    if (sc) sc.innerHTML = `
+      <div class="scope-banner__ico">${ICON.globe}</div>
+      <div><h3>Superadmin · barcha ruxsatlar ochiq</h3>
+      <p>Butun platforma ko'rinadi: barcha mahallalar, raislar va foydalanuvchilar statistikasini ko'rish va boshqarish mumkin.</p></div>`;
+
+    const st = $("#adminStats");
+    if (st) {
+      const cards = [
+        { ico:ICON.building, cls:"i-gold", num:"200+", lab:"Jami mahallalar" },
+        { ico:ICON.users, cls:"i-teal", num:"100 ming+", lab:"Jami foydalanuvchilar" },
+        { ico:ICON.shieldCheck, cls:"i-purple", num:"200+", lab:"Faol raislar" },
+        { ico:ICON.ban, cls:"i-red", num:"5 000+", lab:"Bloklangan raqamlar" }
+      ];
+      st.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+    }
+
+    const t = $("#adminMahallalar");
+    if (t) {
+      const head = `<div class="dtable__head dt-mahalla"><div>Mahalla</div><div>Yetakchi</div><div>Foydalanuvchilar</div><div>Faol</div><div>O'rt. ball</div><div></div></div>`;
+      const rows = MAHALLALAR.map((m, i) => {
+        const av = (m.name[0] + m.raisi[0]).toUpperCase();
+        const col = avPalette[i % avPalette.length];
+        return `<div class="dtable__row dt-mahalla${m.own ? " is-own" : ""}">
+          <div class="cellname"><span class="cellname__av" style="background:${m.own ? 'var(--gold)' : col}">${av}</span>
+            <div>${m.name}${m.own ? '<span class="own-tag">SIZ NAZORATDA</span>' : ''}<div class="cellsub">${m.region}</div></div></div>
+          <div class="cellsub" style="font-weight:600;color:var(--ink)">${m.raisi}</div>
+          <div class="cellnum">${m.users}</div>
+          <div class="cellnum">${m.active}<small>faol</small></div>
+          <div class="cellnum">${fmtN(m.avg)}</div>
+          <div><button class="cell-link" data-view="mahalla">Ko'rish</button></div>
+        </div>`;
+      }).join("");
+      t.innerHTML = head + rows;
+      t.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => showView("mahalla")));
+    }
+
+    const pm = $("#permMatrix");
+    if (pm) {
+      const cell = v => v === "y" ? '<span class="perm-y">✓</span>' : v === "own" ? '<span class="perm-s">O‘z mahallasi</span>' : '<span class="perm-n">—</span>';
+      pm.innerHTML = `
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Yoshlar yetakchisi</b>ning ruxsati o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
+        <div style="overflow-x:auto"><table class="permtable">
+          <thead><tr><th>Ruxsat / Ma'lumot</th>
+            <th><span class="perm-role"><span class="perm-dot" style="background:var(--gold)"></span>Superadmin</span></th>
+            <th><span class="perm-role"><span class="perm-dot" style="background:var(--teal)"></span>Yoshlar yetakchisi</span></th>
+            <th><span class="perm-role"><span class="perm-dot" style="background:var(--blue)"></span>User</span></th></tr></thead>
+          <tbody>${PERM_ROWS.map(r => `<tr><th>${r.r}</th><td>${cell(r.s)}</td><td>${cell(r.a)}</td><td>${cell(r.u)}</td></tr>`).join("")}</tbody>
+        </table></div>`;
+    }
+  }
+
+  /* =========================================================
+     MAHALLA PANELI (raisi — bitta mahalla doirasi)
+     ========================================================= */
+  function renderMahalla() {
+    const my = MAHALLALAR.find(m => m.own) || MAHALLALAR[0];
+    const sc = $("#mahallaScope");
+    if (sc) sc.innerHTML = `
+      <div class="scope-banner__ico">${ICON.building}</div>
+      <div><h3>Yoshlar yetakchisi · ${my.name}</h3>
+      <p><b>Faqat o'z mahallangiz ko'rinadi.</b> Boshqa mahallalar statistikasi siz uchun yopiq — u faqat Superadminga ochiq.</p></div>`;
+
+    const st = $("#mahallaStats");
+    if (st) {
+      const cards = [
+        { ico:ICON.users, cls:"i-gold", num:fmtN(my.users), lab:"Foydalanuvchilar" },
+        { ico:ICON.spark, cls:"i-teal", num:fmtN(my.active), lab:"Faol (bu oy)" },
+        { ico:ICON.medal, cls:"i-purple", num:fmtN(my.avg), lab:"O'rtacha ball" },
+        { ico:ICON.ban, cls:"i-red", num:"340", lab:"Bloklangan raqamlar" }
+      ];
+      st.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+    }
+
+    // test ruxsatnomalari (onlayn testdan o'tganlar) — faqat yetakchiga
+    const pl = $("#permitsList");
+    if (pl) {
+      pl.innerHTML = PERMITS.map((p, i) => `
+        <div class="card permit-row${p.isNew ? " is-new" : ""}">
+          <div class="permit-row__qr">${fakeQR(p.code, 21)}</div>
+          <div class="permit-row__body">
+            <div class="permit-row__name">${p.rep} — ${p.hh} xonadoni ${p.isNew ? '<span class="permit-new">YANGI</span>' : ''}</div>
+            <div class="permit-row__sub">${ICON.check} Onlayn testlarni muvaffaqiyatli yakunladi · ${p.date}</div>
+            <div class="permit-row__code">Ruxsatnoma: <b>${p.code}</b> · Maqsad: offlayn testga kirish</div>
+          </div>
+          <button class="btn btn--gold" data-permit="${i}">Ruxsatnomani ochish</button>
+        </div>`).join("");
+      pl.querySelectorAll("[data-permit]").forEach(b => b.addEventListener("click", () => openPermit(+b.dataset.permit)));
+    }
+
+    const hint = $("#mahallaUserHint");
+    if (hint) hint.textContent = `${my.name} · ${my.users} foydalanuvchi (namunaviy 10 tasi)`;
+
+    const t = $("#mahallaUsers");
+    if (t) {
+      const head = `<div class="dtable__head dt-users"><div>Foydalanuvchi</div><div>Xonadon</div><div>Daraja</div><div>Ball</div><div>Holat</div><div></div></div>`;
+      const rows = HOUSEHOLDS.map((h, i) => {
+        const av = (h.who[0] + h.hh[0]).toUpperCase();
+        const col = h.you ? "var(--gold)" : avPalette[i % avPalette.length];
+        const vs = vStatusFor(i);
+        return `<div class="dtable__row dt-users${h.you ? " is-own" : ""}">
+          <div class="cellname"><span class="cellname__av" style="background:${col}">${av}</span>
+            <div>${h.who}${h.you ? '<span class="own-tag">SIZ</span>' : ''}<div class="cellsub">KiberHimoyachi</div></div></div>
+          <div class="cellsub" style="font-weight:600;color:var(--ink)">${h.hh}</div>
+          <div><span class="lvl-badge lvl-${h.lvl}">${levelName(h.lvl)}</span></div>
+          <div class="cellnum">${fmtN(h.pts)}</div>
+          <div><span class="vbadge ${vs.c}">${vs.t}</span></div>
+          <div><button class="cell-link" data-view="dash">Profil</button></div>
+        </div>`;
+      }).join("");
+      t.innerHTML = head + rows;
+      t.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => showView("dash")));
+    }
+
+    const tasks = $("#mahallaTasks");
+    if (tasks) tasks.innerHTML = `
+      <div class="section-title" style="margin:0 0 10px"><h2 style="font-size:18px">Mahalla vazifalari</h2></div>
+      <div class="mini-stat-row"><div class="mini-stat-row__ico i-blue">${ICON.social}</div><div class="mini-stat-row__t">Moderatsiya navbati</div><div class="mini-stat-row__v">3</div></div>
+      <div class="mini-stat-row"><div class="mini-stat-row__ico i-gold">${ICON.cert}</div><div class="mini-stat-row__t">Tasdiq kutayotgan nomzodlar</div><div class="mini-stat-row__v">2</div></div>
+      <div class="mini-stat-row"><div class="mini-stat-row__ico i-teal">${ICON.alert}</div><div class="mini-stat-row__t">Yangi xabarlar (bugun)</div><div class="mini-stat-row__v">8</div></div>
+      <button class="btn btn--gold btn--block" data-view="condition" style="margin-top:14px">Imtiyoz shartini tasdiqlash</button>`;
+    if (tasks) tasks.querySelector("[data-view]").addEventListener("click", () => showView("condition"));
+
+    const locked = $("#mahallaLocked");
+    if (locked) locked.innerHTML = `
+      <div class="locked-box">
+        ${ICON.lock}
+        <h4>Boshqa mahallalar yopiq</h4>
+        <p>Yoshlar yetakchisi sifatida siz faqat <b>${my.name}</b> ma'lumotlarini ko'rasiz. Qolgan ${MAHALLALAR.length - 1}+ mahalla statistikasi faqat Superadminga ochiq — bu RBAC doirasi (scope) bilan ta'minlanadi.</p>
+      </div>`;
+
+    // bildirishnoma badge — yangi ruxsatnomalar soni
+    const badge = $("#mahallaBadge");
+    if (badge) { const n = PERMITS.filter(p => p.isNew).length; badge.textContent = n; badge.style.display = n ? "" : "none"; }
+  }
+
+  /* ---- ruxsatnoma (QR) modal — faqat yetakchiga ---- */
+  function openPermit(i) {
+    const p = PERMITS[i]; if (!p) return;
+    const doc = $("#permitDoc"), modal = $("#permitModal");
+    doc.innerHTML = `
+      <button class="permit-doc__close" data-permit-close aria-label="Yopish">&times;</button>
+      <div class="permit-doc__top">
+        <span class="permit-doc__brand"><span class="permit-doc__shield">${ICON.shieldCheck}</span> KiberOgoh UZ</span>
+        <span class="permit-doc__tag">RASMIY</span>
+      </div>
+      <div class="permit-doc__title">RUXSATNOMA</div>
+      <div class="permit-doc__num">№ ${p.code}</div>
+      <div class="permit-doc__qr">${fakeQR(p.code, 27)}</div>
+      <div class="permit-doc__rows">
+        <div><span class="k">Fuqaro</span><span class="v">${p.full}</span></div>
+        <div><span class="k">Mahalla</span><span class="v">${MY_MAHALLA}</span></div>
+        <div><span class="k">Maqsad</span><span class="v">Offlayn bilim testiga kirish</span></div>
+        <div><span class="k">Berilgan sana</span><span class="v">${p.date}</span></div>
+        <div><span class="k">Holat</span><span class="v"><span class="permit-doc__live">Faol</span></span></div>
+      </div>
+      <div class="permit-doc__foot">
+        <span>Onlayn testlar yakunlangani uchun <b>tizim tomonidan</b> berildi. Yoshlar yetakchisi rasmiylashtiradi.</span>
+        ${SEAL}
+      </div>`;
+    modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
+  }
+  function closePermit() {
+    const modal = $("#permitModal");
+    modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true");
+  }
+  function setupPermitModal() {
+    document.addEventListener("click", e => { if (e.target.closest("[data-permit-close]")) closePermit(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closePermit(); });
+  }
+
+  /* =========================================================
      INIT
      ========================================================= */
   function init() {
@@ -1193,7 +1611,7 @@
     renderScamFilters();
     renderScams();
     $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
-    renderJamoa();
+    renderAI();
     renderHelp();
     setupReg();
     renderAbout();
@@ -1212,6 +1630,11 @@
     renderPrivileges();
     renderCondStatic();
     renderCondTracker();
+    renderAdmin();
+    renderMahalla();
+    setupPermitModal();
+    bindRoleSwitch();
+    applyRole("superadmin");
     animateDash(); dashAnimated = true;
     startLive();
   }
