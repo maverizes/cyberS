@@ -27,6 +27,7 @@
   <div class="topbar__spacer"></div>
   <div class="role-switch" id="roleSwitch" role="tablist" aria-label="Rol">
     <button data-role="superadmin" class="is-active">Superadmin</button>
+    <button data-role="tuman">Tuman mas'uli</button>
     <button data-role="raisi">Yoshlar yetakchisi</button>
     <button data-role="user">User</button>
   </div>
@@ -45,6 +46,10 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
         Superadmin paneli
       </button>
+      <button class="nav-item" data-view="kxi" data-role="superadmin tuman">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21a9 9 0 1 1 9-9" /><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M7 13a5 5 0 0 1 8-3" stroke-linecap="round" opacity=".5"/></svg>
+        KiberXavfsizlik Indeksi
+      </button>
       <button class="nav-item" data-view="mahalla" data-role="superadmin raisi">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/></svg>
         Mahalla paneli
@@ -56,6 +61,11 @@
       <button class="nav-item is-active" data-view="dash">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
         Boshqaruv paneli
+      </button>
+      <button class="nav-item nav-item--star" data-view="assist">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3.5 13.9 9l5.6 1.9-5.6 1.9L12 18l-1.9-5.2L4.5 11 10 9 12 3.5Z" stroke-linejoin="round"/><path d="M19 16v3M20.5 17.5h-3" stroke-linecap="round"/></svg>
+        Kiber Assist
+        <span class="badge badge--ai">AI</span>
       </button>
       <button class="nav-item" data-view="feed">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/></svg>
@@ -129,6 +139,16 @@
         <h1>Mahallangizning kiber holati</h1>
         <p class="lead">Real vaqtdagi tahdidlar, hududiy qamrov va himoya darajasi — barchasi bitta oynada. Quyidagi ko'rsatkichlar namunaviy (demo) ma'lumotlardir.</p>
       </div>
+
+      <button class="assist-cta" data-view="assist" id="assistCta">
+        <span class="assist-cta__glow"></span>
+        <span class="assist-cta__ico" id="assistCtaIco"></span>
+        <span class="assist-cta__txt">
+          <span class="assist-cta__t">Kiber Assist — AI yordamchi</span>
+          <span class="assist-cta__p">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Yozing yoki rasm yuklang — AI soniyada tekshiradi.</span>
+        </span>
+        <span class="assist-cta__go" id="assistCtaGo"></span>
+      </button>
 
       <div class="grid stat-grid" id="statGrid"></div>
 
@@ -478,7 +498,50 @@
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
+    <!-- ===== KIBERXAVFSIZLIK INDEKSI (KXI) ===== -->
+    <section class="view" id="view-kxi">
+      <div class="page-head">
+        <span class="eyebrow">KiberXavfsizlik Indeksi</span>
+        <h1>Har mahallaga — bitta ball, bitta holat</h1>
+        <p class="lead">KXI har bir mahallaning kiberxavfsizlik holatini 0–100 ball bilan baholaydi. Tizim ko'rsatkichlarni avtomatik hisoblab, qaysi mahallaga e'tibor kerakligini bir qarashda ko'rsatadi.</p>
+      </div>
+      <div class="scope-banner scope-banner--tuman" id="kxiScope"></div>
+      <div class="grid stat-grid" id="kxiSummary"></div>
+      <div class="section-title"><h2>Baholash darajalari</h2></div>
+      <div class="grid kxi-legend" id="kxiLegend"></div>
+      <div class="section-title"><h2>Hokimlik boshqaruv paneli</h2><span class="hint">mahallalar reytingi · qatorni bosib batafsil ko'ring</span></div>
+      <div class="card" style="padding:8px 6px"><div id="kxiTable"></div></div>
+      <div class="section-title"><h2>Ball qanday hisoblanadi?</h2></div>
+      <div class="card card--pad" id="kxiFormula"></div>
+    </section>
+
+    <!-- ===== KIBER ASSIST (AI chat) ===== -->
+    <section class="view" id="view-assist">
+      <div class="page-head">
+        <span class="eyebrow">Kiber Assist</span>
+        <h1>AI yordamchi — shubhangizni soniyada tekshiring</h1>
+        <p class="lead">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Shuni yozing yoki rasmini yuklang — Kiber Assist uni tahlil qilib, firibgarlik yoki yo'qligini, nima qilish kerakligini va rasmiy ma'lumotni aytadi.</p>
+      </div>
+      <div class="chat" id="chat">
+        <div class="chat__head">
+          <span class="chat__ava" id="chatAva"></span>
+          <div>
+            <div class="chat__name">Kiber Assist</div>
+            <div class="chat__status"><span class="chat__dot"></span>Onlayn · AI yordamchi</div>
+          </div>
+          <button class="chat__reset" id="chatReset" title="Suhbatni tozalash">Tozalash</button>
+        </div>
+        <div class="chat__body" id="chatBody"></div>
+        <div class="chat__suggest" id="chatSuggest"></div>
+        <div class="chat__bar">
+          <input type="file" accept="image/*" id="chatFile" hidden>
+          <button class="chat__icon" id="chatImg" title="Rasm yuklash" aria-label="Rasm yuklash"></button>
+          <input type="text" id="chatText" class="chat__text" placeholder="Masalan: Menga Click nomidan SMS keldi..." autocomplete="off">
+          <button class="chat__send" id="chatSend" aria-label="Yuborish"></button>
+        </div>
+      </div>
+      <p class="chat__note">Kiber Assist — namunaviy demo. Javoblar avtomatik tahlil asosida beriladi; real platformada AI model (masalan, Claude) bilan ishlaydi. Shaxsiy yozishmalar saqlanmaydi.</p>
+    </section>
     <footer class="foot">
       <div class="foot__row">
         <div>

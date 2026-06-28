@@ -38,7 +38,9 @@
     lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
     exam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2.2h6V3" stroke-linejoin="round"/><path d="M8.5 11.5l1.4 1.4 2.6-2.8M8.5 16.5h7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     tg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z" stroke-linejoin="round"/></svg>',
-    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" stroke-linecap="round"/></svg>'
+    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" stroke-linecap="round"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.7"/><path d="m4 17 5-5 4 4 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    send: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6 3 10l12 2-12 2 .4 6.4Z"/></svg>'
   };
 
   /* =========================================================
@@ -369,9 +371,11 @@
   /* ---- RBAC: rollar, mahallalar, ruxsatlar ---- */
   const ROLE_META = {
     superadmin: { name:"Superadmin", scope:"Butun platforma" },
+    tuman:      { name:"Tuman mas'uli", scope:"Chilonzor tumani" },
     raisi:      { name:"Yoshlar yetakchisi", scope:"Navbahor MFY" },
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
+  const MY_TUMAN = "Chilonzor tumani";
   const MY_MAHALLA = "Navbahor MFY";
   const MAHALLALAR = [
     { name:"Navbahor MFY", region:"Toshkent sh. · Chilonzor", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
@@ -383,31 +387,62 @@
     { name:"Obod MFY", region:"Buxoro · Kogon", raisi:"Gulnoza Nazarova", users:87, active:45, avg:790 }
   ];
   const PERM_ROWS = [
-    { r:"O'z profili, statistikasi va ballari", s:"y", a:"y", u:"y" },
-    { r:"O'z mahallasidagi foydalanuvchilar statistikasi", s:"y", a:"y", u:"n" },
-    { r:"Boshqa mahallalar va ularning userlari", s:"y", a:"n", u:"n" },
-    { r:"Barcha mahalla va raislarni boshqarish", s:"y", a:"n", u:"n" },
-    { r:"Rol biriktirish (yetakchi tayinlash)", s:"y", a:"n", u:"n" },
-    { r:"Kontent moderatsiyasi", s:"y", a:"own", u:"n" },
-    { r:"Imtiyoz shartini tasdiqlash", s:"y", a:"own", u:"n" }
+    { r:"O'z profili, statistikasi va ballari", s:"y", tm:"y", a:"y", u:"y" },
+    { r:"O'z mahallasidagi foydalanuvchilar statistikasi", s:"y", tm:"n", a:"y", u:"n" },
+    { r:"Tumandagi barcha mahallalar (KXI)", s:"y", tm:"dist", a:"n", u:"n" },
+    { r:"Boshqa tumanlar / butun platforma", s:"y", tm:"n", a:"n", u:"n" },
+    { r:"Barcha mahalla va raislarni boshqarish", s:"y", tm:"n", a:"n", u:"n" },
+    { r:"Rol biriktirish (yetakchi tayinlash)", s:"y", tm:"n", a:"n", u:"n" },
+    { r:"Imtiyoz shartini tasdiqlash", s:"y", tm:"n", a:"own", u:"n" }
   ];
   // mahalla foydalanuvchilari = HOUSEHOLDS vakillari (Navbahor MFY)
   const vStatusFor = i => i === 0 ? { c:"vb-done", t:"Taqdirlangan" } : i <= 2 ? { c:"vb-nom", t:"Nomzod" } : { c:"vb-act", t:"Faol" };
+
+  /* ---- KiberXavfsizlik Indeksi (KXI) — tuman kesimida ---- */
+  const KXI_WEIGHTS = [
+    { k:"Platforma faolligi", w:25 },
+    { k:"Test natijalari", w:20 },
+    { k:"Firibgarlikdan himoya", w:25 },
+    { k:"Kiber faol ko'ngillilar", w:15 },
+    { k:"Ogohlantirishlarni ko'rish", w:15 }
+  ];
+  // sub: [faollik, test, firibgarlikdan himoya, ko'ngillilar, ogohlantirish] — har biri 0–100
+  const KXI_MAHALLALAR = [
+    { name:"Navbahor MFY", sub:[96,92,95,90,93], own:true },
+    { name:"Bunyodkor MFY", sub:[88,85,90,84,86] },
+    { name:"Do'stlik MFY", sub:[84,80,85,78,82] },
+    { name:"Mustaqillik MFY", sub:[75,70,72,74,73] },
+    { name:"Guliston MFY", sub:[70,66,64,72,68] },
+    { name:"Obod MFY", sub:[58,52,55,60,54] },
+    { name:"Yangiobod MFY", sub:[44,40,38,45,42] },
+    { name:"Birlik MFY", sub:[40,35,34,42,38] }
+  ];
+  const kxiScore = m => Math.round(m.sub.reduce((s, v, i) => s + v * KXI_WEIGHTS[i].w / 100, 0));
+  function kxiLevel(score) {
+    if (score >= 81) return { key:"green", label:"Xavfsiz", dot:"🟢", cls:"kxi-green" };
+    if (score >= 51) return { key:"yellow", label:"Ogohlantirish", dot:"🟡", cls:"kxi-yellow" };
+    return { key:"red", label:"Yuqori xavf", dot:"🔴", cls:"kxi-red" };
+  }
+  const KXI_REC = {
+    green: "Mahalla holati barqaror. Faollikni shu darajada saqlang va tajribani boshqa mahallalarga ulashing.",
+    yellow: "Kiber faollik pasaygan. Aholini testlarga jalb qiling, ko'ngillilarni faollashtiring va qo'shimcha ogohlantirishlar yuboring.",
+    red: "Yuqori xavf — zudlik bilan chora ko'ring: mahallada targ'ibot o'tkazing, jonli seminar tashkil qiling va qo'shimcha ogohlantirish yuboring."
+  };
 
   /* =========================================================
      NAVIGATION
      ========================================================= */
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Viktorina",
-    base:"Firibgarliklar bazasi", ai:"AI tahlil", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
+    base:"Firibgarliklar bazasi", ai:"AI tahlil", assist:"Kiber Assist", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
     rating:"Xonadonlar reytingi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
-    admin:"Superadmin paneli", mahalla:"Mahalla paneli"
+    admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi"
   };
   let dashAnimated = false, quizBuilt = false;
 
   /* ---- RBAC state ---- */
   let currentRole = "superadmin";
-  const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"] };
+  const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"], kxi: ["superadmin", "tuman"] };
   const canSeeView = v => !RESTRICTED[v] || RESTRICTED[v].includes(currentRole);
 
   function showView(v) {
@@ -1464,15 +1499,16 @@
 
     const pm = $("#permMatrix");
     if (pm) {
-      const cell = v => v === "y" ? '<span class="perm-y">✓</span>' : v === "own" ? '<span class="perm-s">O‘z mahallasi</span>' : '<span class="perm-n">—</span>';
+      const cell = v => v === "y" ? '<span class="perm-y">✓</span>' : v === "own" ? '<span class="perm-s">O‘z mahallasi</span>' : v === "dist" ? '<span class="perm-s">O‘z tumani</span>' : '<span class="perm-n">—</span>';
       pm.innerHTML = `
-        <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Yoshlar yetakchisi</b>ning ruxsati o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Tuman mas'uli</b> o'z tumani, <b style="color:var(--navy)">Yoshlar yetakchisi</b> o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
         <div style="overflow-x:auto"><table class="permtable">
           <thead><tr><th>Ruxsat / Ma'lumot</th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--gold)"></span>Superadmin</span></th>
+            <th><span class="perm-role"><span class="perm-dot" style="background:var(--purple)"></span>Tuman mas'uli</span></th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--teal)"></span>Yoshlar yetakchisi</span></th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--blue)"></span>User</span></th></tr></thead>
-          <tbody>${PERM_ROWS.map(r => `<tr><th>${r.r}</th><td>${cell(r.s)}</td><td>${cell(r.a)}</td><td>${cell(r.u)}</td></tr>`).join("")}</tbody>
+          <tbody>${PERM_ROWS.map(r => `<tr><th>${r.r}</th><td>${cell(r.s)}</td><td>${cell(r.tm)}</td><td>${cell(r.a)}</td><td>${cell(r.u)}</td></tr>`).join("")}</tbody>
         </table></div>`;
     }
   }
@@ -1597,6 +1633,194 @@
   }
 
   /* =========================================================
+     KIBERXAVFSIZLIK INDEKSI (KXI) — tuman mas'uli / superadmin
+     ========================================================= */
+  function renderKxi() {
+    const rows = KXI_MAHALLALAR.map(m => ({ ...m, score: kxiScore(m), lvl: kxiLevel(kxiScore(m)) }))
+      .sort((a, b) => b.score - a.score);
+    const counts = { green: 0, yellow: 0, red: 0 };
+    rows.forEach(r => counts[r.lvl.key]++);
+    const avg = Math.round(rows.reduce((s, r) => s + r.score, 0) / rows.length);
+
+    const scope = $("#kxiScope");
+    if (scope) scope.innerHTML = `
+      <div class="scope-banner__ico">${ICON.globe}</div>
+      <div><h3>Tuman mas'uli · ${MY_TUMAN}</h3>
+        <p>Tumandagi <b>${rows.length} ta mahalla</b> holati ko'rinadi. Bir qarashda qaysi mahallaga e'tibor kerakligi aniqlanadi.</p></div>`;
+
+    const sum = $("#kxiSummary");
+    if (sum) {
+      const cards = [
+        { num: avg, lab: "Tuman o'rtacha KXI", cls: "i-gold", ico: ICON.spark },
+        { num: counts.green, lab: "Xavfsiz 🟢", cls: "i-teal", ico: ICON.shieldCheck },
+        { num: counts.yellow, lab: "Ogohlantirish 🟡", cls: "i-amber", ico: ICON.eye },
+        { num: counts.red, lab: "Yuqori xavf 🔴", cls: "i-red", ico: ICON.alert }
+      ];
+      sum.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+    }
+
+    const legend = $("#kxiLegend");
+    if (legend) {
+      const L = [
+        { cls: "kxi-green", dot: "🟢", t: "Xavfsiz mahalla", range: "81–100 ball", pts: ["Aholining ko'p qismi platformadan foydalanadi", "Test natijalari yuqori, firibgarlik kam", "Ko'ngillilar faol, ogohlantirishlar tez tarqaladi"], msg: "Platformada: «Mahalla holati: Xavfsiz 🟢»" },
+        { cls: "kxi-yellow", dot: "🟡", t: "Ogohlantirish darajasi", range: "51–80 ball", pts: ["Aholi faolligi pasaygan, testlar kam ishlangan", "Firibgarlik urinishlari ko'paygan", "Ko'ngillilar soni yetarli emas"], msg: "Tavsiya: «Mahallangizda kiber faollik pasaygan. Testlarda qatnashing va qo'shnilaringizni ogohlantiring.»" },
+        { cls: "kxi-red", dot: "🔴", t: "Yuqori xavf", range: "0–50 ball", pts: ["Firibgarliklar ko'p, foydalanuvchilar juda kam", "Kiber savodxonlik past", "Ko'ngillilar ishlamayapti"], msg: "Avtomatik tavsiya: targ'ibot o'tkazish, jonli seminar, qo'shimcha ogohlantirish" }
+      ];
+      legend.innerHTML = L.map(x => `
+        <div class="card kxi-leg ${x.cls}">
+          <div class="kxi-leg__head"><span class="kxi-leg__dot">${x.dot}</span><div><div class="kxi-leg__t">${x.t}</div><div class="kxi-leg__range">${x.range}</div></div></div>
+          <ul class="kxi-leg__list">${x.pts.map(p => `<li>${p}</li>`).join("")}</ul>
+          <div class="kxi-leg__msg">${x.msg}</div>
+        </div>`).join("");
+    }
+
+    const table = $("#kxiTable");
+    if (table) {
+      table.innerHTML = `<div class="kxitable__head"><div>Mahalla</div><div>KXI ball</div><div>Holat</div><div></div></div>` +
+        rows.map((r, i) => `
+          <div class="kxitable__row ${r.lvl.cls}" data-kxi="${i}">
+            <div class="kxitable__name">${r.own ? '<span class="kxi-you">SIZ</span> ' : ""}${r.name}</div>
+            <div class="kxitable__score"><span class="kxitable__num">${r.score}</span><div class="kxitable__bar"><i style="width:${r.score}%"></i></div></div>
+            <div><span class="kxi-badge ${r.lvl.cls}">${r.lvl.dot} ${r.lvl.label}</span></div>
+            <button class="kxitable__exp" aria-label="Batafsil">${ICON.caret}</button>
+          </div>
+          <div class="kxitable__detail" id="kxiDetail${i}">
+            <div class="kxi-breakdown">
+              ${r.sub.map((v, k) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${KXI_WEIGHTS[k].k}</span><span class="kxi-ind__w">${v}/100 · ulush ${KXI_WEIGHTS[k].w}%</span></div><div class="kxi-ind__bar"><i style="width:${v}%;background:${v >= 81 ? "var(--teal)" : v >= 51 ? "var(--gold)" : "var(--red)"}"></i></div></div>`).join("")}
+            </div>
+            <div class="kxi-rec ${r.lvl.cls}">${ICON.alert}<span><b>Tavsiya:</b> ${KXI_REC[r.lvl.key]}</span></div>
+          </div>`).join("");
+      table.querySelectorAll(".kxitable__row").forEach(row => row.addEventListener("click", () => {
+        const d = $("#kxiDetail" + row.dataset.kxi);
+        const open = d.classList.toggle("is-open"); row.classList.toggle("is-exp", open);
+      }));
+    }
+
+    const formula = $("#kxiFormula");
+    if (formula) {
+      const palette = { 0: "var(--blue)", 1: "var(--purple)", 2: "var(--teal)", 3: "var(--gold)", 4: "#e07b3e" };
+      formula.innerHTML = `
+        <p style="font-size:13.5px;color:var(--muted);margin:0 0 14px">Tizim har bir ko'rsatkichni baholab, og'irligiga ko'ra <b style="color:var(--navy)">100 ballik indeksni avtomatik hisoblaydi</b>:</p>
+        <div class="kxi-weights">${KXI_WEIGHTS.map((x, i) => `<div class="kxi-wseg" style="width:${x.w}%;background:${palette[i]}" title="${x.k} ${x.w}%"></div>`).join("")}</div>
+        <div class="kxi-wlist">${KXI_WEIGHTS.map((x, i) => `<div class="kxi-wrow"><span class="kxi-wkey"><span class="kxi-wdot" style="background:${palette[i]}"></span>${x.k}</span><span class="kxi-wval">${x.w}%</span></div>`).join("")}</div>`;
+    }
+  }
+
+  /* =========================================================
+     KIBER ASSIST (AI chat — simulyatsiya)
+     ========================================================= */
+  const ASSIST_CHIPS = ["Click'dan SMS keldi", "Bankdan kod so'rashyapti", "Telegramga kod keldi", "“Pul yutdingiz” SMS"];
+
+  function assistReply(text) {
+    const t = (text || "").toLowerCase();
+    const has = (...a) => a.some(k => t.includes(k));
+    const url = (text || "").match(/((https?:\/\/)?[a-z0-9-]+\.(xyz|top|club|online|site|info|ru|tk|cn|click|link|bonus))[^\s]*/i);
+
+    if (has("salom", "assalom", "hayrli", "yaxshimisiz") && t.length < 28)
+      return { v: "info", title: "Assalomu alaykum!", lines: ["Men Kiber Assist — kiberxavfsizlik AI yordamchisiman. Shubhali SMS, qo'ng'iroq yoki havola kelgan bo'lsa, shuni yozing yoki rasmini yuklang — men tahlil qilib beraman."] };
+
+    if (has("click", "payme", "uzcard", "humo", "paynet", "apelsin"))
+      return { v: "danger", title: "Bu fishing (firibgarlik)",
+        lines: ["Rasmiy Click/Payme/Uzcard hech qachon SMS orqali havola yubormaydi yoki kod so'ramaydi.", "Havolani <b>bosmang</b>, hech qanday kod yoki parolni kiritmang.", "Hisobingizni faqat <b>rasmiy ilova</b> orqali oching."],
+        official: "Click rasmiy: 1080 · @clickuzofficial. Shubhada — Tekshirgich bo'limidan o'tkazing." };
+
+    if (has("kod", "parol", "pin", "cvv", "tasdiqlash kod", "sms kod", "bank xodim", "karta raqam"))
+      return { v: "danger", title: "Hech qachon kodni bermang",
+        lines: ["Bank xodimi yoki to'lov tizimi SMS-kod, parol, PIN yoki karta orqasidagi 3 raqamni (CVV) <b>hech qachon</b> so'ramaydi.", "Kim so'rasa — bu firibgar. Darhol qo'ng'iroqni tugating.", "Kartani bloklash kerak bo'lsa, o'zingiz rasmiy raqamga qo'ng'iroq qiling."],
+        official: "Bank raqamini kartangiz orqasidan yoki rasmiy ilovadan oling — qo'ng'iroqdagi raqamga ishonmang." };
+
+    if (has("yutding", "yutuq", "sovg'a", "sovga", "mukofot", "avtomobil", "mashina yut", "pul yut", "aksiya yut"))
+      return { v: "danger", title: "Soxta yutuq aldovi",
+        lines: ["“Avtomobil/pul yutdingiz” xabarlari — klassik firibgarlik.", "Haqiqiy yutuq uchun siz <b>hech qachon</b> oldindan pul, “soliq” yoki “komissiya” to'lamaysiz.", "Hech qanday to'lov qilmang va shaxsiy ma'lumot bermang."],
+        official: "Aksiyani faqat tashkilotning rasmiy sayti yoki ilovasidan tekshiring." };
+
+    if (has("telegram", "akkaunt", "akount", "akaunt", "kodni yubor", "kod keldi"))
+      return { v: "danger", title: "Telegram akkauntni o'g'irlash urinishi",
+        lines: ["Kimdir Telegramga kelgan <b>kodni</b> so'rayaptimi? Uni hech kimga bermang — bu akkauntni o'g'irlash usuli.", "Hatto “do'stingiz” so'rasa ham bermang: uning akkaunti buzilgan bo'lishi mumkin.", "Ikki bosqichli parol (2FA) yoqing: Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash."],
+        official: "Telegram kodi faqat o'zingiz kirishingiz uchun — uni hech kim so'ramasligi kerak." };
+
+    if (has("ish bor", "vakansiya", "daromad", "pul ishla", "uyda o'tirib", "online ish", "investitsiya", "sarmoya"))
+      return { v: "caution", title: "Ehtiyot bo'ling — soxta ish/daromad bo'lishi mumkin",
+        lines: ["“Uyda o'tirib katta daromad”, oldindan to'lov so'raydigan yoki karta ma'lumotini talab qiladigan takliflar ko'pincha firibgarlik.", "Ishga kirish yoki “investitsiya” uchun <b>hech qachon</b> pul o'tkazmang.", "Tashkilotni rasmiy manbalardan tekshiring."],
+        official: "Rasmiy vakansiyalarni ishonchli, tasdiqlangan manbalardan qidiring." };
+
+    if (url)
+      return { v: "caution", title: "Havolani ehtiyotkorlik bilan tekshiring",
+        lines: [`Bu havola rasmiy domenga o'xshamaydi: <b>${url[0].slice(0, 44)}</b>`, "Soxta domenlar rasmiyga o'xshatib yoziladi (masalan: clik-uz.xyz, click-bonus.top).", "Bosishdan oldin <b>Tekshirgich</b> bo'limidan o'tkazing."],
+        official: "Rasmiy xizmatni faqat o'zingiz bilgan ilova yoki manzil orqali oching." };
+
+    return { v: "info", title: "Tahlil uchun biroz batafsilroq yozing",
+      lines: ["Xabarni to'liqroq yozing yoki <b>rasmini yuklang</b>. Masalan: kim yubordi, qanday havola yoki raqam bor, nima so'rayapti.", "Quyidagi tezkor tugmalardan ham foydalanishingiz mumkin."] };
+  }
+
+  function assistBubble(r) {
+    const vmap = { danger: ["verdict--danger", ICON.alert], caution: ["verdict--caution", ICON.eye], safe: ["verdict--safe", ICON.check], info: ["verdict--info", ICON.spark] };
+    const [cls, ico] = vmap[r.v] || vmap.info;
+    const lines = r.lines.map(l => `<p>${l}</p>`).join("");
+    const off = r.official ? `<div class="msg__official">${ICON.shieldCheck}<span>${r.official}</span></div>` : "";
+    return `<div class="verdict ${cls}">${ico}<span>${r.title}</span></div>${lines}${off}`;
+  }
+  function assistAdd(role, html, isImg) {
+    const body = $("#chatBody"); if (!body) return;
+    const m = el("div", "msg msg--" + role);
+    m.innerHTML = role === "ai"
+      ? `<span class="msg__ava">${ICON.spark}</span><div class="msg__bubble">${html}</div>`
+      : `<div class="msg__bubble${isImg ? " msg__bubble--img" : ""}">${html}</div>`;
+    body.appendChild(m); body.scrollTop = body.scrollHeight;
+  }
+  function assistTyping() {
+    const body = $("#chatBody");
+    const m = el("div", "msg msg--ai"); m.id = "chatTyping";
+    m.innerHTML = `<span class="msg__ava">${ICON.spark}</span><div class="msg__bubble msg__bubble--typing"><i></i><i></i><i></i></div>`;
+    body.appendChild(m); body.scrollTop = body.scrollHeight;
+  }
+  function assistRespond(text, imageMode) {
+    assistTyping();
+    setTimeout(() => {
+      const t = $("#chatTyping"); if (t) t.remove();
+      const r = imageMode
+        ? { v: "danger", title: "Rasmni tahlil qildim — fishing belgilari bor",
+            lines: ["Bu xabar rasmiy emasga o'xshaydi. Fishing belgilari: shoshilishga undash (“hisobingiz bloklandi”), notanish qisqartirilgan havola va kod/parol so'rovi.", "Havolani <b>bosmang</b>, hech qanday kod yoki ma'lumot <b>bermang</b>.", "Click/Payme yoki bank ilovasini faqat rasmiy ilovadan oching."],
+            official: "Shubha bo'lsa — havolani Tekshirgichdan o'tkazing yoki rasmiy qo'llab-quvvatlashga murojaat qiling." }
+        : assistReply(text);
+      assistAdd("ai", assistBubble(r));
+    }, 720 + Math.random() * 480);
+  }
+  function assistSend(text) {
+    text = (text || "").trim(); if (!text) return;
+    assistAdd("me", text.replace(/[<>]/g, s => s === "<" ? "&lt;" : "&gt;"));
+    const inp = $("#chatText"); if (inp) inp.value = "";
+    assistRespond(text, false);
+  }
+  function assistImage(file) {
+    const reader = new FileReader();
+    reader.onload = e => { assistAdd("me", `<img src="${e.target.result}" alt="rasm">`, true); assistRespond("", true); };
+    reader.readAsDataURL(file);
+  }
+  function assistWelcome() {
+    const body = $("#chatBody"); if (!body) return;
+    body.innerHTML = "";
+    assistAdd("ai", `<p><b>Assalomu alaykum!</b> Men Kiber Assist — kiberxavfsizlik AI yordamchisiman.</p><p>Shubhali SMS, qo'ng'iroq yoki havola keldimi? Shuni yozing yoki rasmini yuklang — men firibgarlik yoki yo'qligini tahlil qilib beraman.</p>`);
+  }
+  function renderAssist() {
+    const set = (id, ico) => { const n = $(id); if (n) n.innerHTML = ico; };
+    set("#chatAva", ICON.spark); set("#chatImg", ICON.image); set("#chatSend", ICON.send);
+    set("#assistCtaIco", ICON.spark); set("#assistCtaGo", ICON.caret);
+    const sg = $("#chatSuggest");
+    if (sg) { sg.innerHTML = ASSIST_CHIPS.map(c => `<button class="chat-chip" data-chip>${c}</button>`).join("");
+      sg.querySelectorAll("[data-chip]").forEach(b => b.addEventListener("click", () => assistSend(b.textContent))); }
+    assistWelcome();
+    if (!renderAssist._wired) {
+      renderAssist._wired = true;
+      $("#chatSend") && $("#chatSend").addEventListener("click", () => assistSend($("#chatText").value));
+      $("#chatText") && $("#chatText").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); assistSend($("#chatText").value); } });
+      $("#chatImg") && $("#chatImg").addEventListener("click", () => $("#chatFile").click());
+      $("#chatFile") && $("#chatFile").addEventListener("change", e => { if (e.target.files[0]) assistImage(e.target.files[0]); e.target.value = ""; });
+      $("#chatReset") && $("#chatReset").addEventListener("click", assistWelcome);
+    }
+  }
+
+  /* =========================================================
      INIT
      ========================================================= */
   function init() {
@@ -1612,6 +1836,8 @@
     renderScams();
     $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
     renderAI();
+    renderKxi();
+    renderAssist();
     renderHelp();
     setupReg();
     renderAbout();

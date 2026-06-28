@@ -113,7 +113,7 @@ img,svg{ display:block; }
 .region-pill b{ color:#fff; font-weight:600; }
 
 .btn{
-  border:0; border-radius:11px; padding:10px 18px; font-weight:600; font-size:14px; text-decoration: none;
+  border:0; border-radius:11px; padding:10px 18px; font-weight:600; font-size:14px;
   background:var(--navy); color:#fff; transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
 }
 .btn:hover{ transform:translateY(-1px); }
@@ -827,6 +827,83 @@ img,svg{ display:block; }
 .flow-step__b b{ color:var(--navy); }
 
 /* =========================================================
+   KIBER ASSIST (CTA + chat)
+   ========================================================= */
+.badge--ai{ background:linear-gradient(135deg,var(--purple),#8b7be6); color:#fff; }
+.nav-item--star .ico{ color:var(--gold); }
+
+/* dashboard CTA */
+.assist-cta{ position:relative; overflow:hidden; width:100%; display:flex; align-items:center; gap:16px; text-align:left; cursor:pointer;
+  background:linear-gradient(120deg,#241a52,#16224a 65%,#101a36); border:1px solid rgba(124,108,232,.35); border-radius:var(--r-xl); padding:18px 22px; margin-bottom:20px; box-shadow:0 12px 32px rgba(16,23,46,.25); transition:transform .15s ease, box-shadow .15s ease; }
+.assist-cta:hover{ transform:translateY(-2px); box-shadow:0 18px 40px rgba(16,23,46,.34); }
+.assist-cta__glow{ position:absolute; left:-40px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(124,108,232,.5), transparent 65%); pointer-events:none; }
+.assist-cta__ico{ position:relative; width:50px; height:50px; flex:0 0 50px; border-radius:14px; background:linear-gradient(135deg,var(--purple),#8b7be6); color:#fff; display:grid; place-items:center; box-shadow:0 8px 20px rgba(124,108,232,.4); }
+.assist-cta__ico svg{ width:26px; height:26px; }
+.assist-cta__txt{ position:relative; flex:1; min-width:0; }
+.assist-cta__t{ display:block; font-family:var(--display); font-weight:700; font-size:17px; color:#fff; }
+.assist-cta__p{ display:block; font-size:13.5px; color:#bcc3e2; margin-top:2px; line-height:1.45; }
+.assist-cta__go{ position:relative; width:34px; height:34px; flex:0 0 34px; border-radius:50%; background:rgba(255,255,255,.1); color:#fff; display:grid; place-items:center; }
+.assist-cta__go svg{ width:18px; height:18px; transform:rotate(-90deg); }
+
+/* chat shell */
+.chat{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-xl); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; height:min(640px,72vh); }
+.chat__head{ display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); background:var(--navy); color:#fff; }
+.chat__ava{ width:40px; height:40px; flex:0 0 40px; border-radius:12px; background:linear-gradient(135deg,var(--purple),#8b7be6); display:grid; place-items:center; }
+.chat__ava svg{ width:22px; height:22px; color:#fff; }
+.chat__name{ font-family:var(--display); font-weight:700; font-size:16px; }
+.chat__status{ font-size:12px; color:#9aa3c4; display:flex; align-items:center; gap:6px; }
+.chat__dot{ width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 0 rgba(27,158,134,.6); animation:pulse 1.8s infinite; }
+.chat__reset{ margin-left:auto; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); color:#cfd5ea; font-size:12px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer; }
+.chat__reset:hover{ background:rgba(255,255,255,.16); }
+
+.chat__body{ flex:1; overflow-y:auto; padding:20px 18px; display:flex; flex-direction:column; gap:14px; background:var(--canvas); }
+.msg{ display:flex; gap:10px; max-width:84%; }
+.msg--ai{ align-self:flex-start; }
+.msg--me{ align-self:flex-end; }
+.msg__ava{ width:32px; height:32px; flex:0 0 32px; border-radius:9px; background:linear-gradient(135deg,var(--purple),#8b7be6); display:grid; place-items:center; }
+.msg__ava svg{ width:17px; height:17px; color:#fff; }
+.msg__bubble{ background:#fff; border:1px solid var(--line); border-radius:16px; border-top-left-radius:5px; padding:13px 15px; font-size:14px; color:var(--ink); line-height:1.55; box-shadow:var(--shadow-sm); }
+.msg__bubble p{ margin:0 0 7px; } .msg__bubble p:last-child{ margin-bottom:0; }
+.msg__bubble b{ color:var(--navy); }
+.msg--me .msg__bubble{ background:var(--navy); color:#fff; border:0; border-radius:16px; border-top-right-radius:5px; }
+.msg--me .msg__bubble--img{ padding:5px; background:var(--navy); }
+.msg--me .msg__bubble img{ max-width:220px; max-height:260px; border-radius:11px; display:block; }
+.msg__official{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--line-2); font-size:13px; color:var(--teal); font-weight:600; line-height:1.45; }
+.msg__official svg{ width:16px; height:16px; flex:0 0 16px; margin-top:1px; }
+
+/* verdict header inside bubble */
+.verdict{ display:flex; align-items:center; gap:8px; font-family:var(--display); font-weight:700; font-size:15px; margin-bottom:8px; }
+.verdict svg{ width:18px; height:18px; flex:0 0 18px; }
+.verdict--danger{ color:var(--red); } .verdict--caution{ color:var(--gold-700); }
+.verdict--safe{ color:var(--teal); } .verdict--info{ color:var(--purple); }
+
+/* typing */
+.msg__bubble--typing{ display:flex; gap:5px; padding:15px; }
+.msg__bubble--typing i{ width:7px; height:7px; border-radius:50%; background:var(--faint); animation:typing 1.2s infinite; }
+.msg__bubble--typing i:nth-child(2){ animation-delay:.2s; } .msg__bubble--typing i:nth-child(3){ animation-delay:.4s; }
+@keyframes typing{ 0%,60%,100%{ transform:translateY(0); opacity:.4; } 30%{ transform:translateY(-5px); opacity:1; } }
+
+/* suggestion chips */
+.chat__suggest{ display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px solid var(--line); background:var(--surface); }
+.chat-chip{ background:var(--gold-soft); border:1px solid #f0d99a; color:var(--gold-700); font-size:13px; font-weight:600; padding:7px 13px; border-radius:999px; cursor:pointer; transition:all .15s ease; }
+.chat-chip:hover{ background:var(--gold); color:var(--navy); border-color:var(--gold); }
+
+/* input bar */
+.chat__bar{ display:flex; align-items:center; gap:10px; padding:12px 16px; border-top:1px solid var(--line); background:var(--surface); }
+.chat__icon, .chat__send{ width:42px; height:42px; flex:0 0 42px; border-radius:12px; display:grid; place-items:center; cursor:pointer; border:0; }
+.chat__icon{ background:var(--canvas); border:1px solid var(--line); color:var(--muted); }
+.chat__icon:hover{ color:var(--navy); border-color:var(--navy); }
+.chat__icon svg{ width:21px; height:21px; }
+.chat__text{ flex:1; min-width:0; height:42px; border:1px solid var(--line); border-radius:12px; padding:0 15px; font-size:14px; font-family:var(--ui); background:var(--canvas); color:var(--ink); outline:none; transition:border-color .15s ease; }
+.chat__text:focus{ border-color:var(--gold); background:#fff; }
+.chat__send{ background:var(--gold); color:var(--navy); }
+.chat__send:hover{ background:var(--gold-700); color:#fff; }
+.chat__send svg{ width:20px; height:20px; }
+.chat__note{ font-size:12.5px; color:var(--faint); margin-top:14px; line-height:1.5; }
+
+@media (max-width:540px){ .msg{ max-width:92%; } .chat{ height:74vh; } .assist-cta__go{ display:none; } }
+
+/* =========================================================
    AI TAHLIL (analytics)
    ========================================================= */
 .ai-insight{ position:relative; overflow:hidden; background:linear-gradient(140deg,#1b1240,#13294f 60%,#0f1530); border:0; padding:26px 28px; color:#fff; margin-bottom:18px; }
@@ -942,7 +1019,7 @@ img,svg{ display:block; }
    RBAC — rol almashtirgich, panellar, ruxsatlar
    ========================================================= */
 .role-switch{ display:inline-flex; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:11px; padding:3px; gap:2px; }
-.role-switch button{ border:0; background:transparent; color:#c2c9e4; font-weight:600; font-size:12.5px; padding:7px 12px; border-radius:8px; transition:all .15s ease; white-space:nowrap; }
+.role-switch button{ border:0; background:transparent; color:#c2c9e4; font-weight:600; font-size:12px; padding:6px 10px; border-radius:8px; transition:all .15s ease; white-space:nowrap; cursor:pointer; }
 .role-switch button:hover{ color:#fff; }
 .role-switch button.is-active{ background:var(--gold); color:var(--navy); }
 
@@ -958,7 +1035,86 @@ img,svg{ display:block; }
 .scope-banner--raisi{ background:var(--teal-soft); border:1px solid #c4e9e0; color:#0f6b5a; }
 .scope-banner--raisi .scope-banner__ico{ background:var(--teal); color:#fff; }
 .scope-banner--raisi h3{ color:#0f6b5a; } .scope-banner--raisi p{ color:#178069; }
+.scope-banner--tuman{ background:var(--purple-soft); border:1px solid #d6cffb; color:#42389a; }
+.scope-banner--tuman .scope-banner__ico{ background:var(--purple); color:#fff; }
+.scope-banner--tuman h3{ color:#42389a; } .scope-banner--tuman p{ color:#5346b0; }
 .scope-banner b{ font-weight:700; }
+.i-amber{ background:var(--amber-soft); color:var(--gold-700); }
+
+/* =========================================================
+   KIBERXAVFSIZLIK INDEKSI (KXI)
+   ========================================================= */
+.kxi-legend{ grid-template-columns:repeat(3,1fr); }
+.kxi-leg{ padding:18px; border-top:3px solid var(--line); }
+.kxi-leg.kxi-green{ border-top-color:var(--teal); }
+.kxi-leg.kxi-yellow{ border-top-color:var(--gold); }
+.kxi-leg.kxi-red{ border-top-color:var(--red); }
+.kxi-leg__head{ display:flex; align-items:center; gap:11px; margin-bottom:12px; }
+.kxi-leg__dot{ font-size:22px; line-height:1; }
+.kxi-leg__t{ font-family:var(--display); font-weight:700; font-size:16px; color:var(--navy); }
+.kxi-leg__range{ font-size:12.5px; color:var(--muted); font-family:var(--mono); margin-top:1px; }
+.kxi-leg__list{ margin:0 0 12px; padding-left:18px; }
+.kxi-leg__list li{ font-size:13px; color:var(--ink); line-height:1.5; margin:4px 0; }
+.kxi-leg__msg{ font-size:12.5px; line-height:1.5; padding:10px 12px; border-radius:9px; background:var(--canvas); color:var(--muted); }
+.kxi-green .kxi-leg__msg{ background:var(--teal-soft); color:#0f6b5a; }
+.kxi-yellow .kxi-leg__msg{ background:var(--amber-soft); color:#7a5a14; }
+.kxi-red .kxi-leg__msg{ background:var(--red-soft); color:#a23434; }
+
+/* hokimlik table */
+.kxitable__head{ display:grid; grid-template-columns:1fr 220px 160px 40px; gap:14px; align-items:center; padding:10px 16px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--faint); }
+.kxitable__row{ display:grid; grid-template-columns:1fr 220px 160px 40px; gap:14px; align-items:center; padding:13px 16px; border-radius:12px; cursor:pointer; transition:background .15s ease; border-left:4px solid transparent; }
+.kxitable__row:hover{ background:var(--canvas); }
+.kxitable__row.kxi-green{ border-left-color:var(--teal); }
+.kxitable__row.kxi-yellow{ border-left-color:var(--gold); }
+.kxitable__row.kxi-red{ border-left-color:var(--red); }
+.kxitable__name{ font-weight:700; font-size:14.5px; color:var(--ink); display:flex; align-items:center; gap:8px; }
+.kxi-you{ font-size:10px; font-weight:800; letter-spacing:.04em; color:var(--navy); background:var(--gold); border-radius:5px; padding:2px 6px; }
+.kxitable__score{ display:flex; align-items:center; gap:11px; }
+.kxitable__num{ font-family:var(--display); font-weight:700; font-size:19px; color:var(--navy); width:30px; }
+.kxitable__bar{ flex:1; height:8px; background:var(--line); border-radius:8px; overflow:hidden; }
+.kxitable__bar i{ display:block; height:100%; border-radius:8px; }
+.kxi-green .kxitable__bar i{ background:var(--teal); }
+.kxi-yellow .kxitable__bar i{ background:var(--gold); }
+.kxi-red .kxitable__bar i{ background:var(--red); }
+.kxi-badge{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; white-space:nowrap; }
+.kxi-badge.kxi-green{ background:var(--teal-soft); color:#0f6b5a; }
+.kxi-badge.kxi-yellow{ background:var(--amber-soft); color:var(--gold-700); }
+.kxi-badge.kxi-red{ background:var(--red-soft); color:var(--red); }
+.kxitable__exp{ width:30px; height:30px; border:0; background:transparent; color:var(--muted); cursor:pointer; display:grid; place-items:center; justify-self:end; }
+.kxitable__exp svg{ width:18px; height:18px; transition:transform .2s ease; }
+.kxitable__row.is-exp .kxitable__exp svg{ transform:rotate(180deg); }
+.kxitable__detail{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+.kxitable__detail.is-open{ max-height:600px; }
+.kxi-breakdown{ padding:6px 16px 14px; }
+.kxi-ind{ margin:9px 0; }
+.kxi-ind__top{ display:flex; justify-content:space-between; gap:12px; font-size:13px; margin-bottom:5px; }
+.kxi-ind__top span:first-child{ color:var(--ink); font-weight:500; }
+.kxi-ind__w{ color:var(--faint); font-size:12px; font-family:var(--mono); white-space:nowrap; }
+.kxi-ind__bar{ height:7px; background:var(--line); border-radius:7px; overflow:hidden; }
+.kxi-ind__bar i{ display:block; height:100%; border-radius:7px; }
+.kxi-rec{ display:flex; align-items:flex-start; gap:10px; margin:0 16px 14px; padding:12px 14px; border-radius:11px; font-size:13px; line-height:1.5; }
+.kxi-rec svg{ width:17px; height:17px; flex:0 0 17px; margin-top:1px; }
+.kxi-rec b{ font-weight:700; }
+.kxi-rec.kxi-green{ background:var(--teal-soft); color:#0f6b5a; } .kxi-rec.kxi-green svg{ color:var(--teal); }
+.kxi-rec.kxi-yellow{ background:var(--amber-soft); color:#7a5a14; } .kxi-rec.kxi-yellow svg{ color:var(--gold-700); }
+.kxi-rec.kxi-red{ background:var(--red-soft); color:#a23434; } .kxi-rec.kxi-red svg{ color:var(--red); }
+
+/* formula */
+.kxi-weights{ display:flex; height:30px; border-radius:9px; overflow:hidden; margin-bottom:16px; }
+.kxi-wseg{ height:100%; }
+.kxi-wlist{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px 22px; }
+.kxi-wrow{ display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--line-2); font-size:13.5px; }
+.kxi-wkey{ display:flex; align-items:center; gap:9px; color:var(--ink); }
+.kxi-wdot{ width:11px; height:11px; border-radius:3px; flex:0 0 11px; }
+.kxi-wval{ font-family:var(--display); font-weight:700; color:var(--navy); }
+
+@media (max-width:980px){
+  .kxi-legend{ grid-template-columns:1fr; }
+  .kxitable__head{ grid-template-columns:1fr 90px 40px; }
+  .kxitable__head > div:nth-child(2){ display:none; }
+  .kxitable__row{ grid-template-columns:1fr 110px 40px; }
+  .kxitable__score{ display:none; }
+}
 
 /* admin/mahalla data table */
 .dtable{ width:100%; }
@@ -1019,6 +1175,7 @@ img,svg{ display:block; }
 /* =========================================================
    RESPONSIVE
    ========================================================= */
+@media (max-width:1180px){ .region-pill{ display:none; } }
 @media (max-width:1040px){
   .stat-grid{ grid-template-columns:repeat(2,1fr); }
   .mod-grid{ grid-template-columns:repeat(2,1fr); }
