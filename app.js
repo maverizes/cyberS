@@ -505,7 +505,7 @@
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
     base:"Firibgarliklar bazasi", ai:"AI tahlil", assist:"Kiber Assist", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
-    rating:"Xonadonlar reytingi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
+    life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi"
   };
   let dashAnimated = false, quizBuilt = false;
@@ -583,15 +583,17 @@
       const tick = () => { i++; cur = Math.min(target, cur + inc); n.textContent = fmt(cur) + suf; if (i < steps) requestAnimationFrame(tick); else n.textContent = fmt(target) + suf; };
       requestAnimationFrame(tick);
     });
-    // shield ring
+    // shield ring (faqat mavjud bo'lsa)
     const C = 2 * Math.PI * 52, pct = 0.86;
     const ring = $("#shieldProg");
-    ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C;
-    setTimeout(() => { ring.style.strokeDashoffset = C * (1 - pct); }, 150);
-    let p = 0; const pe = $("#shieldPct");
-    const pt = () => { p = Math.min(86, p + 2); pe.textContent = p + "%"; if (p < 86) requestAnimationFrame(pt); };
-    setTimeout(() => requestAnimationFrame(pt), 150);
-    $("#mActive").textContent = "312"; $("#mBlocked").textContent = "5 240";
+    if (ring) {
+      ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C;
+      setTimeout(() => { ring.style.strokeDashoffset = C * (1 - pct); }, 150);
+      let p = 0; const pe = $("#shieldPct");
+      const pt = () => { p = Math.min(86, p + 2); if (pe) pe.textContent = p + "%"; if (p < 86) requestAnimationFrame(pt); };
+      setTimeout(() => requestAnimationFrame(pt), 150);
+      const ma = $("#mActive"), mb = $("#mBlocked"); if (ma) ma.textContent = "312"; if (mb) mb.textContent = "5 240";
+    }
   }
   function alertNode(a, isNew) {
     const cat = CATS[a.cat];
@@ -606,7 +608,7 @@
     return n;
   }
   function renderDashFeed() {
-    const f = $("#dashFeed"); f.innerHTML = "";
+    const f = $("#dashFeed"); if (!f) return; f.innerHTML = "";
     FEED.slice(0, 3).forEach(a => f.appendChild(alertNode(a)));
   }
   function renderPyramid(target) {
@@ -790,9 +792,229 @@
   /* =========================================================
      KIBERSINOV (quiz) — natija foydalanuvchi → mahalla → tuman ga ta'sir qiladi
      ========================================================= */
+  /* ---- Foydalanuvchi paneli: odat (habit) yondashuvi ---- */
+  const USER_NAME = "Azizbek";
+  const USER_SEC = [
+    { ok:true,  w:22, t:"Kuchli parol o'rnatilgan" },
+    { ok:true,  w:28, t:"Ikki bosqichli himoya (2FA) yoqilgan" },
+    { ok:true,  w:22, t:"Shubhali ilovalar o'rnatilmagan" },
+    { ok:false, w:14, t:"Telefon tizimi yangilanmagan", action:"Qanday yangilash", view:"life" },
+    { ok:false, w:14, t:"Phishing testidan o'tmagansiz", action:"Testni boshlash", view:"quiz" }
+  ];
+  const BADGES = [
+    { at:500, name:"Boshlovchi" }, { at:1000, name:"Hushyor fuqaro" },
+    { at:1500, name:"Kiber faol" }, { at:2500, name:"Kiber qahramon" }
+  ];
+  const DAILY_TIPS = [
+    "Bugun telefoningizdagi ishlatilmayotgan ilovalarni o'chirib tashlang — ular ma'lumotingizni yig'ishi mumkin.",
+    "Bugun Google akkauntingizda ikki bosqichli himoyani (2FA) yoqing.",
+    "Bugun bank ilovangiz parolini brauzeringizdan emas, faqat ilovaning o'zidan kiriting.",
+    "Bugun eng muhim akkauntlaringiz parolini takrorlanmas qilib o'zgartiring."
+  ];
+  const LIFEHACKS = [
+    { ico:ICON.social, cls:"i-blue",   t:"Telegram akkauntini himoyalash", d:"2FA va faol sessiyalarni tekshirish", dur:"0:45",
+      steps:["Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash'ni yoqing.", "Sozlamalar → Qurilmalar'da notanish faol sessiyalarni o'chiring.", "Telegramga kelgan kodni hech kimga bermang."] },
+    { ico:ICON.coin, cls:"i-gold",     t:"Bank kartangizni himoyalash", d:"CVV, SMS-kod va push xavfsizligi", dur:"0:50",
+      steps:["Karta orqasidagi 3 raqamni (CVV) hech kimga aytmang.", "SMS yoki qo'ng'iroqda kelgan kodni bermang — bank uni so'ramaydi.", "To'lovlar uchun push-tasdiq va limit o'rnating."] },
+    { ico:ICON.phone, cls:"i-teal",    t:"Telefonni tezlashtirish", d:"Kesh va ortiqcha ilovalardan tozalash", dur:"0:40",
+      steps:["Ishlatilmayotgan ilovalarni o'chiring.", "Ilovalar keshini tozalang (Sozlamalar → Ilovalar).", "Avtomatik ishga tushadigan ilovalarni cheklang."] },
+    { ico:ICON.phone, cls:"i-red",     t:"Firibgar qo'ng'iroqni aniqlash", d:"Shubhali qo'ng'iroq belgilari", dur:"0:55",
+      steps:["Shoshiltirish va qo'rqitish — asosiy belgi.", "Bank/davlat nomidan kod yoki parol so'rashsa — bu firibgar.", "Shubha bo'lsa, go'shakni qo'ying va rasmiy raqamga o'zingiz qo'ng'iroq qiling."] },
+    { ico:ICON.lock, cls:"i-purple",   t:"Wi-Fi parolini to'g'ri tanlash", d:"Kuchli parol qoidalari", dur:"0:35",
+      steps:["Kamida 12 belgidan, harf+raqam+belgi aralash.", "Ism, tug'ilgan sana yoki 12345 ishlatmang.", "Router'da WPA2/WPA3 himoyasini yoqing."] },
+    { ico:ICON.eye, cls:"i-blue",      t:"Deepfake videoni ajratish", d:"Soxta videoning belgilari", dur:"1:00",
+      steps:["Yuz va lab harakati ovozga mos kelmasligi.", "Ko'z pirpiratishi va yorug'lik g'ayritabiiy bo'lishi.", "Manbani tekshiring — rasmiy kanaldan tarqalganmi."] }
+  ];
+
+  function badgeInfo() {
+    const next = BADGES.find(b => b.at > userBall) || BADGES[BADGES.length - 1];
+    const prev = [...BADGES].reverse().find(b => b.at <= userBall);
+    const base = prev ? prev.at : 0;
+    const pct = Math.min(100, Math.round((userBall - base) / (next.at - base) * 100));
+    return { next, remain: Math.max(0, next.at - userBall), pct };
+  }
+  function renderDashHero() {
+    const wrap = $("#dashHero"); if (!wrap) return;
+    const secPct = USER_SEC.filter(s => s.ok).reduce((s, x) => s + x.w, 0);
+    const done = USER_SEC.filter(s => s.ok).length;
+    const bi = badgeInfo();
+    const C = 2 * Math.PI * 34;
+    wrap.innerHTML = `
+      <div class="hero-card hero-card--sec">
+        <div class="hero-card__top"><span>🛡 Kiber darajangiz</span></div>
+        <div class="sec-ring">
+          <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-track"/><circle cx="40" cy="40" r="34" class="sr-prog" style="stroke-dasharray:${C};stroke-dashoffset:${C * (1 - secPct / 100)};stroke:${kxiColor(secPct)}"/></svg>
+          <div class="sec-ring__c"><div class="sec-ring__pct">${secPct}%</div></div>
+        </div>
+        <p class="hero-card__sub">${USER_SEC.length} tekshiruvdan <b>${done} tasi</b> bajarildi</p>
+      </div>
+      <div class="hero-card hero-card--task">
+        <div class="hero-card__top"><span>🔥 Bugungi vazifa</span></div>
+        <div class="task-body"><div class="task-ico">${ICON.exam}</div><div><div class="task-t">3 ta phishing savolini ishlang</div><div class="task-d">2 daqiqa · +10 ball</div></div></div>
+        <button class="btn btn--gold btn--block" data-view="quiz">Boshlash</button>
+      </div>
+      <div class="hero-card hero-card--ball">
+        <div class="hero-card__top"><span>🏆 Mening ballarim</span></div>
+        <div class="ball-num">${fmtN(userBall)}<span>ball</span></div>
+        <div class="ball-next">Keyingi badge: <b>${bi.next.name}</b></div>
+        <div class="ball-bar"><i style="width:${bi.pct}%"></i></div>
+        <div class="ball-remain">${fmtN(bi.remain)} ball qoldi</div>
+      </div>`;
+    wireViewBtns(wrap);
+  }
+  function renderSecLevel() {
+    const c = $("#dashSec"); if (!c) return;
+    const secPct = USER_SEC.filter(s => s.ok).reduce((s, x) => s + x.w, 0);
+    c.innerHTML = `
+      <div class="seclevel__head">
+        <div><span class="eyebrow">🛡 Mening kiber pasportim</span><h3>Profilingiz qanchalik himoyalangan</h3></div>
+        <div class="seclevel__pct" style="color:${kxiColor(secPct)}">${secPct}<span>%</span></div>
+      </div>
+      <div class="seclevel__bar"><i style="width:${secPct}%;background:${kxiColor(secPct)}"></i></div>
+      <div class="seclevel__list">
+        ${USER_SEC.map(s => `<div class="sec-item ${s.ok ? "ok" : "no"}">
+          <span class="sec-item__mark">${s.ok ? "✔️" : "✖️"}</span>
+          <span class="sec-item__t">${s.t}</span>
+          ${!s.ok ? `<button class="sec-item__btn" data-view="${s.view}">${s.action} →</button>` : ""}
+        </div>`).join("")}
+      </div>`;
+    wireViewBtns(c);
+  }
+  function renderDayTip() {
+    const c = $("#dashTip"); if (!c) return;
+    const tip = DAILY_TIPS[new Date().getDate() % DAILY_TIPS.length];
+    c.innerHTML = `<div class="daytip__ico">💡</div><div><div class="daytip__lab">Bugungi tavsiya</div><p class="daytip__p">${tip}</p></div>`;
+  }
+  function renderLifehacks() {
+    const prev = $("#dashLife");
+    const cards = (arr, withSteps) => arr.map((h, i) => `
+      <div class="lh-card${withSteps ? " lh-card--full" : ""}" ${withSteps ? `data-lh="${i}"` : `data-view="life"`}>
+        <div class="lh-card__top"><span class="lh-card__ico ${h.cls}">${h.ico}</span><span class="lh-card__dur">${ICON.play} ${h.dur}</span></div>
+        <h4>${h.t}</h4><p>${h.d}</p>
+        ${withSteps ? `<div class="lh-steps" id="lhSteps${i}"><ol>${h.steps.map(s => `<li>${s}</li>`).join("")}</ol></div><button class="lh-toggle" data-lh="${i}">Ko'rsatmalarni ochish ${ICON.caret}</button>` : ""}
+      </div>`).join("");
+    if (prev) { prev.innerHTML = cards(LIFEHACKS.slice(0, 3), false); wireViewBtns(prev); }
+    const full = $("#lifeGrid");
+    if (full) {
+      full.innerHTML = cards(LIFEHACKS, true);
+      full.querySelectorAll(".lh-toggle").forEach(b => b.addEventListener("click", e => {
+        e.stopPropagation();
+        const card = b.closest(".lh-card"); const open = card.classList.toggle("is-open");
+        b.innerHTML = (open ? "Ko'rsatmalarni yopish " : "Ko'rsatmalarni ochish ") + ICON.caret;
+      }));
+    }
+  }
+
+  /* ---- OFFLINE SERTIFIKAT SINOVI — asosiy maqsad ---- */
+  const CERT = {
+    ready: 82,
+    stats: [
+      { n:5, lab:"Kurs tugallangan", ico:ICON.grad, cls:"i-purple" },
+      { n:18, lab:"Layfxak ko'rilgan", ico:ICON.play, cls:"i-blue" },
+      { n:42, lab:"Test ishlangan", ico:ICON.exam, cls:"i-gold" }
+    ],
+    topics: [
+      { t:"Parollar", pct:95 },
+      { t:"Telegram xavfsizligi", pct:90 },
+      { t:"Firibgar qo'ng'iroqlar", pct:78 },
+      { t:"AI firibgarligi", pct:70 },
+      { t:"Fishing havolalar", pct:62 },
+      { t:"Bank xavfsizligi", pct:45 }
+    ]
+  };
+  const CHAIN = [
+    { ico:ICON.play, t:"Kiber Layfxak", d:"Qisqa video — kunlik odat" },
+    { ico:ICON.spark, t:"Mini test", d:"Bilimni mustahkamlash" },
+    { ico:ICON.grad, t:"Kurs", d:"Mavzuni chuqur o'rganish" },
+    { ico:ICON.target, t:"Amaliy vazifa", d:"Bilimni hayotda qo'llash" },
+    { ico:ICON.medal, t:"Ball va badge", d:"Rag'bat to'planadi" },
+    { ico:ICON.exam, t:"Offline test", d:"Haqiqiy imtihon", key:true },
+    { ico:ICON.cert, t:"Sertifikat", d:"Rasmiy tasdiq" },
+    { ico:ICON.gift, t:"Rag'bat", d:"Imtiyoz va sovg'a" }
+  ];
+  const certWeak = () => [...CERT.topics].sort((a, b) => a.pct - b.pct)[0];
+  function certTopicBars() {
+    return CERT.topics.map(t => {
+      const lvl = t.pct >= 81 ? "🟢" : t.pct >= 51 ? "🟡" : "🔴";
+      return `<div class="ct-row"><div class="ct-name">${lvl} ${t.t}</div><div class="ct-track"><i style="width:${t.pct}%;background:${kxiColor(t.pct)}"></i></div><div class="ct-val">${t.pct}%</div></div>`;
+    }).join("");
+  }
+  function renderCertGoal() {
+    const c = $("#dashCert"); if (!c) return;
+    const weak = certWeak();
+    c.innerHTML = `
+      <div class="certgoal__badge">🎓 Asosiy maqsad</div>
+      <div class="certgoal__main">
+        <div class="certgoal__left">
+          <h3>Offline sertifikat sinovi</h3>
+          <p>Siz faqat ball yig'mayapsiz — haqiqiy imtihonga tayyorlanyapsiz. Bilim → Offline test → Sertifikat → Rag'bat.</p>
+          <div class="certgoal__stats">${CERT.stats.map(s => `<span><b>${s.n}</b> ${s.lab.toLowerCase()}</span>`).join("")}</div>
+          <button class="btn btn--gold" data-view="cert">Tayyorlik darajangizni ko'ring</button>
+        </div>
+        <div class="certgoal__ring">
+          <div class="cg-ring" style="background:conic-gradient(var(--gold) ${CERT.ready * 3.6}deg, rgba(255,255,255,.18) 0)"><div class="cg-ring__h"><div class="cg-ring__n">${CERT.ready}%</div><div class="cg-ring__l">tayyorgarlik</div></div></div>
+        </div>
+      </div>`;
+    wireViewBtns(c);
+  }
+  function renderCert() {
+    const wrap = $("#view-cert"); if (!wrap) return;
+    const weak = certWeak();
+    const hero = $("#certHero");
+    if (hero) hero.innerHTML = `
+      <div class="cert-hero__top">
+        <div><span class="eyebrow" style="color:rgba(255,255,255,.8)">Umumiy tayyorgarlik</span><div class="cert-hero__pct">${CERT.ready}%</div></div>
+        <div class="cert-hero__ico">${ICON.grad}</div>
+      </div>
+      <div class="cert-hero__bar"><i style="width:${CERT.ready}%"></i></div>
+      <p class="cert-hero__note">Bu ko'rsatkich kurslar, layfxaklar, testlar va bilim darajangizni birlashtiradi.</p>
+      <button class="btn btn--gold" id="certEnroll">${ICON.cert} Offline testga yozilish</button>`;
+    const stats = $("#certStats");
+    if (stats) stats.innerHTML = CERT.stats.map(s => `<div class="card stat"><div class="stat__ico ${s.cls}">${s.ico}</div><div class="stat__num">${s.n}</div><div class="stat__label">${s.lab}</div></div>`).join("");
+    const topics = $("#certTopics");
+    if (topics) topics.innerHTML = certTopicBars();
+    const rec = $("#certRec");
+    if (rec) rec.innerHTML = `
+      <div class="cert-rec__ico">${ICON.target}</div>
+      <div>
+        <div class="cert-rec__t">Tizim tavsiyasi</div>
+        <p>Eng zaif mavzuingiz — <b>${weak.t} (${weak.pct}%)</b>. Shu bo'yicha <b>“${weak.t}”</b> kursini tugatsangiz, offline testdan o'tish ehtimolingiz <b class="cert-rec__hl">94%</b> bo'ladi.</p>
+        <button class="btn btn--ghost" data-view="life">“${weak.t}” bo'yicha o'rganish</button>
+      </div>`;
+    const chain = $("#certChain");
+    if (chain) chain.innerHTML = CHAIN.map((s, i) => `
+      <div class="chain-step${s.key ? " chain-step--key" : ""}">
+        <div class="chain-step__ico">${s.ico}</div>
+        <div class="chain-step__t">${s.t}</div>
+        <div class="chain-step__d">${s.d}</div>
+      </div>${i < CHAIN.length - 1 ? `<div class="chain-arrow">${ICON.caret}</div>` : ""}`).join("");
+    wireViewBtns(wrap);
+    const enroll = $("#certEnroll");
+    if (enroll) enroll.addEventListener("click", () => showView("condition"));
+  }
+  function renderCourseRec() {
+    const c = $("#dashCourse"); if (!c) return;
+    const weak = certWeak();
+    c.innerHTML = `
+      <div class="section-title" style="margin:0 0 12px"><h2 style="font-size:17px">📚 Tavsiya etilgan kurs</h2></div>
+      <div class="course-rec">
+        <div class="course-rec__ico">${ICON.grad}</div>
+        <div class="course-rec__body">
+          <h4>${weak.t}</h4>
+          <p>Zaif tomoningiz shu mavzuda (${weak.pct}%). Tizim aynan shuni tavsiya qiladi.</p>
+          <div class="course-rec__bar"><i style="width:${weak.pct}%;background:${kxiColor(weak.pct)}"></i></div>
+        </div>
+      </div>
+      <button class="btn btn--ghost btn--block" data-view="cert" style="margin-top:14px">Offline testga tayyorligimni ko'rish</button>`;
+    wireViewBtns(c);
+  }
+
+  /* =========================================================
+     KIBERSINOV (quiz) — natija foydalanuvchi → mahalla → tuman ga ta'sir qiladi
+     ========================================================= */
   let qi = 0, qScore = 0;
   const POINT_PER_CORRECT = 15;
-  let userBall = 1240;               // Alisher (Abdullayevlar) — reytingdagi joriy bal
+  let userBall = 1280;               // Azizbek — joriy ball
   function levelFor(pct) {
     if (pct >= 90) return "Kiber Qahramon";
     if (pct >= 70) return "Kiber faol";
@@ -880,10 +1102,10 @@
       </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
         <button class="btn btn--gold" id="qRestart">Qayta o'ynash</button>
-        <button class="btn btn--ghost" data-view="rating">Xonadonlar reytingi</button>
+        <button class="btn btn--ghost" data-view="life">Kiber Layfxak</button>
       </div>`;
     $("#qRestart").addEventListener("click", startQuiz);
-    $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("rating"); });
+    $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("life"); });
   }
 
   /* =========================================================
@@ -1177,8 +1399,8 @@
         <div class="hh-mini__stat"><div class="v">${fmtN(you.pts)}</div><div class="k">Ball</div></div>
         <div class="hh-mini__stat"><div class="v" style="color:var(--teal)">▲ 165</div><div class="k">Bu hafta</div></div>
       </div>
-      <button class="btn btn--ghost btn--block" data-view="rating" style="margin-top:14px">To'liq reytingni ko'rish</button>`;
-    c.querySelector("[data-view]").addEventListener("click", e => { e.preventDefault(); showView("rating"); });
+      <button class="btn btn--ghost btn--block" data-view="life" style="margin-top:14px">To'liq reytingni ko'rish</button>`;
+    c.querySelector("[data-view]").addEventListener("click", e => { e.preventDefault(); showView("life"); });
   }
 
   /* =========================================================
@@ -1286,7 +1508,7 @@
             <p>${SPOTLIGHT.issuer} tomonidan rasmiy guvohnoma topshirildi. Endi u <b>${SPOTLIGHT.benefit}</b> qilinadi.</p>
             <div class="spotlight__cta">
               <button class="btn btn--gold" data-view="privilege">Barcha imtiyozlar</button>
-              <button class="btn btn--ghost-light" data-view="rating">Siz ham KiberHimoyachi bo'ling</button>
+              <button class="btn btn--ghost-light" data-view="life">Siz ham KiberHimoyachi bo'ling</button>
             </div>
           </div>
         </div>
@@ -1377,7 +1599,7 @@
       });
     }
     const cta = $("#view-privilege .priv-cta [data-view]");
-    if (cta) cta.addEventListener("click", e => { e.preventDefault(); showView("rating"); });
+    if (cta) cta.addEventListener("click", e => { e.preventDefault(); showView("life"); });
   }
 
   /* =========================================================
@@ -2060,9 +2282,7 @@
      ========================================================= */
   function init() {
     bindNav();
-    renderStats();
     renderDashFeed();
-    renderPyramid("#dashPyramid");
     renderFeedFilters();
     renderFullFeed();
     renderCheckExamples();
@@ -2077,15 +2297,14 @@
     renderHelp();
     setupReg();
     renderAbout();
-    // yangi bo'limlar
-    renderHouseholdMini();
-    renderDashVideos();
-    renderRatingTop();
-    renderPodium();
-    renderRankList();
-    renderEarn();
-    renderLevels();
-    renderEngage();
+    // foydalanuvchi paneli (odat yondashuvi)
+    renderDashHero();
+    renderSecLevel();
+    renderDayTip();
+    renderLifehacks();
+    renderCertGoal();
+    renderCourseRec();
+    renderCert();
     renderReels("#reelsFull", false);
     setupReelModal();
     renderSpotlight();

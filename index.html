@@ -84,9 +84,14 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.1 9a3 3 0 1 1 4 2.8c-.9.4-1.6 1.2-1.6 2.2v.5"/><circle cx="11.5" cy="18" r=".5" fill="currentColor" stroke="none"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>
         Kibersinov
       </button>
-      <button class="nav-item" data-view="rating">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V10M12 21V4M19 21v-7" stroke-linecap="round"/><path d="M9 7.5 12 4l3 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Xonadonlar reytingi
+      <button class="nav-item nav-item--star" data-view="life">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" stroke-linejoin="round"/></svg>
+        Kiber Layfxak
+      </button>
+      <button class="nav-item nav-item--goal" data-view="cert">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" stroke-linejoin="round"/><path d="M22 10v5" stroke-linecap="round"/></svg>
+        Offline sertifikat
+        <span class="badge badge--goal">Maqsad</span>
       </button>
       <button class="nav-item" data-view="privilege">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -138,10 +143,20 @@
     <!-- ===== DASHBOARD ===== -->
     <section class="view is-active" id="view-dash">
       <div id="dashSpotlight"></div>
-      <div class="page-head">
-        <span class="eyebrow">Boshqaruv paneli</span>
-        <h1>Mahallangizning kiber holati</h1>
-        <p class="lead">Real vaqtdagi tahdidlar, hududiy qamrov va himoya darajasi — barchasi bitta oynada. Quyidagi ko'rsatkichlar namunaviy (demo) ma'lumotlardir.</p>
+      <div class="dash-hello">
+        <h1>Salom, <span id="helloName">Azizbek</span> <span class="wave">👋</span></h1>
+        <p class="lead">Bugun ham kiberxavfsizlik sari bir qadam. Quyidagi vazifalarni bajaring, ball to'plang va himoyangizni oshiring.</p>
+      </div>
+
+      <div class="dash-hero" id="dashHero"></div>
+
+      <div class="card certgoal" id="dashCert"></div>
+
+      <div class="card seclevel" id="dashSec"></div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px" id="dashMidRow">
+        <div class="card card--pad" id="dashCourse"></div>
+        <div class="card daytip daytip--full" id="dashTip"></div>
       </div>
 
       <button class="assist-cta" data-view="assist" id="assistCta">
@@ -154,40 +169,11 @@
         <span class="assist-cta__go" id="assistCtaGo"></span>
       </button>
 
-      <div class="grid stat-grid" id="statGrid"></div>
+      <div class="section-title"><h2>🎥 Kiber Layfxak</h2><span class="hint">qisqa amaliy maslahatlar</span><button class="section-link" data-view="life">Barchasi →</button></div>
+      <div class="grid lifehack-grid" id="dashLife"></div>
 
-      <div class="grid dash-grid" style="margin-top:20px">
-        <div>
-          <div class="section-title"><h2>So'nggi tahdidlar</h2><span class="hint">avtomatik yangilanadi</span></div>
-          <div class="feed" id="dashFeed"></div>
-          <div style="margin-top:14px"><button class="btn btn--ghost btn--block" data-view="feed">Barcha tahdidlarni ko'rish</button></div>
-        </div>
-        <div class="grid" style="gap:18px">
-          <div class="card shield-card">
-            <span class="eyebrow">Kiber qalqon</span>
-            <h3>Himoya darajasi</h3>
-            <div class="shield-ring">
-              <div class="shield-sweep"></div>
-              <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="shieldProg" cx="60" cy="60" r="52"/></svg>
-              <div class="shield-ring__center"><div><div class="pct" id="shieldPct">0%</div><div class="cap">Qalqon</div></div></div>
-            </div>
-            <div class="shield-meta">
-              <div><div class="v" id="mActive">0</div><div class="k">Faol ko'ngilli</div></div>
-              <div><div class="v" id="mBlocked">0</div><div class="k">Bloklangan</div></div>
-              <div><div class="v">24/7</div><div class="k">Monitoring</div></div>
-            </div>
-          </div>
-          <div class="card card--pad">
-            <div class="section-title" style="margin:0 0 12px"><h2 style="font-size:18px">Boshqaruv modeli</h2></div>
-            <div class="pyramid" id="dashPyramid"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid" style="grid-template-columns:1.25fr 1fr;gap:18px;margin-top:20px" id="dashExtraRow">
-        <div class="card card--pad" id="dashHousehold"></div>
-        <div class="card card--pad" id="dashVideos"></div>
-      </div>
+      <div class="section-title"><h2>🚨 So'nggi ogohlantirishlar</h2><button class="section-link" data-view="feed">Barchasi →</button></div>
+      <div class="feed" id="dashFeed"></div>
     </section>
 
     <!-- ===== THREAT FEED ===== -->
@@ -383,30 +369,35 @@
     </section>
 
     <!-- ===== XONADONLAR REYTINGI ===== -->
-    <section class="view" id="view-rating">
+    <!-- ===== KIBER LAYFXAK ===== -->
+    <section class="view" id="view-life">
       <div class="page-head">
-        <span class="eyebrow">Xonadonlar reytingi</span>
-        <h1>Har xonadondan bitta KiberHimoyachi</h1>
-        <p class="lead">Har bir xonadon o'z KiberHimoyachisini tanlaydi — u oila nomidan ball yig'adi. Masalan, <b>Abdullayevlar xonadonidan Alisher</b>. Mahalla bo'ylab reyting sog'lom raqobat va jamoaviy himoyani rag'batlantiradi.</p>
+        <span class="eyebrow">Kiber Layfxak</span>
+        <h1>Qisqa amaliy maslahatlar</h1>
+        <p class="lead">Telefoningiz, akkauntlaringiz va kartangizni himoyalashning eng kerakli usullari — har biri 30–60 soniyalik amaliy maslahat. Kartani bosib ko'rsatmalarni oching.</p>
       </div>
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px" id="ratingTop"></div>
-
-      <div class="section-title"><h2>Yetakchi xonadonlar</h2><span class="hint">bu oy</span></div>
-      <div class="podium" id="podium"></div>
-
-      <div class="section-title"><h2>Mahalla reytingi</h2><span class="hint">Navbahor MFY · 142 xonadon</span></div>
-      <div id="rankList"></div>
-
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
-        <div class="card card--pad" id="earnCard"></div>
-        <div class="card card--pad" id="levelCard"></div>
+      <div class="grid lifehack-grid lifehack-grid--full" id="lifeGrid"></div>
+      <div class="card card--pad" style="margin-top:22px;display:flex;gap:13px;align-items:flex-start;background:var(--blue-soft);border-color:#cfe3fb">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--blue)" stroke-width="2" style="flex:0 0 22px;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="7.5" r=".6" fill="var(--blue)" stroke="none"/></svg>
+        <p style="font-size:14px;color:#1c4f86">Har bir layfxak qisqa video shaklida ham beriladi va Instagram/Telegram/YouTube'ga tarqatiladi. Layfxakni ko'rganingiz uchun ball olasiz.</p>
       </div>
-
-      <div class="section-title"><h2>Aholini jalb qilishning boshqa usullari</h2></div>
-      <div class="grid feature-grid" id="engageGrid"></div>
     </section>
 
-    <!-- ===== SO'NGGI VIDEOLAR ===== -->
+    <!-- ===== OFFLINE SERTIFIKAT SINOVI ===== -->
+    <section class="view" id="view-cert">
+      <div class="page-head">
+        <span class="eyebrow">⭐️ Asosiy maqsad</span>
+        <h1>Offline sertifikat sinovi</h1>
+        <p class="lead">Platformaning yakuniy maqsadi — sizni haqiqiy bilimga olib borish. Bu yerda siz offline imtihonga qanchalik tayyorligingizni ko'rasiz va aniq yo'nalish olasiz.</p>
+      </div>
+      <div class="card cert-hero" id="certHero"></div>
+      <div class="grid stat-grid" id="certStats"></div>
+      <div class="section-title"><h2>Offline testga tayyorlik — bilim darajangiz</h2></div>
+      <div class="card card--pad"><div class="cert-topics" id="certTopics"></div></div>
+      <div class="card cert-rec" id="certRec"></div>
+      <div class="section-title"><h2>Motivatsiya zanjiri</h2><span class="hint">har bir qadam keyingisiga olib boradi</span></div>
+      <div class="card card--pad"><div class="chain" id="certChain"></div></div>
+    </section>
     <section class="view" id="view-video">
       <div class="page-head">
         <span class="eyebrow">So'nggi videolar</span>
@@ -443,7 +434,7 @@
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn--gold btn--lg" data-view="condition">Imtiyoz shartini ko'rish</button>
-          <button class="btn btn--ghost btn--lg" data-view="rating">Reyting</button>
+          <button class="btn btn--ghost btn--lg" data-view="life">Kiber Layfxak</button>
         </div>
       </div>
     </section>
