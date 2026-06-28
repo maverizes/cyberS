@@ -63,7 +63,7 @@
   };
 
   const FEED = [
-    { cat:"sms",  sev:"high", title:"Soxta “Click” SMS: hisobingiz bloklandi", body:"“Click hisobingiz bloklandi, qayta tiklash uchun havolaga kiring” — havola rasmiy clik.uz emas. Bosmang.", region:"Chilonzor", time:"5 daqiqa oldin", n:140 },
+    { cat:"sms",  sev:"high", title:"Soxta “Click” SMS: hisobingiz bloklandi", body:"“Click hisobingiz bloklandi, qayta tiklash uchun havolaga kiring” — havola rasmiy clik.uz emas. Bosmang.", region:"Zangiota", time:"5 daqiqa oldin", n:140 },
     { cat:"prize",sev:"high", title:"“Avtomobil yutdingiz” qo'ng'irog'i", body:"Notanish raqamdan “lotereyada yutdingiz, soliq uchun pul o'tkazing” deyishadi. Hech qanday yutuq yo'q.", region:"Yunusobod", time:"22 daqiqa oldin", n:61 },
     { cat:"fish", sev:"mid",  title:"Soxta pochta yetkazib berish havolasi", body:"“Posilkangiz kutmoqda, bojni to'lang” SMS’idagi havola karta ma'lumotini o'g'irlaydi.", region:"Mirzo Ulug'bek", time:"1 soat oldin", n:88 },
     { cat:"social",sev:"mid", title:"Telegramda akkaunt “ovoz berish” aldovi", body:"Do'stingiz nomidan “bolam tanlovda, ovoz ber” havolasi — bu akkaunt o'g'irlash usuli.", region:"Sergeli", time:"2 soat oldin", n:53 },
@@ -150,7 +150,7 @@
     { t:"Ijtimoiy tarmoq qalbaki profillari", pct:12, delta:2 }
   ];
   const AI_REGIONS = [
-    { r:"Toshkent shahri", threat:"Fishing havolalar", delta:28, lvl:"yuqori" },
+    { r:"Toshkent viloyati", threat:"Fishing havolalar", delta:28, lvl:"yuqori" },
     { r:"Samarqand", threat:"Telefon orqali aldov", delta:41, lvl:"yuqori" },
     { r:"Farg'ona", threat:"Soxta ish e'lonlari", delta:19, lvl:"orta" },
     { r:"Andijon", threat:"Telegram akkaunt o'g'irlash", delta:15, lvl:"orta" },
@@ -166,7 +166,7 @@
   const AI_RECS = [
     { ico:ICON.grad, cls:"i-gold", t:"60+ yosh uchun maxsus material", p:"Bank kartasi va telefon aldovi bo'yicha sodda, yirik shriftli video tayyorlang — bu toifa eng kam himoyalangan (38%)." },
     { ico:ICON.building, cls:"i-teal", t:"Samarqandda profilaktika seminari", p:"Telefon orqali aldov 41% oshgan — mahalla markazlarida yuzma-yuz uchrashuv rejalashtiring." },
-    { ico:ICON.sms, cls:"i-red", t:"“Soxta Click SMS” kampaniyasi", p:"Eng ko'p so'ralgan mavzu (34%, ↑9). Yangi Reels va viktorina savollarini qo'shing." },
+    { ico:ICON.sms, cls:"i-red", t:"“Soxta Click SMS” kampaniyasi", p:"Eng ko'p so'ralgan mavzu (34%, ↑9). Yangi Reels va Kibersinov savollarini qo'shing." },
     { ico:ICON.social, cls:"i-purple", t:"Yoshlar uchun qalbaki profil darsi", p:"14–18 yoshlilar shaxsiy ma'lumot himoyasini sust biladi (64%)." }
   ];
 
@@ -182,7 +182,7 @@
     { ico:ICON.alert, cls:"i-red",   t:"Tahdidlar lentasi", p:"Real vaqtdagi ogohlantirishlar", view:"feed" },
     { ico:ICON.map,   cls:"i-gold",  t:"Ro'yxatdan o'tish", p:"Mahalla qamrovi", view:"reg" },
     { ico:ICON.link,  cls:"i-teal",  t:"Tekshirgich", p:"Havola va raqamni tekshirish", view:"check" },
-    { ico:ICON.spark, cls:"i-purple",t:"Viktorina", p:"Firibgarni tanish o'yini", view:"quiz" },
+    { ico:ICON.spark, cls:"i-purple",t:"Kibersinov", p:"Firibgarni tanish o'yini", view:"quiz" },
     { ico:ICON.shieldCheck, cls:"i-blue", t:"Firibgarliklar bazasi", p:"O'zbekistonga xos sxemalar", view:"base" },
     { ico:ICON.check, cls:"i-teal",  t:"Yordam", p:"Qadama-qadam yo'riqnoma", view:"help" },
     { ico:ICON.spark,cls:"i-purple",t:"AI tahlil", p:"Anonim tendentsiya tahlili", view:"ai" },
@@ -212,7 +212,7 @@
 
   const REGIONS = {
     "Toshkent shahri": ["Bektemir","Chilonzor","Mirobod","Mirzo Ulug'bek","Olmazor","Sergeli","Shayxontohur","Uchtepa","Yakkasaroy","Yashnobod","Yunusobod","Yangihayot"],
-    "Toshkent viloyati": ["Angren","Bekobod","Bo'ka","Chinoz","Qibray","Ohangaron","Oqqo'rg'on","Parkent","Piskent","Yangiyo'l","Zangiota","Chirchiq"],
+    "Toshkent viloyati": ["Nurafshon shahri","Angren shahri","Bekobod shahri","Olmaliq shahri","Ohangaron shahri","Chirchiq shahri","Yangiyo'l shahri","Bekobod tumani","Bo'ka tumani","Bo'stonliq tumani","Qibray tumani","Quyi Chirchiq tumani","Oqqo'rg'on tumani","Ohangaron tumani","Parkent tumani","Piskent tumani","Toshkent tumani","Zangiota tumani","O'rta Chirchiq tumani","Chinoz tumani","Yuqori Chirchiq tumani","Yangiyo'l tumani"],
     "Andijon": ["Andijon shahri","Asaka","Baliqchi","Izboskan","Marhamat","Oltinko'l","Paxtaobod","Shahrixon","Xo'jaobod"],
     "Farg'ona": ["Farg'ona shahri","Marg'ilon","Qo'qon","Quva","Rishton","Beshariq","Oltiariq","Furqat"],
     "Namangan": ["Namangan shahri","Chust","Pop","To'raqo'rg'on","Uchqo'rg'on","Kosonsoy","Mingbuloq"],
@@ -249,7 +249,7 @@
   ];
   const levelName = k => (LEVELS.find(l => l.key === k) || {}).name || k;
   const EARN = [
-    { ico:ICON.spark, cls:"i-purple", a:"Viktorinani yakunlash", p:50 },
+    { ico:ICON.spark, cls:"i-purple", a:"Kibersinovni yakunlash", p:50 },
     { ico:ICON.alert, cls:"i-red", a:"Firibgarlikni xabar qilish (tasdiqlangan)", p:40 },
     { ico:ICON.users, cls:"i-blue", a:"Qo'shnini ogohlantirish", p:25 },
     { ico:ICON.check, cls:"i-teal", a:"Yo'riqnomani o'qish", p:15 },
@@ -371,20 +371,20 @@
   /* ---- RBAC: rollar, mahallalar, ruxsatlar ---- */
   const ROLE_META = {
     superadmin: { name:"Superadmin", scope:"Butun platforma" },
-    tuman:      { name:"Tuman mas'uli", scope:"Chilonzor tumani" },
+    tuman:      { name:"Tuman mas'uli", scope:"Zangiota tumani" },
     raisi:      { name:"Yoshlar yetakchisi", scope:"Navbahor MFY" },
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
-  const MY_TUMAN = "Chilonzor tumani";
+  const MY_TUMAN = "Zangiota tumani";
   const MY_MAHALLA = "Navbahor MFY";
   const MAHALLALAR = [
-    { name:"Navbahor MFY", region:"Toshkent sh. · Chilonzor", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
-    { name:"Do'stlik MFY", region:"Toshkent sh. · Sergeli", raisi:"Sevara Olimova", users:165, active:110, avg:1340 },
-    { name:"Bunyodkor MFY", region:"Toshkent sh. · Yunusobod", raisi:"Dilshod Karimov", users:128, active:74, avg:1020 },
-    { name:"Guliston MFY", region:"Andijon · Asaka", raisi:"Nilufar Sodiqova", users:113, active:81, avg:1090 },
-    { name:"Birlik MFY", region:"Farg'ona · Marg'ilon", raisi:"Sardor To'xtayev", users:134, active:69, avg:960 },
-    { name:"Istiqlol MFY", region:"Samarqand · Urgut", raisi:"Bekzod Rahimov", users:98, active:52, avg:880 },
-    { name:"Obod MFY", region:"Buxoro · Kogon", raisi:"Gulnoza Nazarova", users:87, active:45, avg:790 }
+    { name:"Navbahor MFY", region:"Toshkent vil. · Zangiota", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
+    { name:"Do'stlik MFY", region:"Toshkent vil. · Qibray", raisi:"Sevara Olimova", users:165, active:110, avg:1340 },
+    { name:"Bunyodkor MFY", region:"Toshkent vil. · Chirchiq sh.", raisi:"Dilshod Karimov", users:128, active:74, avg:1020 },
+    { name:"Guliston MFY", region:"Toshkent vil. · Yangiyo'l", raisi:"Nilufar Sodiqova", users:113, active:81, avg:1090 },
+    { name:"Birlik MFY", region:"Toshkent vil. · Parkent", raisi:"Sardor To'xtayev", users:134, active:69, avg:960 },
+    { name:"Istiqlol MFY", region:"Toshkent vil. · Bekobod", raisi:"Bekzod Rahimov", users:98, active:52, avg:880 },
+    { name:"Obod MFY", region:"Toshkent vil. · Bo'ka", raisi:"Gulnoza Nazarova", users:87, active:45, avg:790 }
   ];
   const PERM_ROWS = [
     { r:"O'z profili, statistikasi va ballari", s:"y", tm:"y", a:"y", u:"y" },
@@ -429,20 +429,90 @@
     red: "Yuqori xavf — zudlik bilan chora ko'ring: mahallada targ'ibot o'tkazing, jonli seminar tashkil qiling va qo'shimcha ogohlantirish yuboring."
   };
 
+  /* ---- Platforma kartasi: Toshkent viloyati → tuman/shahar → mahalla ---- */
+  const REGION_NAME = "Toshkent viloyati";
+  // Toshkent viloyati: 7 shahar + 15 tuman (jami 22 hudud)
+  const TUMANLAR = [
+    { name:"Nurafshon", city:true, kxi:88, users:1340, mahallas:9 },
+    { name:"Chirchiq", city:true, kxi:86, users:1450, mahallas:14 },
+    { name:"Olmaliq", city:true, kxi:81, users:1280, mahallas:12 },
+    { name:"Qibray", kxi:79, users:1120, mahallas:11 },
+    { name:"Angren", city:true, kxi:78, users:1190, mahallas:13 },
+    { name:"Bekobod", city:true, kxi:74, users:980, mahallas:10 },
+    { name:"Yangiyo'l", city:true, kxi:72, users:860, mahallas:8 },
+    { name:"Toshkent tumani", kxi:71, users:950, mahallas:10, label:"Toshkent t." },
+    { name:"Ohangaron", city:true, kxi:69, users:720, mahallas:7 },
+    { name:"Zangiota", kxi:68, users:1240, mahallas:8, own:true },
+    { name:"Yangiyo'l tumani", kxi:66, users:740, mahallas:9, label:"Yangiyo'l t." },
+    { name:"Quyi Chirchiq", kxi:64, users:690, mahallas:9 },
+    { name:"Parkent", kxi:62, users:710, mahallas:8 },
+    { name:"O'rta Chirchiq", kxi:60, users:660, mahallas:9 },
+    { name:"Yuqori Chirchiq", kxi:57, users:620, mahallas:9 },
+    { name:"Bo'stonliq", kxi:58, users:640, mahallas:9 },
+    { name:"Piskent", kxi:55, users:580, mahallas:7 },
+    { name:"Oqqo'rg'on", kxi:53, users:600, mahallas:8 },
+    { name:"Bo'ka", kxi:51, users:540, mahallas:8 },
+    { name:"Ohangaron tumani", kxi:49, users:520, mahallas:7, label:"Ohangaron t." },
+    { name:"Chinoz", kxi:47, users:490, mahallas:7 },
+    { name:"Bekobod tumani", kxi:44, users:470, mahallas:8, label:"Bekobod t." }
+  ];
+  // hudud nomini ko'rsatish: shahar => "X sh.", tuman => qisqa nom
+  const tumDisp = t => t.label || (t.city ? t.name + " sh." : t.name);
+  const tumFull = t => t.label ? t.name : (t.city ? t.name + " shahri" : t.name + " tumani");
+  // 0=qizil, 50=sariq, 100=yashil — uzluksiz rang shkalasi
+  function kxiColor(score) {
+    const stops = [[0, [221, 77, 77]], [50, [232, 165, 50]], [81, [122, 184, 92]], [100, [27, 158, 134]]];
+    let a = stops[0], b = stops[stops.length - 1];
+    for (let i = 0; i < stops.length - 1; i++) if (score >= stops[i][0] && score <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
+    const t = b[0] === a[0] ? 0 : (score - a[0]) / (b[0] - a[0]);
+    const c = k => Math.round(a[1][k] + (b[1][k] - a[1][k]) * t);
+    return `rgb(${c(0)},${c(1)},${c(2)})`;
+  }
+  const MHZ_NAMES = ["Navbahor", "Bog'iston", "Yangiobod", "Do'stlik", "Bunyodkor", "Istiqlol", "Guliston", "Obod", "Birlik", "Mehnat", "Chinor", "Lola", "Navro'z", "Mustaqillik", "Oqtepa", "Gulzor", "Bahor", "Sharq", "Yoshlik", "Tinchlik", "Hamkor", "Kelajak", "Fayzobod", "Qorako'l"];
+  function tumanMahallas(t) {
+    if (t.own) return KXI_MAHALLALAR.map(m => ({ name: m.name, score: kxiScore(m) }));
+    let s = 0; for (const ch of t.name) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
+    const rand = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    const off = s % MHZ_NAMES.length;   // har tuman boshqa nomlardan boshlanadi
+    return Array.from({ length: t.mahallas }, (_, i) => ({ name: MHZ_NAMES[(off + i) % MHZ_NAMES.length] + " MFY", score: Math.max(22, Math.min(98, Math.round(t.kxi + (rand() * 2 - 1) * 17))) }));
+  }
+  // buzilgan to'r asosida gap'siz choropleth katakchalarini hosil qilish
+  function gridCells(units, cols, w, h, seed) {
+    const n = units.length, rows = Math.ceil(n / cols);
+    const cw = w / cols, ch = h / rows;
+    let s = seed || 7; const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    const V = [];
+    for (let r = 0; r <= rows; r++) { V[r] = []; for (let c = 0; c <= cols; c++) {
+      const jx = (c === 0 || c === cols) ? 0 : (rnd() * 2 - 1) * cw * 0.22;
+      const jy = (r === 0 || r === rows) ? 0 : (rnd() * 2 - 1) * ch * 0.22;
+      // tashqi chekka biroz organik
+      const ex = (c === 0 ? rnd() * cw * 0.12 : c === cols ? -rnd() * cw * 0.12 : 0);
+      const ey = (r === 0 ? rnd() * ch * 0.12 : r === rows ? -rnd() * ch * 0.12 : 0);
+      V[r][c] = [c * cw + jx + ex, r * ch + jy + ey];
+    } }
+    const cells = [];
+    for (let i = 0; i < n; i++) { const r = Math.floor(i / cols), c = i % cols;
+      const p = [V[r][c], V[r][c + 1], V[r + 1][c + 1], V[r + 1][c]];
+      const cx = (p[0][0] + p[1][0] + p[2][0] + p[3][0]) / 4, cy = (p[0][1] + p[1][1] + p[2][1] + p[3][1]) / 4;
+      cells.push({ unit: units[i], d: `M${p.map(q => q.map(Math.round).join(",")).join("L")}Z`, cx, cy });
+    }
+    return cells;
+  }
+
   /* =========================================================
      NAVIGATION
      ========================================================= */
   const VIEW_TITLES = {
-    dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Viktorina",
+    dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
     base:"Firibgarliklar bazasi", ai:"AI tahlil", assist:"Kiber Assist", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
     rating:"Xonadonlar reytingi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
-    admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi"
+    admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi"
   };
   let dashAnimated = false, quizBuilt = false;
 
   /* ---- RBAC state ---- */
   let currentRole = "superadmin";
-  const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"], kxi: ["superadmin", "tuman"] };
+  const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"], kxi: ["superadmin", "tuman"], map: ["superadmin", "tuman"] };
   const canSeeView = v => !RESTRICTED[v] || RESTRICTED[v].includes(currentRole);
 
   function showView(v) {
@@ -478,6 +548,7 @@
     const active = ($(".view.is-active") || {}).id || "";
     const v = active.replace("view-", "");
     if (!canSeeView(v)) showView("dash");
+    if (typeof renderMap === "function") renderMap();
   }
   function bindRoleSwitch() {
     $$("#roleSwitch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
@@ -717,9 +788,11 @@
   }
 
   /* =========================================================
-     VIKTORINA (quiz)
+     KIBERSINOV (quiz) — natija foydalanuvchi → mahalla → tuman ga ta'sir qiladi
      ========================================================= */
   let qi = 0, qScore = 0;
+  const POINT_PER_CORRECT = 15;
+  let userBall = 1240;               // Alisher (Abdullayevlar) — reytingdagi joriy bal
   function levelFor(pct) {
     if (pct >= 90) return "Kiber Qahramon";
     if (pct >= 70) return "Kiber faol";
@@ -773,19 +846,44 @@
   function renderQuizResult() {
     const pct = Math.round(qScore / QUIZ.length * 100);
     const lvl = levelFor(pct);
+    const earned = qScore * POINT_PER_CORRECT;
+    const prev = userBall;
+    userBall += earned;                // natija shaxsiy ballga qo'shiladi
     $("#quizWrap").innerHTML = `
       <div class="card quiz-result">
         <div class="medal">${ICON.medal}</div>
         <h2>${qScore} / ${QUIZ.length} to'g'ri</h2>
         <div class="lvl">Darajangiz: ${lvl}</div>
         <p>${pct >= 70 ? "Ajoyib! Siz firibgarlik belgilarini yaxshi tanidingiz." : "Yaxshi boshlanish. Firibgarliklar bazasini ko'rib, yana urinib ko'ring."}</p>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn btn--gold" id="qRestart">Qayta o'ynash</button>
-          <button class="btn btn--ghost" data-view="base">Firibgarliklar bazasi</button>
+        <div class="qpoints"><span class="qpoints__plus">+${earned} ball</span><span class="qpoints__sub">shaxsiy ballingizga qo'shildi</span></div>
+      </div>
+      <div class="card ripple">
+        <div class="ripple__title">${ICON.spark} Natijangiz qayerga ta'sir qiladi</div>
+        <div class="ripple__node ripple--you">
+          <span class="ripple__ico">${ICON.users}</span>
+          <div class="ripple__body"><div class="ripple__t">Siz — Alisher (Abdullayevlar)</div>
+            <div class="ripple__p">Shaxsiy ball: <b>${fmtN(prev)} → ${fmtN(userBall)}</b> <span class="ripple__delta">+${earned}</span></div></div>
         </div>
+        <div class="ripple__link">${ICON.caret}<span>hissa qo'shadi</span></div>
+        <div class="ripple__node ripple--mahalla">
+          <span class="ripple__ico">${ICON.building}</span>
+          <div class="ripple__body"><div class="ripple__t">Navbahor MFY</div>
+            <div class="ripple__p">Mahalla o'rtacha balli va xonadonlar reytingi ko'tariladi</div></div>
+        </div>
+        <div class="ripple__link">${ICON.caret}<span>hissa qo'shadi</span></div>
+        <div class="ripple__node ripple--tuman">
+          <span class="ripple__ico">${ICON.globe}</span>
+          <div class="ripple__body"><div class="ripple__t">${MY_TUMAN}</div>
+            <div class="ripple__p">Tuman <b>KiberXavfsizlik Indeksi (KXI)</b> ko'rsatkichiga ta'sir qiladi</div></div>
+        </div>
+        <p class="ripple__note">Har bir fuqaroning bilimi yuqoriga — mahalla, so'ng tuman darajasiga jamlanadi. Bitta odam ham umumiy xavfsizlikka hissa qo'shadi.</p>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+        <button class="btn btn--gold" id="qRestart">Qayta o'ynash</button>
+        <button class="btn btn--ghost" data-view="rating">Xonadonlar reytingi</button>
       </div>`;
     $("#qRestart").addEventListener("click", startQuiz);
-    $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("base"); });
+    $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("rating"); });
   }
 
   /* =========================================================
@@ -1707,6 +1805,143 @@
   }
 
   /* =========================================================
+     PLATFORMA KARTASI (interaktiv choropleth + diagrammalar)
+     ========================================================= */
+  let mapSel = null;
+  function renderMap() {
+    const wrap = $("#view-map"); if (!wrap) return;
+    const district = currentRole === "tuman"; // tuman mas'uli => faqat o'z mahallalari
+    const own = TUMANLAR.find(t => t.own);
+    const title = $("#mapTitle"), lead = $("#mapLead"), scope = $("#mapScope");
+
+    // birliklar: superadmin => tumanlar; tuman => o'z mahallalari
+    let units, unitLabel, areaName;
+    if (district) {
+      areaName = own.name + " tumani";
+      unitLabel = "mahalla";
+      units = tumanMahallas(own).map(m => ({ name: m.name, score: m.score }));
+    } else {
+      areaName = REGION_NAME;
+      unitLabel = "tuman";
+      units = TUMANLAR.map(t => ({ name: t.name, disp: tumDisp(t), full: tumFull(t), score: t.kxi, users: t.users, mahallas: t.mahallas, own: t.own, ref: t }));
+    }
+    units.forEach(u => u.lvl = kxiLevel(u.score));
+
+    if (title) title.textContent = district ? `${MY_TUMAN} xaritasi` : `${REGION_NAME} — hududlar xaritasi`;
+    if (lead) lead.textContent = district
+      ? `Tumaningizdagi har bir mahallaning KiberXavfsizlik holati. Mahalla ustiga bosing — batafsil ko'ring.`
+      : `Viloyatdagi har bir tuman va shaharning holati. Hudud ustiga bosing — ichidagi mahallalar statistikasi ochiladi.`;
+    if (scope) scope.innerHTML = district
+      ? `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Tuman mas'uli · ${MY_TUMAN}</h3><p>Faqat <b>o'z tumaningiz</b> mahallalari ko'rinadi. Boshqa hududlar yopiq.</p></div>`
+      : `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Superadmin · ${REGION_NAME}</h3><p>Barcha <b>${units.length} hudud</b> (shahar va tuman) va ularning ichidagi mahallalari ko'rinadi.</p></div>`;
+    scope.className = "scope-banner " + (district ? "scope-banner--tuman" : "scope-banner--admin");
+
+    // summary kartalar
+    const sum = $("#mapSummary");
+    if (sum) {
+      const avg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
+      const totUsers = district ? own.users : TUMANLAR.reduce((s, t) => s + t.users, 0);
+      const totMhz = district ? units.length : TUMANLAR.reduce((s, t) => s + t.mahallas, 0);
+      const greenCnt = units.filter(u => u.lvl.key === "green").length;
+      const third = district
+        ? { num: greenCnt, lab: "Xavfsiz 🟢 mahalla", cls: "i-teal", ico: ICON.shieldCheck }
+        : { num: fmtN(totMhz), lab: "Jami mahallalar", cls: "i-purple", ico: ICON.building };
+      const cards = [
+        { num: units.length, lab: district ? "Mahallalar" : "Hududlar", cls: "i-blue", ico: ICON.map },
+        { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
+        third,
+        { num: fmtN(totUsers), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users }
+      ];
+      sum.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+    }
+
+    // choropleth SVG
+    const cols = units.length <= 4 ? units.length : units.length <= 6 ? 3 : units.length <= 12 ? 4 : units.length <= 20 ? 5 : 6;
+    const W = 760, H = Math.ceil(units.length / cols) * 142;
+    const cells = gridCells(units, cols, W, H, 41);
+    const svg = $("#mapSvg");
+    if (svg) {
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      svg.innerHTML = cells.map((c, i) => {
+        const u = c.unit, fill = kxiColor(u.score);
+        const labelDark = u.score >= 51;
+        const nm = (u.disp || u.name).replace(" MFY", "");
+        return `<g class="mcell" data-cell="${i}">
+          <path d="${c.d}" fill="${fill}" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+          <text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - 4}" class="mcell__name" fill="${labelDark ? "#fff" : "#7a2030"}">${nm}</text>
+          <text x="${Math.round(c.cx)}" y="${Math.round(c.cy) + 13}" class="mcell__val" fill="${labelDark ? "rgba(255,255,255,.85)" : "rgba(122,32,48,.8)"}">${u.score}</text>
+          ${u.own ? `<text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - 20}" class="mcell__you">SIZ</text>` : ""}
+        </g>`;
+      }).join("");
+      const tip = $("#mapTip");
+      svg.querySelectorAll(".mcell").forEach(g => {
+        const u = cells[+g.dataset.cell].unit;
+        g.addEventListener("mousemove", e => {
+          const r = svg.getBoundingClientRect();
+          tip.style.left = (e.clientX - r.left) + "px"; tip.style.top = (e.clientY - r.top) + "px";
+          tip.innerHTML = `<div class="mtip__t">${u.full || u.name}</div><div class="mtip__row"><span>KXI</span><b>${u.score}</b></div><div class="mtip__row"><span>Holat</span><b>${u.lvl.dot} ${u.lvl.label}</b></div>${u.users ? `<div class="mtip__row"><span>Foydalanuvchi</span><b>${fmtN(u.users)}</b></div>` : ""}${u.mahallas ? `<div class="mtip__row"><span>Mahalla</span><b>${u.mahallas}</b></div>` : ""}`;
+          tip.classList.add("is-on");
+        });
+        g.addEventListener("mouseleave", () => tip.classList.remove("is-on"));
+        g.addEventListener("click", () => { mapSel = +g.dataset.cell; svg.querySelectorAll(".mcell").forEach(x => x.classList.remove("is-sel")); g.classList.add("is-sel"); renderMapDetail(u, district); });
+      });
+    }
+
+    // donut (daraja taqsimoti)
+    const counts = { green: 0, yellow: 0, red: 0 };
+    units.forEach(u => counts[u.lvl.key]++);
+    const tot = units.length;
+    const gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
+    const donut = $("#mapDonut");
+    if (donut) {
+      donut.innerHTML = `
+        <div class="donut" style="background:conic-gradient(var(--teal) 0 ${gp}%, var(--gold) ${gp}% ${gp + yp}%, var(--red) ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">${district ? "mahalla" : "tuman"}</div></div></div>
+        <div class="donut__legend">
+          <div><span class="dleg" style="background:var(--teal)"></span>Xavfsiz 🟢 <b>${counts.green}</b></div>
+          <div><span class="dleg" style="background:var(--gold)"></span>Ogohlantirish 🟡 <b>${counts.yellow}</b></div>
+          <div><span class="dleg" style="background:var(--red)"></span>Yuqori xavf 🔴 <b>${counts.red}</b></div>
+        </div>`;
+    }
+
+    // reyting diagrammasi (horizontal bars)
+    const bars = $("#mapBars");
+    if (bars) {
+      const sorted = [...units].sort((a, b) => b.score - a.score);
+      bars.innerHTML = sorted.map(u => `
+        <div class="mbar${u.own ? " is-you" : ""}" data-bar="${u.name}">
+          <div class="mbar__name">${u.own ? '<span class="kxi-you">SIZ</span> ' : ""}${(u.disp || u.name).replace(" MFY", "")}</div>
+          <div class="mbar__track"><i style="width:${u.score}%;background:${kxiColor(u.score)}"></i></div>
+          <div class="mbar__val">${u.score}</div>
+        </div>`).join("");
+    }
+
+    // detalни tozalash
+    mapSel = null;
+    const det = $("#mapDetail");
+    if (det) det.innerHTML = `<div class="map-detail-empty">${ICON.map}<p>${district ? "Mahalla" : "Hudud"} ustiga bosing — batafsil statistika va ${district ? "ko'rsatkichlar" : "ichidagi mahallalar"} shu yerda chiqadi.</p></div>`;
+  }
+  function renderMapDetail(u, district) {
+    const det = $("#mapDetail"); if (!det) return;
+    if (district) {
+      det.innerHTML = `
+        <div class="md-head"><div><h3>${u.name}</h3><span class="kxi-badge ${u.lvl.cls}">${u.lvl.dot} ${u.lvl.label}</span></div><div class="md-score" style="color:${kxiColor(u.score)}">${u.score}<span>/100</span></div></div>
+        <div class="kxi-rec ${u.lvl.cls}" style="margin:14px 0 0">${ICON.alert}<span><b>Tavsiya:</b> ${KXI_REC[u.lvl.key]}</span></div>`;
+      return;
+    }
+    // tuman => ichidagi mahallalar
+    const mhz = tumanMahallas(u.ref).map(m => ({ ...m, lvl: kxiLevel(m.score) })).sort((a, b) => b.score - a.score);
+    det.innerHTML = `
+      <div class="md-head"><div><h3>${u.full || u.name}</h3><span class="kxi-badge ${u.lvl.cls}">${u.lvl.dot} ${u.lvl.label}</span></div><div class="md-score" style="color:${kxiColor(u.score)}">${u.score}<span>/100</span></div></div>
+      <div class="md-stats">
+        <div><span class="k">Foydalanuvchilar</span><span class="v">${fmtN(u.users)}</span></div>
+        <div><span class="k">Mahallalar</span><span class="v">${u.mahallas}</span></div>
+        <div><span class="k">O'rtacha KXI</span><span class="v">${u.score}</span></div>
+      </div>
+      <div class="md-sub">Ichidagi mahallalar (KXI bo'yicha)</div>
+      <div class="md-mhz">${mhz.map(m => `<div class="mbar"><div class="mbar__name">${m.name.replace(" MFY", "")}</div><div class="mbar__track"><i style="width:${m.score}%;background:${kxiColor(m.score)}"></i></div><div class="mbar__val">${m.score}</div></div>`).join("")}</div>`;
+  }
+
+  /* =========================================================
      KIBER ASSIST (AI chat — simulyatsiya)
      ========================================================= */
   const ASSIST_CHIPS = ["Click'dan SMS keldi", "Bankdan kod so'rashyapti", "Telegramga kod keldi", "“Pul yutdingiz” SMS"];
@@ -1837,6 +2072,7 @@
     $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
     renderAI();
     renderKxi();
+    renderMap();
     renderAssist();
     renderHelp();
     setupReg();

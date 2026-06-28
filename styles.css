@@ -827,6 +827,103 @@ img,svg{ display:block; }
 .flow-step__b b{ color:var(--navy); }
 
 /* =========================================================
+   PLATFORMA KARTASI (choropleth + diagrammalar)
+   ========================================================= */
+.map-layout{ display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start; margin-bottom:24px; }
+.map-card{ padding:18px 20px; }
+.map-card__head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.map-card__head h3{ font-family:var(--display); font-weight:700; font-size:17px; color:var(--navy); }
+.map-stage{ position:relative; background:var(--canvas); border-radius:14px; padding:14px; }
+#mapSvg{ width:100%; height:auto; display:block; overflow:visible; }
+.mcell{ cursor:pointer; }
+.mcell path{ transition:filter .18s ease, transform .18s ease; transform-origin:center; transform-box:fill-box; }
+.mcell:hover path{ filter:brightness(1.08) drop-shadow(0 6px 14px rgba(16,23,46,.28)); transform:scale(1.04); }
+.mcell.is-sel path{ stroke:var(--navy); stroke-width:3.5; filter:brightness(1.05) drop-shadow(0 6px 16px rgba(16,23,46,.35)); }
+.mcell__name{ font-family:var(--ui); font-weight:700; font-size:13px; text-anchor:middle; pointer-events:none; }
+.mcell__val{ font-family:var(--display); font-weight:700; font-size:15px; text-anchor:middle; pointer-events:none; }
+.mcell__you{ font-family:var(--ui); font-weight:800; font-size:8.5px; letter-spacing:.05em; text-anchor:middle; fill:#fff; }
+.mcell:hover .mcell__name, .mcell:hover .mcell__val, .mcell.is-sel .mcell__name, .mcell.is-sel .mcell__val{ }
+
+/* tooltip */
+.mtip{ position:absolute; z-index:10; pointer-events:none; transform:translate(-50%,calc(-100% - 14px)); background:var(--navy); color:#fff; border-radius:11px; padding:11px 13px; min-width:165px; box-shadow:0 12px 30px rgba(8,12,28,.4); opacity:0; transition:opacity .14s ease; }
+.mtip.is-on{ opacity:1; }
+.mtip::after{ content:""; position:absolute; left:50%; bottom:-6px; transform:translateX(-50%) rotate(45deg); width:12px; height:12px; background:var(--navy); }
+.mtip__t{ font-family:var(--display); font-weight:700; font-size:14.5px; margin-bottom:7px; }
+.mtip__row{ display:flex; justify-content:space-between; gap:16px; font-size:12.5px; color:#aeb6d4; padding:2px 0; }
+.mtip__row b{ color:#fff; font-weight:600; }
+
+/* color scale */
+.map-scale{ display:flex; align-items:center; gap:9px; margin-top:14px; font-size:11.5px; color:var(--muted); font-family:var(--mono); }
+.map-scale__bar{ flex:1; height:9px; border-radius:6px; background:linear-gradient(90deg,#dd4d4d,#e8a532 45%,#7ab85c 75%,#1b9e86); max-width:240px; }
+.map-scale__lab{ margin-left:auto; font-family:var(--ui); font-weight:600; }
+
+/* aside: donut + detail */
+.map-aside{ display:flex; flex-direction:column; gap:20px; }
+.donut-wrap{ display:flex; align-items:center; gap:20px; }
+.donut{ width:120px; height:120px; border-radius:50%; flex:0 0 120px; display:grid; place-items:center; }
+.donut__hole{ width:78px; height:78px; background:var(--surface); border-radius:50%; display:grid; place-items:center; text-align:center; }
+.donut__num{ font-family:var(--display); font-weight:700; font-size:26px; color:var(--navy); line-height:1; }
+.donut__lab{ font-size:11px; color:var(--muted); }
+.donut__legend{ display:flex; flex-direction:column; gap:9px; font-size:13px; color:var(--ink); }
+.donut__legend > div{ display:flex; align-items:center; gap:8px; }
+.donut__legend b{ margin-left:auto; font-family:var(--display); color:var(--navy); }
+.dleg{ width:12px; height:12px; border-radius:4px; flex:0 0 12px; }
+
+.map-detail{ padding:18px 20px; min-height:120px; }
+.map-detail-empty{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; color:var(--faint); padding:18px 6px; }
+.map-detail-empty svg{ width:34px; height:34px; opacity:.5; }
+.map-detail-empty p{ font-size:13px; line-height:1.5; max-width:30ch; }
+.md-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.md-head h3{ font-family:var(--display); font-weight:700; font-size:18px; color:var(--navy); margin-bottom:6px; }
+.md-score{ font-family:var(--display); font-weight:700; font-size:32px; line-height:1; }
+.md-score span{ font-size:15px; color:var(--faint); }
+.md-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0; }
+.md-stats > div{ background:var(--canvas); border-radius:10px; padding:10px 12px; }
+.md-stats .k{ display:block; font-size:11px; color:var(--faint); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+.md-stats .v{ font-family:var(--display); font-weight:700; font-size:18px; color:var(--navy); }
+.md-sub{ font-size:13px; font-weight:700; color:var(--muted); margin:6px 0 10px; }
+.md-mhz{ display:flex; flex-direction:column; gap:9px; }
+
+/* horizontal bars */
+.mbar{ display:grid; grid-template-columns:140px 1fr 38px; gap:12px; align-items:center; padding:5px 0; }
+.mbar.is-you .mbar__name{ font-weight:800; }
+.mbar__name{ font-size:13.5px; color:var(--ink); font-weight:600; display:flex; align-items:center; gap:7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mbar__track{ height:11px; background:var(--line); border-radius:7px; overflow:hidden; }
+.mbar__track i{ display:block; height:100%; border-radius:7px; transition:width .8s cubic-bezier(.2,.7,.2,1); }
+.mbar__val{ font-family:var(--display); font-weight:700; font-size:14px; color:var(--navy); text-align:right; }
+.md-mhz .mbar{ grid-template-columns:110px 1fr 32px; }
+
+@media (max-width:1040px){ .map-layout{ grid-template-columns:1fr; } .map-aside{ flex-direction:row; flex-wrap:wrap; } .map-aside > .card{ flex:1; min-width:260px; } }
+@media (max-width:560px){ .map-aside{ flex-direction:column; } .mbar{ grid-template-columns:96px 1fr 30px; gap:8px; } .donut-wrap{ flex-direction:column; align-items:flex-start; } }
+
+/* =========================================================
+   KIBERSINOV — ball + ta'sir zanjiri
+   ========================================================= */
+.qpoints{ display:inline-flex; flex-direction:column; align-items:center; gap:2px; margin-top:6px; background:var(--gold-soft); border:1px solid #f0d99a; border-radius:12px; padding:10px 22px; }
+.qpoints__plus{ font-family:var(--display); font-weight:700; font-size:22px; color:var(--gold-700); }
+.qpoints__sub{ font-size:12px; color:#7a5a14; font-weight:600; }
+
+.ripple{ padding:20px 22px; margin-top:16px; text-align:left; }
+.ripple__title{ display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:700; font-size:16px; color:var(--navy); margin-bottom:16px; }
+.ripple__title svg{ width:19px; height:19px; color:var(--purple); }
+.ripple__node{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:13px; border:1px solid var(--line); }
+.ripple__ico{ width:44px; height:44px; flex:0 0 44px; border-radius:12px; display:grid; place-items:center; }
+.ripple__ico svg{ width:23px; height:23px; }
+.ripple--you{ background:var(--gold-soft); border-color:#f0d99a; }
+.ripple--you .ripple__ico{ background:var(--gold); color:var(--navy); }
+.ripple--mahalla{ background:var(--teal-soft); border-color:#c4e9e0; }
+.ripple--mahalla .ripple__ico{ background:var(--teal); color:#fff; }
+.ripple--tuman{ background:var(--purple-soft); border-color:#d6cffb; }
+.ripple--tuman .ripple__ico{ background:var(--purple); color:#fff; }
+.ripple__t{ font-weight:700; font-size:15px; color:var(--ink); }
+.ripple__p{ font-size:13px; color:var(--muted); margin-top:2px; line-height:1.45; }
+.ripple__p b{ color:var(--navy); font-family:var(--mono); }
+.ripple__delta{ font-family:var(--ui); font-weight:700; font-size:12px; color:#fff; background:var(--teal); border-radius:999px; padding:2px 8px; margin-left:4px; }
+.ripple__link{ display:flex; align-items:center; gap:8px; padding:7px 0 7px 19px; font-size:12px; font-weight:600; color:var(--faint); }
+.ripple__link svg{ width:18px; height:18px; color:var(--gold-700); }
+.ripple__note{ font-size:12.5px; color:var(--muted); line-height:1.55; margin-top:14px; padding-top:14px; border-top:1px solid var(--line-2); }
+
+/* =========================================================
    KIBER ASSIST (CTA + chat)
    ========================================================= */
 .badge--ai{ background:linear-gradient(135deg,var(--purple),#8b7be6); color:#fff; }
