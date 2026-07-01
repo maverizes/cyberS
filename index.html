@@ -64,7 +64,7 @@
       </button>
       <button class="nav-item nav-item--star" data-view="assist">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3.5 13.9 9l5.6 1.9-5.6 1.9L12 18l-1.9-5.2L4.5 11 10 9 12 3.5Z" stroke-linejoin="round"/><path d="M19 16v3M20.5 17.5h-3" stroke-linecap="round"/></svg>
-        Kiber Assist
+        AI Hamroh
         <span class="badge badge--ai">AI</span>
       </button>
       <button class="nav-item" data-view="feed">
@@ -99,10 +99,6 @@
       <button class="nav-item" data-view="video">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/></svg>
         So'nggi videolar
-      </button>
-      <button class="nav-item" data-view="base">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2V5Z"/><path d="M12 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2"/></svg>
-        Firibgarliklar bazasi
       </button>
       <button class="nav-item" data-view="help">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor" stroke="none"/></svg>
@@ -151,7 +147,7 @@
         <span class="assist-cta__glow"></span>
         <span class="assist-cta__ico" id="assistCtaIco"></span>
         <span class="assist-cta__txt">
-          <span class="assist-cta__t">Kiber Assist — AI yordamchi</span>
+          <span class="assist-cta__t">AI Hamroh — aqlli kiber hamroh</span>
           <span class="assist-cta__p">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Yozing yoki rasm yuklang — AI soniyada tekshiradi.</span>
         </span>
         <span class="assist-cta__go" id="assistCtaGo"></span>
@@ -215,22 +211,7 @@
     </section>
 
     <!-- ===== SCAM DATABASE ===== -->
-    <section class="view" id="view-base">
-      <div class="page-head">
-        <span class="eyebrow">Firibgarliklar bazasi</span>
-        <h1>O'zbekistonga xos firibgarlik sxemalari</h1>
-        <p class="lead">Har bir sxema qanday ishlashi, qanday tanilishi va nima qilish kerakligi bilan. Qidiring yoki toifa bo'yicha saralang.</p>
-      </div>
-      <div class="search-row">
-        <div class="search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-          <input id="scamSearch" type="search" placeholder="Sxema nomi yoki kalit so'z bo'yicha qidirish…">
-        </div>
-      </div>
-      <div class="filters" id="scamFilters"></div>
-      <div class="grid scam-grid" id="scamGrid"></div>
-    </section>
-
+    
     <!-- ===== AI TAHLIL ===== -->
     
     <!-- ===== HELP ===== -->
@@ -465,16 +446,16 @@
     <!-- ===== KIBER ASSIST (AI chat) ===== -->
     <section class="view" id="view-assist">
       <div class="page-head">
-        <span class="eyebrow">Kiber Assist</span>
-        <h1>AI yordamchi — shubhangizni soniyada tekshiring</h1>
-        <p class="lead">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Shuni yozing yoki rasmini yuklang — Kiber Assist uni tahlil qilib, firibgarlik yoki yo'qligini, nima qilish kerakligini va rasmiy ma'lumotni aytadi.</p>
+        <span class="eyebrow">AI Hamroh · Kiber Himoyachi</span>
+        <h1>Kundalik aqlli hamroh — sizni himoya qiladi</h1>
+        <p class="lead">Istalgan mavzuda suhbatlashing. AI Hamroh javob beradi va agar suhbatda pul, bank, havola, kod, sovg'a kabi xavfli mavzu sezsa — avtomatik ogohlantiradi hamda xavfsizlik maslahatini beradi.</p>
       </div>
       <div class="chat" id="chat">
         <div class="chat__head">
           <span class="chat__ava" id="chatAva"></span>
           <div>
-            <div class="chat__name">Kiber Assist</div>
-            <div class="chat__status"><span class="chat__dot"></span>Onlayn · AI yordamchi</div>
+            <div class="chat__name">AI Hamroh</div>
+            <div class="chat__status"><span class="chat__dot"></span>Onlayn · suhbatdosh + Kiber Himoyachi</div>
           </div>
           <button class="chat__reset" id="chatReset" title="Suhbatni tozalash">Tozalash</button>
         </div>
@@ -483,11 +464,11 @@
         <div class="chat__bar">
           <input type="file" accept="image/*" id="chatFile" hidden>
           <button class="chat__icon" id="chatImg" title="Rasm yuklash" aria-label="Rasm yuklash"></button>
-          <input type="text" id="chatText" class="chat__text" placeholder="Masalan: Menga Click nomidan SMS keldi..." autocomplete="off">
+          <input type="text" id="chatText" class="chat__text" placeholder="Xohlagan narsangizni yozing yoki shubhali xabarni tashlang..." autocomplete="off">
           <button class="chat__send" id="chatSend" aria-label="Yuborish"></button>
         </div>
       </div>
-      <p class="chat__note">Kiber Assist — namunaviy demo. Javoblar avtomatik tahlil asosida beriladi; real platformada AI model (masalan, Claude) bilan ishlaydi. Shaxsiy yozishmalar saqlanmaydi.</p>
+      <p class="chat__note">AI Hamroh — namunaviy demo. Suhbat va xavf aniqlash avtomatik tahlil asosida ishlaydi; real platformada AI model (masalan, Claude) bilan ishlaydi. Shaxsiy yozishmalar saqlanmaydi.</p>
     </section>
     <footer class="foot">
       <div class="foot__row">

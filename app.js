@@ -504,7 +504,7 @@
      ========================================================= */
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
-    base:"Firibgarliklar bazasi", ai:"AI tahlil", assist:"Kiber Assist", help:"Yordam", reg:"Ro'yxatdan o'tish", about:"Loyiha haqida",
+    assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi"
   };
@@ -2223,48 +2223,75 @@
   /* =========================================================
      KIBER ASSIST (AI chat — simulyatsiya)
      ========================================================= */
-  const ASSIST_CHIPS = ["Click'dan SMS keldi", "Bankdan kod so'rashyapti", "Telegramga kod keldi", "“Pul yutdingiz” SMS"];
+  const ASSIST_CHIPS = ["Investitsiyaga chaqirishyapti", "Telegramga kod keldi", "Havola yuborishdi", "Salom, tanishamizmi?"];
 
-  function assistReply(text) {
+  // Kiber Himoyachi — xavfli mavzu qoidalari (suhbatda avtomatik aniqlanadi)
+  const RISK_RULES = [
+    { k:["investitsiya", "investi", "sarmoya", "trading", "treyding", "kripto", "bitcoin", "forex", "tez foyda", "foyda kafolat", "daromad kafolat"], cat:"Investitsiya / tez daromad", ico:ICON.coin,
+      warn:"“Kafolatlangan yuqori foyda” va’dasi — firibgarlikning eng keng tarqalgan belgisi.",
+      tip:"Pul tikishdan oldin tashkilot litsenziyasini tekshiring. “Tezda ikki barobar” degan narsaga ishonmang." },
+    { k:["pul ishla", "pul topish", "oson pul", "uyda o'tirib", "online ish", "ish bor", "daromad top", "qo'shimcha daromad"], cat:"Oson pul / ish taklifi", ico:ICON.briefcase,
+      warn:"Oldindan to‘lov yoki karta ma’lumotini so‘raydigan “oson pul” takliflari ko‘pincha firibgarlik.",
+      tip:"Ishga kirish uchun hech qachon pul o‘tkazmang va karta ma’lumotini bermang." },
+    { k:["bank", "hisob raqam", "balans", "kredit ol", "bankdan"], cat:"Bank", ico:ICON.coin,
+      warn:"Bank hech qachon SMS yoki qo‘ng‘iroqda parol, PIN yoki kod so‘ramaydi.",
+      tip:"Bank ilovasiga faqat rasmiy ilova yoki rasmiy sayt orqali kiring." },
+    { k:["telegram", "tg akkaunt", "telega", "telegramda"], cat:"Telegram", ico:ICON.social,
+      warn:"“Akkaunt bloklandi / tasdiqlang” xabarlari — Telegram akkauntini o‘g‘irlash urinishi.",
+      tip:"Kelgan kodni hech kimga bermang. Sozlamalar → Maxfiylik → 2 bosqichli tasdiqni yoqing." },
+    { k:["instagram", "insta ", "instada", "profil buzil", "instagramda"], cat:"Instagram", ico:ICON.social,
+      warn:"“Profilingiz buzildi / mualliflik huquqi” xabarlari — fishing (parolni o‘g‘irlash).",
+      tip:"Havola orqali parol kiritmang, faqat rasmiy ilovadan kiring." },
+    { k:["havola", "link", "http", "bosing", "kirib ko'r", "saytga o't"], cat:"Havola / link", ico:ICON.link,
+      warn:"Notanish havola zararli sayt yoki fishing sahifasi bo‘lishi mumkin.",
+      tip:"Bosishdan oldin manzilni diqqat bilan tekshiring. Shubhali bo‘lsa — bosmang." },
+    { k:["qr", "qr-kod", "qr kod", "skaner qil"], cat:"QR-kod", ico:ICON.link,
+      warn:"Soxta QR-kod to‘lovni firibgar hisobiga yo‘naltirishi mumkin.",
+      tip:"QR skanerlagach, ochilgan manzil va to‘lov oluvchini tekshiring." },
+    { k:["otp", "bir martalik", "sms kod", "tasdiqlash kod", "kod keldi", "kodni yubor"], cat:"OTP / tasdiq kodi", ico:ICON.sms,
+      warn:"Bir martalik kod (OTP) — kalitingiz. Uni bilgan kishi hisobingizga kiradi.",
+      tip:"Hech kim — hatto bank ham — OTP kodini so‘rashga haqli emas." },
+    { k:["karta raqam", "kartangiz", "cvv", "plastik", "karta orqa", "karta ma'lumot"], cat:"Karta ma’lumotlari", ico:ICON.coin,
+      warn:"Karta raqami + amal muddati + CVV birga bo‘lsa, pulni yechishga yetadi.",
+      tip:"CVV (orqadagi 3 raqam) va SMS-kodni hech kimga aytmang." },
+    { k:["sovg'a", "sovga", "yutuq", "yutding", "mukofot", "prize", "sovrin"], cat:"Sovg‘a / yutuq", ico:ICON.gift,
+      warn:"Kutilmagan “sovg‘a/yutuq” — eng ko‘p uchraydigan aldov turlaridan biri.",
+      tip:"Yutuqni olish uchun oldindan to‘lov yoki karta so‘rasa — bu firibgar." },
+    { k:["lotereya", "loto", "tiraj"], cat:"Lotereya", ico:ICON.gift,
+      warn:"Siz qatnashmagan lotereyada “yutish” mumkin emas.",
+      tip:"Hech qanday to‘lov qilmang va shaxsiy ma’lumot bermang." }
+  ];
+  function detectRisks(text) {
+    const t = (text || "").toLowerCase();
+    const found = [], seen = new Set();
+    for (const r of RISK_RULES) if (!seen.has(r.cat) && r.k.some(k => t.includes(k))) { seen.add(r.cat); found.push(r); }
+    // umumiy URL — agar havola qoidasi hali qo'shilmagan bo'lsa
+    if (!seen.has("Havola / link") && /((https?:\/\/)?[a-z0-9-]+\.[a-z]{2,}\/?)/i.test(text || "") && /\.(xyz|top|club|online|site|info|ru|tk|cn|click|link|bonus|uz|com)/i.test(text || ""))
+      found.push(RISK_RULES.find(r => r.cat === "Havola / link"));
+    return found.slice(0, 3);
+  }
+  function chatReply(text) {
     const t = (text || "").toLowerCase();
     const has = (...a) => a.some(k => t.includes(k));
-    const url = (text || "").match(/((https?:\/\/)?[a-z0-9-]+\.(xyz|top|club|online|site|info|ru|tk|cn|click|link|bonus))[^\s]*/i);
-
-    if (has("salom", "assalom", "hayrli", "yaxshimisiz") && t.length < 28)
-      return { v: "info", title: "Assalomu alaykum!", lines: ["Men Kiber Assist — kiberxavfsizlik AI yordamchisiman. Shubhali SMS, qo'ng'iroq yoki havola kelgan bo'lsa, shuni yozing yoki rasmini yuklang — men tahlil qilib beraman."] };
-
-    if (has("click", "payme", "uzcard", "humo", "paynet", "apelsin"))
-      return { v: "danger", title: "Bu fishing (firibgarlik)",
-        lines: ["Rasmiy Click/Payme/Uzcard hech qachon SMS orqali havola yubormaydi yoki kod so'ramaydi.", "Havolani <b>bosmang</b>, hech qanday kod yoki parolni kiritmang.", "Hisobingizni faqat <b>rasmiy ilova</b> orqali oching."],
-        official: "Click rasmiy: 1080 · @clickuzofficial. Shubhada — Tekshirgich bo'limidan o'tkazing." };
-
-    if (has("kod", "parol", "pin", "cvv", "tasdiqlash kod", "sms kod", "bank xodim", "karta raqam"))
-      return { v: "danger", title: "Hech qachon kodni bermang",
-        lines: ["Bank xodimi yoki to'lov tizimi SMS-kod, parol, PIN yoki karta orqasidagi 3 raqamni (CVV) <b>hech qachon</b> so'ramaydi.", "Kim so'rasa — bu firibgar. Darhol qo'ng'iroqni tugating.", "Kartani bloklash kerak bo'lsa, o'zingiz rasmiy raqamga qo'ng'iroq qiling."],
-        official: "Bank raqamini kartangiz orqasidan yoki rasmiy ilovadan oling — qo'ng'iroqdagi raqamga ishonmang." };
-
-    if (has("yutding", "yutuq", "sovg'a", "sovga", "mukofot", "avtomobil", "mashina yut", "pul yut", "aksiya yut"))
-      return { v: "danger", title: "Soxta yutuq aldovi",
-        lines: ["“Avtomobil/pul yutdingiz” xabarlari — klassik firibgarlik.", "Haqiqiy yutuq uchun siz <b>hech qachon</b> oldindan pul, “soliq” yoki “komissiya” to'lamaysiz.", "Hech qanday to'lov qilmang va shaxsiy ma'lumot bermang."],
-        official: "Aksiyani faqat tashkilotning rasmiy sayti yoki ilovasidan tekshiring." };
-
-    if (has("telegram", "akkaunt", "akount", "akaunt", "kodni yubor", "kod keldi"))
-      return { v: "danger", title: "Telegram akkauntni o'g'irlash urinishi",
-        lines: ["Kimdir Telegramga kelgan <b>kodni</b> so'rayaptimi? Uni hech kimga bermang — bu akkauntni o'g'irlash usuli.", "Hatto “do'stingiz” so'rasa ham bermang: uning akkaunti buzilgan bo'lishi mumkin.", "Ikki bosqichli parol (2FA) yoqing: Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash."],
-        official: "Telegram kodi faqat o'zingiz kirishingiz uchun — uni hech kim so'ramasligi kerak." };
-
-    if (has("ish bor", "vakansiya", "daromad", "pul ishla", "uyda o'tirib", "online ish", "investitsiya", "sarmoya"))
-      return { v: "caution", title: "Ehtiyot bo'ling — soxta ish/daromad bo'lishi mumkin",
-        lines: ["“Uyda o'tirib katta daromad”, oldindan to'lov so'raydigan yoki karta ma'lumotini talab qiladigan takliflar ko'pincha firibgarlik.", "Ishga kirish yoki “investitsiya” uchun <b>hech qachon</b> pul o'tkazmang.", "Tashkilotni rasmiy manbalardan tekshiring."],
-        official: "Rasmiy vakansiyalarni ishonchli, tasdiqlangan manbalardan qidiring." };
-
-    if (url)
-      return { v: "caution", title: "Havolani ehtiyotkorlik bilan tekshiring",
-        lines: [`Bu havola rasmiy domenga o'xshamaydi: <b>${url[0].slice(0, 44)}</b>`, "Soxta domenlar rasmiyga o'xshatib yoziladi (masalan: clik-uz.xyz, click-bonus.top).", "Bosishdan oldin <b>Tekshirgich</b> bo'limidan o'tkazing."],
-        official: "Rasmiy xizmatni faqat o'zingiz bilgan ilova yoki manzil orqali oching." };
-
-    return { v: "info", title: "Tahlil uchun biroz batafsilroq yozing",
-      lines: ["Xabarni to'liqroq yozing yoki <b>rasmini yuklang</b>. Masalan: kim yubordi, qanday havola yoki raqam bor, nima so'rayapti.", "Quyidagi tezkor tugmalardan ham foydalanishingiz mumkin."] };
+    if (has("salom", "assalom", "hayrli", "hello", "tanishamiz")) return "Assalomu alaykum! Men — <b>AI Hamroh</b>. Istalgan mavzuda suhbatlashaman va shu bilan birga sizni kiber firibgarlikdan himoya qilaman. Nima haqida gaplashamiz?";
+    if (has("rahmat", "tashakkur", "raxmat")) return "Arzimaydi! Yana savolingiz bo‘lsa yoki shubhali biror narsa uchrasa — bemalol yozing.";
+    if (has("qandaysan", "qalaysan", "yaxshimisan", "ishlaring")) return "Rahmat, men doim shayman! Suhbatlashamizmi yoki biror xabarni tekshirib beraymi?";
+    if (has("kim san", "kimsan", "nima qila ol", "nima qilasan", "yordam ber", "imkoniyating")) return "Men — <b>AI Hamroh</b>: kundalik suhbatdosh va <b>Kiber Himoyachi</b>. Har qanday mavzuda gaplashaman va savollarga javob beraman. Agar suhbatda pul, bank, havola, kod yoki sovg‘a kabi xavfli mavzu sezsam — avtomatik ogohlantiraman va maslahat beraman.";
+    if (has("ob-havo", "weather", "havo qanday")) return "Ob-havoni real vaqtda ko‘ra olmayman, lekin kuningiz zo‘r o‘tsin! Boshqa savol bo‘lsa — yordam beraman.";
+    if (has("charchadim", "zerikdim", "yolg'iz", "kayfiyat")) return "Sizni tushunaman. Xohlasangiz gaplashamiz — biror mavzu tanlang yoki shunchaki fikringizni yozing, men shu yerdaman.";
+    return "Tushunarli, bu mavzuda gaplashishga tayyorman — batafsilroq yozsangiz, yordam beraman. Agar biror xabar, havola yoki taklif shubhali tuyulsa, menga tashlang — tekshirib, xavfsiz yoki firibgarligini aytaman.";
+  }
+  function riskGuard(risks) {
+    const items = risks.map(r => `
+      <div class="guard-item">
+        <div class="guard-item__cat">${r.ico}<span>${r.cat}</span></div>
+        <p class="guard-item__warn">${r.warn}</p>
+        <div class="guard-item__tip">${ICON.check}<span>${r.tip}</span></div>
+      </div>`).join("");
+    return `<div class="ai-guard">
+      <div class="ai-guard__head">${ICON.shieldCheck}<span>Kiber Himoyachi — avtomatik ogohlantirish</span></div>
+      ${items}
+    </div>`;
   }
 
   function assistBubble(r) {
@@ -2292,13 +2319,18 @@
     assistTyping();
     setTimeout(() => {
       const t = $("#chatTyping"); if (t) t.remove();
-      const r = imageMode
-        ? { v: "danger", title: "Rasmni tahlil qildim — fishing belgilari bor",
-            lines: ["Bu xabar rasmiy emasga o'xshaydi. Fishing belgilari: shoshilishga undash (“hisobingiz bloklandi”), notanish qisqartirilgan havola va kod/parol so'rovi.", "Havolani <b>bosmang</b>, hech qanday kod yoki ma'lumot <b>bermang</b>.", "Click/Payme yoki bank ilovasini faqat rasmiy ilovadan oching."],
-            official: "Shubha bo'lsa — havolani Tekshirgichdan o'tkazing yoki rasmiy qo'llab-quvvatlashga murojaat qiling." }
-        : assistReply(text);
-      assistAdd("ai", assistBubble(r));
-    }, 720 + Math.random() * 480);
+      if (imageMode) {
+        assistAdd("ai", assistBubble({ v: "danger", title: "Rasmni tahlil qildim — fishing belgilari bor",
+          lines: ["Bu xabar rasmiy emasga o'xshaydi. Fishing belgilari: shoshilishga undash (“hisobingiz bloklandi”), notanish qisqartirilgan havola va kod/parol so'rovi.", "Havolani <b>bosmang</b>, hech qanday kod yoki ma'lumot <b>bermang</b>.", "Click/Payme yoki bank ilovasini faqat rasmiy ilovadan oching."],
+          official: "Shubha bo'lsa — havolani Tekshirgichdan o'tkazing yoki rasmiy qo'llab-quvvatlashga murojaat qiling." }));
+        return;
+      }
+      // 1) suhbat javobi (istalgan mavzu)
+      assistAdd("ai", `<p>${chatReply(text)}</p>`);
+      // 2) Kiber Himoyachi — xavfli mavzu sezilsa avtomatik ogohlantirish
+      const risks = detectRisks(text);
+      if (risks.length) setTimeout(() => assistAdd("ai", riskGuard(risks)), 340);
+    }, 700 + Math.random() * 460);
   }
   function assistSend(text) {
     text = (text || "").trim(); if (!text) return;
@@ -2314,7 +2346,7 @@
   function assistWelcome() {
     const body = $("#chatBody"); if (!body) return;
     body.innerHTML = "";
-    assistAdd("ai", `<p><b>Assalomu alaykum!</b> Men Kiber Assist — kiberxavfsizlik AI yordamchisiman.</p><p>Shubhali SMS, qo'ng'iroq yoki havola keldimi? Shuni yozing yoki rasmini yuklang — men firibgarlik yoki yo'qligini tahlil qilib beraman.</p>`);
+    assistAdd("ai", `<p><b>Assalomu alaykum! Men — AI Hamroh 🤝</b></p><p>Istalgan mavzuda suhbatlashaman. Shu bilan birga men — <b>Kiber Himoyachi</b>man: gaplashuvda pul, bank, havola, kod, sovg'a kabi xavfli mavzu sezsam, avtomatik ogohlantiraman va maslahat beraman.</p><p>Yozing yoki shubhali xabar rasmini yuklang.</p>`);
   }
   function renderAssist() {
     const set = (id, ico) => { const n = $(id); if (n) n.innerHTML = ico; };
@@ -2344,9 +2376,6 @@
     renderFullFeed();
     renderCheckExamples();
     $("#checkRun").addEventListener("click", runChecker);
-    renderScamFilters();
-    renderScams();
-    $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
     renderKxi();
     renderMap();
     renderAssist();
