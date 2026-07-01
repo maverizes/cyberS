@@ -990,7 +990,7 @@
       </div>${i < CHAIN.length - 1 ? `<div class="chain-arrow">${ICON.caret}</div>` : ""}`).join("");
     wireViewBtns(wrap);
     const enroll = $("#certEnroll");
-    if (enroll) enroll.addEventListener("click", () => showView("condition"));
+    if (enroll) enroll.addEventListener("click", () => showView("privilege"));
   }
   function renderCourseRec() {
     const c = $("#dashCourse"); if (!c) return;
@@ -1213,6 +1213,57 @@
 
     const note = $("#aiNote");
     if (note) note.innerHTML = `${ICON.lock}<span>Barcha ma'lumotlar <b>anonim va umumlashtirilgan</b> — shaxsiy ma'lumotlar, ism yoki manzil tahlil qilinmaydi. AI faqat umumiy tendentsiyalarni ko'rsatadi.</span>`;
+  }
+
+  /* =========================================================
+     HUQUQIY ASOSLAR — Prezident farmonlari, qarorlar, qonunlar
+     ========================================================= */
+  const LEGAL_ACTS = [
+    { type:"Farmon", tag:"PF-38", date:"10.03.2026", newest:true,
+      t:"2026–2030-yillarga mo'ljallangan Kiberxavfsizlik strategiyasini tasdiqlash to'g'risida",
+      d:"O'zbekistonning yangi milliy kiberxavfsizlik strategiyasi tasdiqlandi. Davlat organlarida kiberxavfsizlik bo'linmalari tashkil etilishi va kiberjinoyatchilikning oldini olish tizimi takomillashtirilishi belgilandi." },
+    { type:"Qonun", tag:"O'RQ-764", date:"15.04.2022",
+      t:"“Kiberxavfsizlik to'g'risida”gi O'zbekiston Respublikasi Qonuni",
+      d:"Soha bo'yicha asosiy qonun. Kibermakonda shaxs, jamiyat va davlat manfaatlarini himoya qilish ustuvor deb belgilandi. Yagona davlat siyosatini Prezident belgilaydi, vakolatli organ — Davlat xavfsizlik xizmati. (17.07.2022 dan kuchga kirgan)" },
+    { type:"Farmon", tag:"PF-6007", date:"15.06.2020",
+      t:"Axborot tizimlari va resurslarini himoya qilish davlat tizimini joriy etish chora-tadbirlari to'g'risida",
+      d:"Davlat axborot tizimlari va resurslarini kibertahdidlardan himoya qiluvchi yagona davlat tizimini joriy etish belgilandi." },
+    { type:"Qaror", tag:"PQ-4751", date:"15.06.2020",
+      t:"Kiberxavfsizlikni ta'minlash tizimini yanada takomillashtirish chora-tadbirlari to'g'risida",
+      d:"Kiberxavfsizlikni ta'minlash tizimini rivojlantirish, muhim axborot infratuzilmasi obyektlarini himoya qilish tartibi belgilandi." },
+    { type:"Farmon", tag:"PF-6079", date:"05.10.2020",
+      t:"“Raqamli O'zbekiston — 2030” strategiyasini tasdiqlash to'g'risida",
+      d:"Mamlakatni raqamli rivojlantirish strategiyasi. Raqamli xizmatlar bilan bir qatorda kiberxavfsizlik va axborot xavfsizligini ta'minlash asosiy yo'nalishlardan biri etib belgilandi." },
+    { type:"Qaror", tag:"PQ-4024", date:"21.11.2018",
+      t:"Kiberxavfsizlik markazini tashkil etish to'g'risida",
+      d:"Davlat unitar korxonasi shaklida “Kiberxavfsizlik markazi” tashkil etildi — milliy segmentda kiberhujumlarni aniqlash va bartaraf etuvchi ishchi organ." }
+  ];
+  const legalTypeCls = t => t === "Qonun" ? "lt-law" : t === "Farmon" ? "lt-decree" : "lt-res";
+  function renderLegal() {
+    const hero = $("#legalHero");
+    if (hero) hero.innerHTML = `
+      <div class="legal-hero__rings"></div>
+      <span class="eyebrow">Davlat siyosati</span>
+      <h2>Kiberxavfsizlik — davlat darajasidagi ustuvor vazifa</h2>
+      <p>“Kiberxavfsizlik to'g'risida”gi Qonunga muvofiq, kibermakonda shaxs, jamiyat va davlat manfaatlarini himoya qilish ustuvor hisoblanadi va sohadagi <b>yagona davlat siyosatini Prezident belgilaydi</b>. KiberOgoh UZ aynan shu siyosat va quyidagi hujjatlar ijrosiga xizmat qiladi.</p>`;
+    const list = $("#legalList");
+    if (list) list.innerHTML = LEGAL_ACTS.map(a => `
+      <div class="legal-card${a.newest ? " legal-card--new" : ""}">
+        <div class="legal-card__side ${legalTypeCls(a.type)}">
+          <span class="legal-card__type">${a.type}</span>
+          <span class="legal-card__tag">${a.tag}</span>
+          <span class="legal-card__date">${a.date}</span>
+        </div>
+        <div class="legal-card__body">
+          ${a.newest ? '<span class="legal-card__badge">Eng yangi</span>' : ""}
+          <h3>${a.t}</h3>
+          <p>${a.d}</p>
+        </div>
+      </div>`).join("");
+    const note = $("#legalNote");
+    if (note) note.innerHTML = `
+      <div class="legal-note__ico">${ICON.shieldCheck}</div>
+      <p>Ushbu ro'yxat asosiy hujjatlarni aks ettiradi. Kiberxavfsizlik sohasida qo'shimcha qonunosti hujjatlari, Vazirlar Mahkamasi qarorlari va idoraviy me'yoriy hujjatlar ham amal qiladi. To'liq matnlar — <b>lex.uz</b> milliy huquqiy axborot bazasida.</p>`;
   }
 
   /* =========================================================
@@ -1901,8 +1952,8 @@
       <div class="mini-stat-row"><div class="mini-stat-row__ico i-blue">${ICON.social}</div><div class="mini-stat-row__t">Moderatsiya navbati</div><div class="mini-stat-row__v">3</div></div>
       <div class="mini-stat-row"><div class="mini-stat-row__ico i-gold">${ICON.cert}</div><div class="mini-stat-row__t">Tasdiq kutayotgan nomzodlar</div><div class="mini-stat-row__v">2</div></div>
       <div class="mini-stat-row"><div class="mini-stat-row__ico i-teal">${ICON.alert}</div><div class="mini-stat-row__t">Yangi xabarlar (bugun)</div><div class="mini-stat-row__v">8</div></div>
-      <button class="btn btn--gold btn--block" data-view="condition" style="margin-top:14px">Imtiyoz shartini tasdiqlash</button>`;
-    if (tasks) tasks.querySelector("[data-view]").addEventListener("click", () => showView("condition"));
+      <button class="btn btn--gold btn--block" data-view="privilege" style="margin-top:14px">Imtiyoz shartini tasdiqlash</button>`;
+    if (tasks) tasks.querySelector("[data-view]").addEventListener("click", () => showView("privilege"));
 
     const locked = $("#mahallaLocked");
     if (locked) locked.innerHTML = `
@@ -2031,7 +2082,7 @@
      ========================================================= */
   let mapSel = null;
   function renderMap() {
-    const wrap = $("#view-map"); if (!wrap) return;
+    const wrap = $("#view-kxi"); if (!wrap || !$("#mapSvg")) return;
     const district = currentRole === "tuman"; // tuman mas'uli => faqat o'z mahallalari
     const own = TUMANLAR.find(t => t.own);
     const title = $("#mapTitle"), lead = $("#mapLead"), scope = $("#mapScope");
@@ -2141,6 +2192,12 @@
     mapSel = null;
     const det = $("#mapDetail");
     if (det) det.innerHTML = `<div class="map-detail-empty">${ICON.map}<p>${district ? "Mahalla" : "Hudud"} ustiga bosing — batafsil statistika va ${district ? "ko'rsatkichlar" : "ichidagi mahallalar"} shu yerda chiqadi.</p></div>`;
+
+    // hokimlik jadvali izohi (mahalla kesimi)
+    const th = $("#kxiTableHint");
+    if (th) th.textContent = district
+      ? `${MY_TUMAN} mahallalari · qatorni bosib batafsil ko'ring`
+      : `Mahalla kesimida namuna: ${MY_TUMAN} · qatorni bosib batafsil ko'ring`;
   }
   function renderMapDetail(u, district) {
     const det = $("#mapDetail"); if (!det) return;
@@ -2290,13 +2347,12 @@
     renderScamFilters();
     renderScams();
     $("#scamSearch").addEventListener("input", e => { scamQuery = e.target.value; renderScams(); });
-    renderAI();
     renderKxi();
     renderMap();
     renderAssist();
     renderHelp();
     setupReg();
-    renderAbout();
+    renderLegal();
     // foydalanuvchi paneli (odat yondashuvi)
     renderDashHero();
     renderSecLevel();

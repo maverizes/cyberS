@@ -897,6 +897,49 @@ img,svg{ display:block; }
 @media (max-width:560px){ .map-aside{ flex-direction:column; } .mbar{ grid-template-columns:96px 1fr 30px; gap:8px; } .donut-wrap{ flex-direction:column; align-items:flex-start; } }
 
 /* =========================================================
+   HUQUQIY ASOSLAR (legal panel)
+   ========================================================= */
+.legal-hero{ position:relative; overflow:hidden; padding:26px 28px; background:linear-gradient(135deg,#161f3d,#28335f); border:0; color:#fff; margin-bottom:22px; }
+.legal-hero .eyebrow{ color:var(--gold); }
+.legal-hero h2{ font-family:var(--display); font-weight:700; font-size:22px; margin:6px 0 10px; color:#fff; }
+.legal-hero p{ font-size:14.5px; color:#c9d0e8; line-height:1.6; max-width:70ch; }
+.legal-hero p b{ color:#fff; }
+.legal-hero__rings{ position:absolute; right:-70px; top:-70px; width:240px; height:240px; border-radius:50%; border:1px solid rgba(238,155,28,.25); box-shadow:0 0 0 26px rgba(238,155,28,.05), 0 0 0 60px rgba(238,155,28,.03); }
+
+.legal-list{ display:flex; flex-direction:column; gap:14px; }
+.legal-card{ display:flex; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--shadow-sm); overflow:hidden; transition:box-shadow .16s ease, transform .16s ease; }
+.legal-card:hover{ box-shadow:var(--shadow); transform:translateY(-2px); }
+.legal-card--new{ border-color:#f0d99a; }
+.legal-card__side{ flex:0 0 132px; padding:18px 16px; display:flex; flex-direction:column; gap:4px; justify-content:center; color:#fff; }
+.legal-card__side.lt-law{ background:linear-gradient(160deg,#1b9e86,#12806b); }
+.legal-card__side.lt-decree{ background:linear-gradient(160deg,#c98a1e,#a5701a); }
+.legal-card__side.lt-res{ background:linear-gradient(160deg,#2e7fd0,#245ea8); }
+.legal-card__type{ font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; opacity:.9; }
+.legal-card__tag{ font-family:var(--display); font-weight:700; font-size:20px; }
+.legal-card__date{ font-size:12px; font-family:var(--mono); opacity:.85; }
+.legal-card__body{ flex:1; padding:18px 20px; position:relative; }
+.legal-card__badge{ position:absolute; top:14px; right:16px; background:var(--gold); color:var(--navy); font-weight:800; font-size:10.5px; letter-spacing:.03em; padding:3px 10px; border-radius:999px; }
+.legal-card__body h3{ font-family:var(--ui); font-weight:700; font-size:15.5px; color:var(--ink); line-height:1.35; margin-bottom:7px; max-width:60ch; }
+.legal-card__body p{ font-size:13.5px; color:var(--muted); line-height:1.55; }
+
+.legal-note{ display:flex; gap:13px; align-items:flex-start; padding:16px 20px; margin-top:18px; background:var(--teal-soft); border-color:#c4e9e0; }
+.legal-note__ico{ width:22px; height:22px; flex:0 0 22px; color:var(--teal); margin-top:1px; }
+.legal-note__ico svg{ width:22px; height:22px; }
+.legal-note p{ font-size:13.5px; color:#0f6b5a; line-height:1.55; }
+.legal-note b{ color:#0c5647; }
+
+/* imtiyoz bo'linuvchi (rewards -> conditions) */
+.priv-divider{ display:flex; align-items:center; justify-content:center; margin:34px 0 6px; position:relative; }
+.priv-divider::before{ content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line); }
+.priv-divider__badge{ position:relative; background:var(--navy); color:#fff; font-weight:700; font-size:13.5px; padding:8px 20px; border-radius:999px; box-shadow:var(--shadow-sm); }
+
+@media (max-width:640px){
+  .legal-card{ flex-direction:column; }
+  .legal-card__side{ flex-direction:row; align-items:center; gap:10px; flex:0 0 auto; }
+  .legal-card__tag{ font-size:17px; }
+}
+
+/* =========================================================
    OFFLINE SERTIFIKAT SINOVI — asosiy maqsad
    ========================================================= */
 .nav-item--goal .badge--goal{ background:var(--gold); color:var(--navy); font-weight:800; }

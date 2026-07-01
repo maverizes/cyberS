@@ -50,10 +50,6 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21a9 9 0 1 1 9-9" /><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M7 13a5 5 0 0 1 8-3" stroke-linecap="round" opacity=".5"/></svg>
         KiberXavfsizlik Indeksi
       </button>
-      <button class="nav-item" data-view="map" data-role="superadmin tuman">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>
-        Platforma kartasi
-      </button>
       <button class="nav-item" data-view="mahalla" data-role="superadmin raisi">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/></svg>
         Mahalla paneli
@@ -97,10 +93,6 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Imtiyozlar
       </button>
-      <button class="nav-item" data-view="condition">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11.5l2 2 4.5-4.5"/><path d="M5 4h14a1 1 0 0 1 1 1v15l-3.5-2.2L13 20l-1-2-1 2-2.5-2.2L5 20V5a1 1 0 0 1 0-1Z" stroke-linejoin="round"/></svg>
-        Imtiyoz sharti
-      </button>
     </div>
     <div class="rail__group">
       <div class="rail__label">Bilim</div>
@@ -111,10 +103,6 @@
       <button class="nav-item" data-view="base">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2V5Z"/><path d="M12 5c0-1 1.5-2 4-2s4 1 4 2v15c0-1-1.5-2-4-2s-4 1-4 2"/></svg>
         Firibgarliklar bazasi
-      </button>
-      <button class="nav-item" data-view="ai">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4" stroke-linecap="round"/><path d="M13 4l2.4 5.6L21 12l-5.6 2.4L13 20l-2.4-5.6L5 12l5.6-2.4L13 4Z" stroke-linejoin="round"/></svg>
-        AI tahlil
       </button>
       <button class="nav-item" data-view="help">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3"/><circle cx="12" cy="16.5" r=".5" fill="currentColor" stroke="none"/></svg>
@@ -127,9 +115,9 @@
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
         Ro'yxatdan o'tish
       </button>
-      <button class="nav-item" data-view="about">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r=".6" fill="currentColor" stroke="none"/></svg>
-        Loyiha haqida
+      <button class="nav-item" data-view="legal">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14" stroke-linecap="round"/><path d="M5 7 3 13h4L5 7ZM19 7l-2 6h4l-2-6Z" stroke-linejoin="round"/><path d="M8 21h8" stroke-linecap="round"/></svg>
+        Huquqiy asoslar
       </button>
     </div>
     <div class="rail__foot">
@@ -244,24 +232,7 @@
     </section>
 
     <!-- ===== AI TAHLIL ===== -->
-    <section class="view" id="view-ai">
-      <div class="page-head">
-        <span class="eyebrow">AI tahlil</span>
-        <h1>Ma'lumotlar — yo'nalish ko'rsatadi</h1>
-        <p class="lead">Sun'iy intellekt platformadagi barcha faollikni <b>anonim va umumlashtirilgan</b> ko'rinishda tahlil qiladi: qaysi mavzular ko'p so'ralmoqda, qaysi hududlarda qanday muammolar o'smoqda, qaysi yosh toifasi nimani kam biladi. Bu — yangi o'quv materiallari va profilaktikani rejalashtirishga yordam beradi.</p>
-      </div>
-      <div class="card ai-insight" id="aiInsight"></div>
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px" id="aiRow">
-        <div class="card card--pad" id="aiTopics"></div>
-        <div class="card card--pad" id="aiRegions"></div>
-      </div>
-      <div class="section-title"><h2>Yosh toifalari bo'yicha bilim tahlili</h2><span class="hint">past foiz = ko'proq xavf</span></div>
-      <div class="grid ai-ages" id="aiAges"></div>
-      <div class="section-title"><h2>AI tavsiyalari</h2><span class="hint">o'quv va profilaktika uchun</span></div>
-      <div class="grid feature-grid" id="aiRecs"></div>
-      <div class="ai-note" id="aiNote"></div>
-    </section>
-
+    
     <!-- ===== HELP ===== -->
     <section class="view" id="view-help">
       <div class="page-head">
@@ -329,43 +300,16 @@
     </section>
 
     <!-- ===== ABOUT (compiled deck) ===== -->
-    <section class="view" id="view-about">
+    <section class="view" id="view-legal">
       <div class="page-head">
-        <span class="eyebrow">Loyiha haqida</span>
-        <h1>KiberOgoh UZ konsepsiyasi</h1>
+        <span class="eyebrow">Huquqiy asoslar</span>
+        <h1>Kiberxavfsizlikning huquqiy asoslari</h1>
+        <p class="lead">KiberOgoh UZ O'zbekiston Respublikasi Prezidenti tomonidan belgilangan davlat siyosati va qonunchilik asosida quriladi. Kiberxavfsizlik sohasidagi yagona davlat siyosatini Prezident belgilaydi.</p>
       </div>
-
-      <div class="card about-hero">
-        <div class="about-hero__rings"></div>
-        <span class="eyebrow">Asosiy g'oya</span>
-        <h2>Bitta platforma: o'rgan, tekshir, ogohlantir</h2>
-        <p>KiberOgoh UZ — fuqaro o'rganadigan, shubhali xabarni tekshiradigan va jamoaviy ogohlik yaratadigan yagona tizim. Mahalla darajasida ishlaydi, biroq texnik jihatdan markaziy. Har mahallaga mutaxassis emas — bitta platforma va o'qitilgan ko'ngillilar tarmog'i muammoni real va arzon hal qiladi.</p>
-      </div>
-
-      <div class="section-title"><h2>Muammo</h2><span class="hint">nega bu platforma zarur</span></div>
-      <div class="grid feature-grid" id="aboutProblem"></div>
-
-      <div class="section-title"><h2>Platformaning yettita moduli</h2></div>
-      <div class="grid mod-grid" id="aboutModules"></div>
-
-      <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px;margin-top:26px">
-        <div class="card card--pad">
-          <div class="section-title" style="margin:0 0 16px"><h2 style="font-size:19px">Boshqaruv modeli</h2></div>
-          <p style="color:var(--muted);font-size:14px;margin-bottom:16px">200 mahallaga 200 mutaxassis kerak emas. Mutaxassis faqat yuqori bosqichda, mahallada esa — o'qitilgan ko'ngillilar. Bir viloyatga atigi 15–18 nafar professional kuch.</p>
-          <div class="pyramid" id="aboutPyramid"></div>
-        </div>
-        <div class="card card--pad">
-          <div class="section-title" style="margin:0 0 16px"><h2 style="font-size:19px">Maxfiylik tamoyili</h2></div>
-          <p style="color:var(--muted);font-size:14px;margin-bottom:8px">“Kerakli minimal ma'lumot” — fuqaroni kuzatish emas, qamrovni hisoblash. Himoya tizimining o'zi namuna bo'lishi shart.</p>
-          <div id="aboutPrivacy"></div>
-        </div>
-      </div>
-
-      <div class="section-title"><h2>Yo'l xaritasi</h2></div>
-      <div class="road" id="aboutRoad"></div>
-
-      <div class="section-title"><h2>Maqsadli ko'rsatkichlar</h2><span class="hint">birinchi ikki yil</span></div>
-      <div class="grid metrics" id="aboutMetrics"></div>
+      <div class="card legal-hero" id="legalHero"></div>
+      <div class="section-title"><h2>Prezident farmonlari, qarorlari va qonunlar</h2><span class="hint">kiberxavfsizlik sohasida</span></div>
+      <div class="legal-list" id="legalList"></div>
+      <div class="card legal-note" id="legalNote"></div>
     </section>
 
     <!-- ===== XONADONLAR REYTINGI ===== -->
@@ -416,7 +360,7 @@
       <div class="page-head">
         <span class="eyebrow">Imtiyozlar</span>
         <h1>KiberHimoyachilik — real imtiyozlar</h1>
-        <p class="lead">Faol KiberHimoyachilar shunchaki ball emas, rasmiy organlar tomonidan tasdiqlangan haqiqiy imtiyozlarga ega bo'ladi. Aynan shu mahalla ichida sog'lom raqobatni oshiradi va ota-onalarni farzandini jalb qilishga undaydi.</p>
+        <p class="lead">Faol KiberHimoyachilar shunchaki ball emas, rasmiy organlar tomonidan tasdiqlangan haqiqiy imtiyozlarga ega bo'ladi. Bu mahalla ichida sog'lom raqobatni oshiradi va ota-onalarni farzandini jalb qilishga undaydi.</p>
       </div>
 
       <div class="card priv-hero" id="privHero"></div>
@@ -427,24 +371,8 @@
       <div class="section-title"><h2>So'nggi taqdirlanganlar</h2><span class="hint">mahalla bo'yicha</span></div>
       <div id="recipientsList"></div>
 
-      <div class="priv-cta" style="margin-top:24px">
-        <div class="priv-cta__t">
-          <h3>Imtiyozni qanday qo'lga kiritish mumkin?</h3>
-          <p>Yuqori ball — bu boshlanishi. Sovg'a yoki guvohnomani olish uchun nomzod <b>Imtiyoz sharti</b>dan o'tishi shart: o'zi, ota-onasi va qo'shnilari og'zaki savol-javobdan o'tkaziladi.</p>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn--gold btn--lg" data-view="condition">Imtiyoz shartini ko'rish</button>
-          <button class="btn btn--ghost btn--lg" data-view="life">Kiber Layfxak</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== IMTIYOZ SHARTI ===== -->
-    <section class="view" id="view-condition">
-      <div class="page-head">
-        <span class="eyebrow">Imtiyoz sharti</span>
-        <h1>Sovg'a — faqat ball uchun emas, real targ'ibot uchun</h1>
-        <p class="lead">Sertifikat yoki vazirlik sovg'asini olish uchun nomzod nafaqat yuqori ball to'plashi, balki bilimini amalda isbotlashi va platformani oilasi hamda qo'shnilariga yetkazgani <b>og'zaki savol-javob</b> orqali tasdiqlanishi shart. Shu tariqa platformadan yosh avlod bilan birga ota-onalar ham foydalanadi.</p>
+      <div class="priv-divider">
+        <span class="priv-divider__badge">Imtiyozga ega bo'lish sharti</span>
       </div>
 
       <div class="card cond-why" id="condWhyCard">
@@ -461,6 +389,8 @@
       </div>
     </section>
 
+    <!-- ===== IMTIYOZ SHARTI ===== -->
+    
     <!-- ===== SUPERADMIN PANELI ===== -->
     <section class="view" id="view-admin">
       <div class="page-head">
@@ -493,32 +423,17 @@
       </div>
     </section>
 
-    <!-- ===== KIBERXAVFSIZLIK INDEKSI (KXI) ===== -->
+    <!-- ===== KIBERXAVFSIZLIK INDEKSI (KXI) — karta ichida ===== -->
     <section class="view" id="view-kxi">
       <div class="page-head">
         <span class="eyebrow">KiberXavfsizlik Indeksi</span>
-        <h1>Har mahallaga — bitta ball, bitta holat</h1>
-        <p class="lead">KXI har bir mahallaning kiberxavfsizlik holatini 0–100 ball bilan baholaydi. Tizim ko'rsatkichlarni avtomatik hisoblab, qaysi mahallaga e'tibor kerakligini bir qarashda ko'rsatadi.</p>
-      </div>
-      <div class="scope-banner scope-banner--tuman" id="kxiScope"></div>
-      <div class="grid stat-grid" id="kxiSummary"></div>
-      <div class="section-title"><h2>Baholash darajalari</h2></div>
-      <div class="grid kxi-legend" id="kxiLegend"></div>
-      <div class="section-title"><h2>Hokimlik boshqaruv paneli</h2><span class="hint">mahallalar reytingi · qatorni bosib batafsil ko'ring</span></div>
-      <div class="card" style="padding:8px 6px"><div id="kxiTable"></div></div>
-      <div class="section-title"><h2>Ball qanday hisoblanadi?</h2></div>
-      <div class="card card--pad" id="kxiFormula"></div>
-    </section>
-
-    <!-- ===== PLATFORMA KARTASI ===== -->
-    <section class="view" id="view-map">
-      <div class="page-head">
-        <span class="eyebrow">Platforma kartasi</span>
-        <h1 id="mapTitle">Tumanlar xaritasi</h1>
-        <p class="lead" id="mapLead"></p>
+        <h1>Har hududga — bitta ball, bitta holat</h1>
+        <p class="lead">KXI har bir hudud va mahallaning kiberxavfsizlik holatini 0–100 ball bilan baholaydi. Tizim ko'rsatkichlarni avtomatik hisoblab, qaysi hududga e'tibor kerakligini xaritada bir qarashda ko'rsatadi.</p>
       </div>
       <div class="scope-banner" id="mapScope"></div>
       <div class="grid stat-grid" id="mapSummary"></div>
+
+      <div class="section-title"><h2 id="mapTitle">Hududlar xaritasi</h2><span class="hint" id="mapLead"></span></div>
       <div class="map-layout">
         <div class="card map-card">
           <div class="map-card__head"><h3>Choropleth xarita</h3><span class="hint">rang — KXI darajasi · hover bilan batafsil</span></div>
@@ -533,8 +448,18 @@
           <div class="card map-detail" id="mapDetail"></div>
         </div>
       </div>
+
       <div class="section-title"><h2>Reyting — KXI bo'yicha</h2><span class="hint">diagramma</span></div>
       <div class="card card--pad"><div id="mapBars"></div></div>
+
+      <div class="section-title"><h2>Baholash darajalari</h2></div>
+      <div class="grid kxi-legend" id="kxiLegend"></div>
+
+      <div class="section-title"><h2>Hokimlik boshqaruv paneli</h2><span class="hint" id="kxiTableHint">mahallalar reytingi · qatorni bosib batafsil ko'ring</span></div>
+      <div class="card" style="padding:8px 6px"><div id="kxiTable"></div></div>
+
+      <div class="section-title"><h2>Ball qanday hisoblanadi?</h2></div>
+      <div class="card card--pad" id="kxiFormula"></div>
     </section>
 
     <!-- ===== KIBER ASSIST (AI chat) ===== -->
