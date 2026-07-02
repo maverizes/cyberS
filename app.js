@@ -457,30 +457,30 @@
   ];
 
   const REGION_NAME = "Toshkent viloyati";
-  // Toshkent viloyati: 7 shahar + 15 tuman (jami 22 hudud)
+  // Real ma'lumotlar: aholi soni va mahallalar soni — rasmiy statistika; users — demo (KXI bilan bog'liq qamrov)
   const TUMANLAR = [
-    { name:"Nurafshon", city:true, kxi:88, users:1340, mahallas:9 },
-    { name:"Chirchiq", city:true, kxi:86, users:1450, mahallas:14 },
-    { name:"Olmaliq", city:true, kxi:81, users:1280, mahallas:12 },
-    { name:"Qibray", kxi:79, users:1120, mahallas:11 },
-    { name:"Angren", city:true, kxi:78, users:1190, mahallas:13 },
-    { name:"Bekobod", city:true, kxi:74, users:980, mahallas:10 },
-    { name:"Yangiyo'l", city:true, kxi:72, users:860, mahallas:8 },
-    { name:"Toshkent tumani", kxi:71, users:950, mahallas:10, label:"Toshkent t." },
-    { name:"Ohangaron", city:true, kxi:69, users:720, mahallas:7 },
-    { name:"Zangiota", kxi:68, users:1240, mahallas:8, own:true },
-    { name:"Yangiyo'l tumani", kxi:66, users:740, mahallas:9, label:"Yangiyo'l t." },
-    { name:"Quyi Chirchiq", kxi:64, users:690, mahallas:9 },
-    { name:"Parkent", kxi:62, users:710, mahallas:8 },
-    { name:"O'rta Chirchiq", kxi:60, users:660, mahallas:9 },
-    { name:"Yuqori Chirchiq", kxi:57, users:620, mahallas:9 },
-    { name:"Bo'stonliq", kxi:58, users:640, mahallas:9 },
-    { name:"Piskent", kxi:55, users:580, mahallas:7 },
-    { name:"Oqqo'rg'on", kxi:53, users:600, mahallas:8 },
-    { name:"Bo'ka", kxi:51, users:540, mahallas:8 },
-    { name:"Ohangaron tumani", kxi:49, users:520, mahallas:7, label:"Ohangaron t." },
-    { name:"Chinoz", kxi:47, users:490, mahallas:7 },
-    { name:"Bekobod tumani", kxi:44, users:470, mahallas:8, label:"Bekobod t." }
+    { name:"Nurafshon", city:true, kxi:88, aholi:58763, users:9002, mahallas:22 },
+    { name:"Chirchiq", city:true, kxi:86, aholi:178270, users:26585, mahallas:44 },
+    { name:"Olmaliq", city:true, kxi:81, aholi:151022, users:21293, mahallas:51 },
+    { name:"Qibray", kxi:79, aholi:181732, users:21310, mahallas:67 },
+    { name:"Angren", city:true, kxi:78, aholi:188275, users:24370, mahallas:47 },
+    { name:"Bekobod", city:true, kxi:74, aholi:107292, users:12987, mahallas:35 },
+    { name:"Yangiyo'l", city:true, kxi:72, aholi:88884, users:11250, mahallas:18 },
+    { name:"Toshkent tumani", kxi:71, aholi:209794, users:23835, mahallas:68, label:"Toshkent t." },
+    { name:"Ohangaron", city:true, kxi:69, aholi:42731, users:4590, mahallas:21 },
+    { name:"Zangiota", kxi:68, aholi:180533, users:19830, mahallas:72, own:true },
+    { name:"Yangiyo'l tumani", kxi:66, aholi:207692, users:23170, mahallas:69, label:"Yangiyo'l t." },
+    { name:"Quyi Chirchiq", kxi:64, aholi:119390, users:12555, mahallas:37 },
+    { name:"Parkent", kxi:62, aholi:185049, users:21505, mahallas:62 },
+    { name:"O'rta Chirchiq", kxi:60, aholi:142986, users:15752, mahallas:57 },
+    { name:"Bo'stonliq", kxi:58, aholi:179084, users:20600, mahallas:59 },
+    { name:"Yuqori Chirchiq", kxi:57, aholi:144026, users:14952, mahallas:45 },
+    { name:"Piskent", kxi:55, aholi:104851, users:9464, mahallas:29 },
+    { name:"Oqqo'rg'on", kxi:53, aholi:115547, users:12196, mahallas:29 },
+    { name:"Bo'ka", kxi:51, aholi:138730, users:13204, mahallas:42 },
+    { name:"Ohangaron tumani", kxi:49, aholi:114606, users:10967, mahallas:29, label:"Ohangaron t." },
+    { name:"Chinoz", kxi:47, aholi:150502, users:14750, mahallas:55 },
+    { name:"Bekobod tumani", kxi:44, aholi:170912, users:15069, mahallas:51, label:"Bekobod t." },
   ];
   // hudud nomini ko'rsatish: shahar => "X sh.", tuman => qisqa nom
   const tumDisp = t => t.label || (t.city ? t.name + " sh." : t.name);
@@ -496,11 +496,22 @@
   }
   const MHZ_NAMES = ["Navbahor", "Bog'iston", "Yangiobod", "Do'stlik", "Bunyodkor", "Istiqlol", "Guliston", "Obod", "Birlik", "Mehnat", "Chinor", "Lola", "Navro'z", "Mustaqillik", "Oqtepa", "Gulzor", "Bahor", "Sharq", "Yoshlik", "Tinchlik", "Hamkor", "Kelajak", "Fayzobod", "Qorako'l"];
   function tumanMahallas(t) {
-    if (t.own) return KXI_MAHALLALAR.map(m => ({ name: m.name, score: kxiScore(m) }));
     let s = 0; for (const ch of t.name) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
     const rand = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-    const off = s % MHZ_NAMES.length;   // har tuman boshqa nomlardan boshlanadi
-    return Array.from({ length: t.mahallas }, (_, i) => ({ name: MHZ_NAMES[(off + i) % MHZ_NAMES.length] + " MFY", score: Math.max(22, Math.min(98, Math.round(t.kxi + (rand() * 2 - 1) * 17))) }));
+    const off = s % MHZ_NAMES.length;
+    const gen = i => {
+      const cyc = Math.floor((off + i) / MHZ_NAMES.length);
+      const base = MHZ_NAMES[(off + i) % MHZ_NAMES.length];
+      return (cyc > 0 ? base + "-" + (cyc + 1) : base) + " MFY";
+    };
+    if (t.own) {
+      // birinchi 8 tasi — nomli KXI namunasi, qolganlari generatsiya (jami real son: t.mahallas)
+      const sample = KXI_MAHALLALAR.map(m => ({ name: m.name, score: kxiScore(m) }));
+      const extra = Array.from({ length: Math.max(0, t.mahallas - sample.length) }, (_, i) =>
+        ({ name: gen(i), score: Math.max(22, Math.min(98, Math.round(t.kxi + (rand() * 2 - 1) * 17))) }));
+      return sample.concat(extra);
+    }
+    return Array.from({ length: t.mahallas }, (_, i) => ({ name: gen(i), score: Math.max(22, Math.min(98, Math.round(t.kxi + (rand() * 2 - 1) * 17))) }));
   }
   // buzilgan to'r asosida gap'siz choropleth katakchalarini hosil qilish
   function gridCells(units, cols, w, h, seed) {
@@ -2122,7 +2133,7 @@
     } else {
       areaName = REGION_NAME;
       unitLabel = "tuman";
-      units = TUMANLAR.map(t => ({ name: t.name, disp: tumDisp(t), full: tumFull(t), score: t.kxi, users: t.users, mahallas: t.mahallas, own: t.own, ref: t }));
+      units = TUMANLAR.map(t => ({ name: t.name, disp: tumDisp(t), full: tumFull(t), score: t.kxi, aholi: t.aholi, users: t.users, cov: t.users / t.aholi * 100, mahallas: t.mahallas, own: t.own, ref: t }));
     }
     units.forEach(u => u.lvl = kxiLevel(u.score));
 
@@ -2131,26 +2142,39 @@
       ? `Tumaningizdagi har bir mahallaning KiberXavfsizlik holati. Mahalla ustiga bosing — batafsil ko'ring.`
       : `Viloyatdagi har bir tuman va shaharning holati. Hudud ustiga bosing — ichidagi mahallalar statistikasi ochiladi.`;
     if (scope) scope.innerHTML = district
-      ? `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Tuman mas'uli · ${MY_TUMAN}</h3><p>Faqat <b>o'z tumaningiz</b> mahallalari ko'rinadi. Boshqa hududlar yopiq.</p></div>`
-      : `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Superadmin · ${REGION_NAME}</h3><p>Barcha <b>${units.length} hudud</b> (shahar va tuman) va ularning ichidagi mahallalari ko'rinadi.</p></div>`;
+      ? `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Tuman mas'uli · ${MY_TUMAN}</h3><p>Tumandagi <b>${own.mahallas} ta rasmiy mahalla</b> holati ko'rinadi. Boshqa hududlar yopiq.</p></div>`
+      : `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Superadmin · ${REGION_NAME}</h3><p>Barcha <b>${units.length} hudud</b> (shahar va tuman), <b>${fmtN(TUMANLAR.reduce((s, t) => s + t.mahallas, 0))} rasmiy mahalla</b> va ularning statistikasi ko'rinadi.</p></div>`;
     scope.className = "scope-banner " + (district ? "scope-banner--tuman" : "scope-banner--admin");
 
-    // summary kartalar
+    // summary kartalar — aholi, foydalanuvchi va qamrov bilan
     const sum = $("#mapSummary");
     if (sum) {
       const avg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
-      const totUsers = district ? own.users : TUMANLAR.reduce((s, t) => s + t.users, 0);
-      const totMhz = district ? units.length : TUMANLAR.reduce((s, t) => s + t.mahallas, 0);
+      const totA = TUMANLAR.reduce((s, t) => s + t.aholi, 0);
+      const totU = TUMANLAR.reduce((s, t) => s + t.users, 0);
+      const totMhz = TUMANLAR.reduce((s, t) => s + t.mahallas, 0);
       const greenCnt = units.filter(u => u.lvl.key === "green").length;
-      const third = district
-        ? { num: greenCnt, lab: "Xavfsiz 🟢 mahalla", cls: "i-teal", ico: ICON.shieldCheck }
-        : { num: fmtN(totMhz), lab: "Jami mahallalar", cls: "i-purple", ico: ICON.building };
-      const cards = [
-        { num: units.length, lab: district ? "Mahallalar" : "Hududlar", cls: "i-blue", ico: ICON.map },
-        { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
-        third,
-        { num: fmtN(totUsers), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users }
-      ];
+      let cards;
+      if (district) {
+        const cov = (own.users / own.aholi * 100).toFixed(1);
+        cards = [
+          { num: units.length, lab: "Mahallalar", cls: "i-blue", ico: ICON.map },
+          { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
+          { num: fmtN(own.aholi), lab: "Aholi soni", cls: "i-purple", ico: ICON.building },
+          { num: fmtN(own.users), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
+          { num: cov + "%", lab: "Qamrov (aholidan)", cls: "i-amber", ico: ICON.target }
+        ];
+      } else {
+        const cov = (totU / totA * 100).toFixed(1);
+        cards = [
+          { num: units.length, lab: "Hududlar", cls: "i-blue", ico: ICON.map },
+          { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
+          { num: fmtN(totMhz), lab: "Mahallalar", cls: "i-purple", ico: ICON.building },
+          { num: fmtN(totU), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
+          { num: cov + "%", lab: `Qamrov · ${(totA / 1e6).toFixed(2).replace(".", ",")} mln aholidan`, cls: "i-amber", ico: ICON.target }
+        ];
+      }
+      sum.classList.add("stat-grid--5");
       sum.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
     }
 
@@ -2187,7 +2211,7 @@
         gEl.addEventListener("mousemove", e => {
           const stage = svg.closest(".map-stage").getBoundingClientRect();
           tip.style.left = (e.clientX - stage.left) + "px"; tip.style.top = (e.clientY - stage.top) + "px";
-          tip.innerHTML = `<div class="mtip__t">${u.full || u.name}</div><div class="mtip__row"><span>KXI</span><b>${u.score}</b></div><div class="mtip__row"><span>Holat</span><b>${u.lvl.dot} ${u.lvl.label}</b></div>${u.users ? `<div class="mtip__row"><span>Foydalanuvchi</span><b>${fmtN(u.users)}</b></div>` : ""}${u.mahallas ? `<div class="mtip__row"><span>Mahalla</span><b>${u.mahallas}</b></div>` : ""}<div class="mtip__cta">Bosing — mahallalar statistikasi</div>`;
+          tip.innerHTML = `<div class="mtip__t">${u.full || u.name}</div><div class="mtip__row"><span>KXI</span><b>${u.score}</b></div><div class="mtip__row"><span>Holat</span><b>${u.lvl.dot} ${u.lvl.label}</b></div>${u.aholi ? `<div class="mtip__row"><span>Aholi</span><b>${fmtN(u.aholi)}</b></div>` : ""}${u.users ? `<div class="mtip__row"><span>Foydalanuvchi</span><b>${fmtN(u.users)}</b></div>` : ""}${u.cov ? `<div class="mtip__row"><span>Qamrov</span><b class="mtip__cov">${u.cov.toFixed(1)}%</b></div>` : ""}${u.mahallas ? `<div class="mtip__row"><span>Mahalla</span><b>${u.mahallas}</b></div>` : ""}<div class="mtip__cta">Bosing — mahallalar statistikasi</div>`;
           tip.classList.add("is-on");
         });
         gEl.addEventListener("mouseleave", () => tip.classList.remove("is-on"));
@@ -2197,15 +2221,21 @@
     } else if (svg) {
       // === TUMAN ICHI (mahallalar) — sxematik ===
       svg.classList.remove("mapsvg--geo");
-      const cols = units.length <= 4 ? units.length : units.length <= 6 ? 3 : units.length <= 12 ? 4 : units.length <= 20 ? 5 : 6;
-      const W = 760, H = Math.ceil(units.length / cols) * 142;
+      const n = units.length;
+      const cols = n <= 4 ? n : n <= 6 ? 3 : n <= 12 ? 4 : n <= 20 ? 5 : n <= 36 ? 6 : 9;
+      const dense = n > 24;
+      const rowH = dense ? 92 : 142;
+      const W = 760, H = Math.ceil(n / cols) * rowH;
       const cells = gridCells(units, cols, W, H, 41);
       svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
       svg.innerHTML = cells.map((c, i) => {
         const u = c.unit, fill = kxiColor(u.score);
         const labelDark = u.score >= 51;
         const nm = (u.disp || u.name).replace(" MFY", "");
-        return `<g class="mcell" data-cell="${i}"><path d="${c.d}" fill="${fill}" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/><text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - 4}" class="mcell__name" fill="${labelDark ? "#fff" : "#7a2030"}">${nm}</text><text x="${Math.round(c.cx)}" y="${Math.round(c.cy) + 13}" class="mcell__val" fill="${labelDark ? "rgba(255,255,255,.85)" : "rgba(122,32,48,.8)"}">${u.score}</text>${u.own ? `<text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - 20}" class="mcell__you">SIZ</text>` : ""}</g>`;
+        const label = dense
+          ? `<text x="${Math.round(c.cx)}" y="${Math.round(c.cy) + 5}" class="mcell__val mcell__val--sm" fill="${labelDark ? "rgba(255,255,255,.92)" : "rgba(122,32,48,.85)"}">${u.score}</text>`
+          : `<text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - 4}" class="mcell__name" fill="${labelDark ? "#fff" : "#7a2030"}">${nm}</text><text x="${Math.round(c.cx)}" y="${Math.round(c.cy) + 13}" class="mcell__val" fill="${labelDark ? "rgba(255,255,255,.85)" : "rgba(122,32,48,.8)"}">${u.score}</text>`;
+        return `<g class="mcell" data-cell="${i}"><path d="${c.d}" fill="${fill}" stroke="#fff" stroke-width="${dense ? 1.8 : 2.5}" stroke-linejoin="round"/>${label}${u.own ? `<text x="${Math.round(c.cx)}" y="${Math.round(c.cy) - (dense ? 12 : 20)}" class="mcell__you">SIZ</text>` : ""}</g>`;
       }).join("");
       const tip = $("#mapTip");
       svg.querySelectorAll(".mcell").forEach(g => {
@@ -2246,16 +2276,28 @@
         </div>`;
     }
 
-    // reyting diagrammasi (horizontal bars) — bosilsa xaritada tanlanadi
+    // reyting diagrammasi — KXI yoki Qamrov bo'yicha (bosilsa xaritada tanlanadi)
     const bars = $("#mapBars");
     if (bars) {
-      const sorted = [...units].sort((a, b) => b.score - a.score);
-      bars.innerHTML = sorted.map(u => `
-        <div class="mbar mbar--click${u.own ? " is-you" : ""}" data-bar="${u.name}" title="Xaritada ko'rsatish">
+      const mode = renderMap._barMode || "kxi";
+      const covMax = Math.max(...units.map(x => x.cov || 0), 1);
+      const rowHtml = u => {
+        const val = mode === "cov" ? (u.cov || 0) : u.score;
+        const w = mode === "cov" ? (u.cov / covMax * 100) : u.score;
+        const col = mode === "cov" ? "var(--blue)" : kxiColor(u.score);
+        const vtxt = mode === "cov" ? val.toFixed(1) + "%" : u.score;
+        return `<div class="mbar mbar--click${u.own ? " is-you" : ""}" data-bar="${u.name}" title="Xaritada ko'rsatish">
           <div class="mbar__name">${u.own ? '<span class="kxi-you">SIZ</span> ' : ""}${(u.disp || u.name).replace(" MFY", "")}</div>
-          <div class="mbar__track"><i style="width:${u.score}%;background:${kxiColor(u.score)}"></i></div>
-          <div class="mbar__val">${u.score}</div>
-        </div>`).join("");
+          <div class="mbar__track"><i style="width:${w}%;background:${col}"></i></div>
+          <div class="mbar__val mbar__val--w">${vtxt}</div>
+        </div>`;
+      };
+      const sorted = [...units].sort((a, b) => (mode === "cov" ? (b.cov || 0) - (a.cov || 0) : b.score - a.score));
+      const toggle = !district && units[0] && units[0].cov != null
+        ? `<div class="map-toggle"><button class="map-toggle__b${mode === "kxi" ? " is-on" : ""}" data-mode="kxi">KXI reytingi</button><button class="map-toggle__b${mode === "cov" ? " is-on" : ""}" data-mode="cov">Qamrov reytingi %</button></div>`
+        : "";
+      bars.innerHTML = toggle + sorted.map(rowHtml).join("");
+      bars.querySelectorAll(".map-toggle__b").forEach(b => b.addEventListener("click", () => { renderMap._barMode = b.dataset.mode; renderMap(); }));
       bars.querySelectorAll(".mbar").forEach(b => b.addEventListener("click", () => {
         const u = units.find(x => x.name === b.dataset.bar); if (!u) return;
         const cellEl = [...(svg ? svg.querySelectorAll(".mcell") : [])].find(g => {
@@ -2273,9 +2315,10 @@
 
     // hokimlik jadvali izohi (mahalla kesimi)
     const th = $("#kxiTableHint");
+    const ownMhz = TUMANLAR.find(t => t.own).mahallas;
     if (th) th.textContent = district
-      ? `${MY_TUMAN} mahallalari · qatorni bosib batafsil ko'ring`
-      : `Mahalla kesimida namuna: ${MY_TUMAN} · qatorni bosib batafsil ko'ring`;
+      ? `${MY_TUMAN}: ${ownMhz} rasmiy mahalladan 8 tasi nomli namunada · qatorni bosib batafsil ko'ring`
+      : `Mahalla kesimida namuna: ${MY_TUMAN} (8/${ownMhz}) · qatorni bosib batafsil ko'ring`;
     const mh = $("#mapHint");
     if (mh) mh.textContent = district
       ? "sxematik ko'rinish · rang — KXI darajasi"
@@ -2289,17 +2332,25 @@
         <div class="kxi-rec ${u.lvl.cls}" style="margin:14px 0 0">${ICON.alert}<span><b>Tavsiya:</b> ${KXI_REC[u.lvl.key]}</span></div>`;
       return;
     }
-    // tuman => ichidagi mahallalar
+    // hudud => aholi/qamrov + mahallalar (yetakchi va e'tibor talab)
     const mhz = tumanMahallas(u.ref).map(m => ({ ...m, lvl: kxiLevel(m.score) })).sort((a, b) => b.score - a.score);
+    const top = mhz.slice(0, 5);
+    const low = mhz.slice(-3).reverse();
+    const cov = u.cov.toFixed(1);
+    const mbar = m => `<div class="mbar"><div class="mbar__name">${m.name.replace(" MFY", "")}</div><div class="mbar__track"><i style="width:${m.score}%;background:${kxiColor(m.score)}"></i></div><div class="mbar__val">${m.score}</div></div>`;
     det.innerHTML = `
       <div class="md-head"><div><h3>${u.full || u.name}</h3><span class="kxi-badge ${u.lvl.cls}">${u.lvl.dot} ${u.lvl.label}</span></div><div class="md-score" style="color:${kxiColor(u.score)}">${u.score}<span>/100</span></div></div>
-      <div class="md-stats">
-        <div><span class="k">Foydalanuvchilar</span><span class="v">${fmtN(u.users)}</span></div>
-        <div><span class="k">Mahallalar</span><span class="v">${u.mahallas}</span></div>
-        <div><span class="k">O'rtacha KXI</span><span class="v">${u.score}</span></div>
+      <div class="md-stats md-stats--4">
+        <div><span class="k">Aholi </span><span class="v">${fmtN(u.aholi)}</span></div>
+        <div><span class="k">Foydalanuvchi</span><span class="v">${fmtN(u.users)}</span></div>
+        <div><span class="k">Qamrov</span><span class="v" style="color:${kxiColor(Math.min(100, u.cov * 6))}">${cov}%</span></div>
+        <div><span class="k">Mahalla </span><span class="v">${u.mahallas}</span></div>
       </div>
-      <div class="md-sub">Ichidagi mahallalar (KXI bo'yicha)</div>
-      <div class="md-mhz">${mhz.map(m => `<div class="mbar"><div class="mbar__name">${m.name.replace(" MFY", "")}</div><div class="mbar__track"><i style="width:${m.score}%;background:${kxiColor(m.score)}"></i></div><div class="mbar__val">${m.score}</div></div>`).join("")}</div>`;
+      <div class="md-cov"><div class="md-cov__lab">Aholi qamrovi — har 100 fuqarodan <b>${Math.round(u.cov)}</b> nafari platformada</div><div class="md-cov__bar"><i style="width:${Math.min(100, u.cov * 5)}%"></i></div></div>
+      <div class="md-sub">🏆 Yetakchi mahallalar (top 5 / ${u.mahallas})</div>
+      <div class="md-mhz">${top.map(mbar).join("")}</div>
+      <div class="md-sub md-sub--low">⚠️ E'tibor talab qiladi (oxirgi 3)</div>
+      <div class="md-mhz">${low.map(mbar).join("")}</div>`;
   }
 
   /* =========================================================
