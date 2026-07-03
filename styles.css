@@ -833,6 +833,23 @@ img,svg{ display:block; }
 .map-card{ padding:18px 20px; }
 .map-card__head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
 .map-card__head h3{ font-family:var(--display); font-weight:700; font-size:17px; color:var(--navy); }
+/* breadcrumb + drill */
+.map-crumb{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:-4px 0 12px; }
+.crumb__seg{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--muted); background:var(--canvas); border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-family:var(--ui); }
+.crumb__seg svg{ width:14px; height:14px; }
+.crumb__seg.is-cur{ color:var(--navy); background:var(--gold-soft); border-color:#f0d99a; }
+button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy); }
+.crumb__sep{ color:var(--faint); font-weight:700; }
+.crumb__return{ margin-left:auto; border:0; background:var(--navy); color:#fff; font-weight:700; font-size:12.5px; padding:7px 14px; border-radius:9px; cursor:pointer; font-family:var(--ui); }
+.crumb__return:hover{ background:#232f5c; }
+
+/* real tuman konturi + uchastkalar */
+.dist-under{ fill:#eef1f9; stroke:none; }
+.dist-outline{ fill:none; stroke:#fff; stroke-width:3.4; stroke-linejoin:round; pointer-events:none; }
+.mcell.is-locked{ cursor:not-allowed; }
+.mcell.is-locked path{ fill:#dde2ee !important; stroke:#fff; }
+.mcell.is-locked:hover path{ transform:none; filter:none; }
+
 .map-stage{ position:relative; background:linear-gradient(160deg,#eef1f9,#e7ebf6); border-radius:14px; padding:18px; }
 #mapSvg{ width:100%; height:auto; display:block; overflow:visible; }
 #mapSvg.mapsvg--geo{ width:auto; max-width:100%; max-height:640px; margin:0 auto; filter:drop-shadow(0 10px 26px rgba(22,31,61,.16)); }
