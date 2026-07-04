@@ -376,6 +376,13 @@
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
   const MY_TUMAN = "Zangiota tumani";
+  /* ---- Autentifikatsiya (demo) ---- */
+  const AUTH = { login: "admin", pass: "1234" };            // imtiyozli rollar uchun
+  const LOCKED_ROLES = ["superadmin", "tuman", "raisi"];    // login talab qilinadi
+  const unlockedRoles = {};                                  // sessiya davomida eslab qolinadi
+  function loadUser() { try { return JSON.parse(localStorage.getItem("ko_user") || "null"); } catch (e) { return null; } }
+  function saveUser(u) { try { localStorage.setItem("ko_user", JSON.stringify(u)); } catch (e) {} }
+  let KO_USER = loadUser();                                  // user: bir marta ro'yxat — ID saqlanadi, logout yo'q
   const MY_MAHALLA = "Navbahor MFY";
   const MAHALLALAR = [
     { name:"Navbahor MFY", region:"Toshkent vil. · Zangiota", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
@@ -586,7 +593,33 @@
     $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
-    if (v === "quiz" && !quizBuilt) { startQuiz(); quizBuilt = true; }
+    if (v === "quiz") {
+      if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
+      else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
+    }
+  }
+  // Kibersinov himoyasi: natija mahalla/tuman statistikasiga qo'shiladi — ID talab qilinadi
+  function quizGateNeeded() { return currentRole === "user" && !KO_USER; }
+  function renderQuizGate() {
+    const w = $("#quizWrap"); if (!w) return;
+    w.innerHTML = `
+      <div class="card quiz-gate">
+        <div class="quiz-gate__ico">${ICON.lock}</div>
+        <h3>Avval ro'yxatdan o'ting</h3>
+        <p>Kibersinov natijangiz <b>shaxsiy ballingizga</b>, so'ng <b>mahallangiz</b> va <b>tumaningiz</b> statistikasiga qo'shiladi. Buning uchun doimiy ID kerak.</p>
+        <p class="quiz-gate__soft">Ro'yxatdan bir marta o'tasiz — login-parol talab qilinmaydi, ID qurilmangizda saqlanadi.</p>
+        <div class="quiz-gate__btns">
+          <button class="btn btn--gold btn--lg" data-view="reg">Ro'yxatdan o'tish →</button>
+          <button class="btn btn--ghost" data-view="dash">Bosh sahifa</button>
+        </div>
+      </div>`;
+    wireViewBtns(w);
+  }
+  function updateQuizLock() {
+    const nav = document.querySelector('.nav-item[data-view="quiz"]'); if (!nav) return;
+    let ic = nav.querySelector(".rlock");
+    if (quizGateNeeded() && !ic) { ic = document.createElement("span"); ic.className = "rlock"; ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'; nav.appendChild(ic); }
+    if (!quizGateNeeded() && ic) ic.remove();
   }
   function bindNav() {
     $$("[data-view]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); showView(b.dataset.view); }));
@@ -594,6 +627,7 @@
 
   // RBAC: rolga qarab navigatsiyani va ko'rinishni boshqaradi
   function applyRole(role) {
+    if (LOCKED_ROLES.includes(role) && !unlockedRoles[role]) { openLogin(role); return; }
     currentRole = role;
     $$("#roleSwitch button").forEach(b => b.classList.toggle("is-active", b.dataset.role === role));
     // rolga tegishli nav elementlarini ko'rsatish/yashirish
@@ -613,9 +647,76 @@
     if (!canSeeView(v)) showView("dash");
     mapDrill = null;
     if (typeof renderMap === "function") renderMap();
+    if (typeof updateQuizLock === "function") updateQuizLock();
+    if ($("#view-quiz") && $("#view-quiz").classList.contains("is-active")) {
+      if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
+      else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
+    }
   }
   function bindRoleSwitch() {
     $$("#roleSwitch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
+    updateRoleLocks();
+  }
+
+  /* ---- Login oynasi (superadmin / tuman mas'uli / yoshlar yetakchisi) ---- */
+  let pendingRole = null;
+  function updateRoleLocks() {
+    $$("#roleSwitch button").forEach(b => {
+      const r = b.dataset.role;
+      const need = LOCKED_ROLES.includes(r) && !unlockedRoles[r];
+      let ic = b.querySelector(".rlock");
+      if (need && !ic) { ic = document.createElement("span"); ic.className = "rlock"; ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'; b.appendChild(ic); }
+      if (!need && ic) ic.remove();
+    });
+  }
+  function openLogin(role) {
+    pendingRole = role;
+    $("#loginRole").textContent = ROLE_META[role].name;
+    $("#loginErr").classList.remove("show");
+    $("#loginUser").value = ""; $("#loginPass").value = "";
+    $("#loginModal").classList.add("is-open");
+    setTimeout(() => $("#loginUser").focus(), 60);
+  }
+  function closeLogin() { $("#loginModal").classList.remove("is-open"); pendingRole = null; }
+  function tryLogin() {
+    const u = $("#loginUser").value.trim(), p = $("#loginPass").value;
+    if (u === AUTH.login && p === AUTH.pass) {
+      unlockedRoles[pendingRole] = true;
+      const r = pendingRole; closeLogin(); updateRoleLocks(); applyRole(r);
+    } else {
+      const err = $("#loginErr"); err.classList.add("show");
+      const card = $("#loginModal .login-card"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    }
+  }
+  function setupLogin() {
+    $("#loginGo").addEventListener("click", tryLogin);
+    $("#loginCancel").addEventListener("click", closeLogin);
+    $("#loginModal").addEventListener("click", e => { if (e.target.id === "loginModal") closeLogin(); });
+    document.addEventListener("keydown", e => {
+      if (!$("#loginModal").classList.contains("is-open")) return;
+      if (e.key === "Escape") closeLogin();
+      if (e.key === "Enter") tryLogin();
+    });
+  }
+
+  /* ---- User ID: bir marta ro'yxat, avtomatik kirish, logout yo'q ---- */
+  function genUserId() { return "KO-2026-" + String(100000 + Math.floor(Math.random() * 900000)); }
+  function applyUserChip() {
+    const btn = $("#topRegBtn"); if (!btn) return;
+    if (KO_USER) {
+      btn.classList.remove("btn--gold"); btn.classList.add("uid-chip");
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M6 16c.7-1.5 1.9-2.2 3-2.2s2.3.7 3 2.2M14 9h5M14 12.5h5" stroke-linecap="round"/></svg><span class="uid-chip__id">${KO_USER.id}</span>`;
+      btn.title = "Sizning doimiy ID raqamingiz — qayta kirish talab qilinmaydi";
+    }
+  }
+  function showRegSaved() {
+    if (!KO_USER) return;
+    const fb = $("#regFormBody"), sc = $("#regSuccess");
+    if (fb) fb.style.display = "none";
+    if (sc) sc.classList.add("show");
+    const w = $("#regWhere"); if (w) w.textContent = `${KO_USER.viloyat} → ${KO_USER.tuman} → ${KO_USER.mahalla}`;
+    const idEl = $("#regId"); if (idEl) idEl.textContent = KO_USER.id;
+    const tr = $("#topRegion"); if (tr) tr.textContent = KO_USER.viloyat;
   }
 
   // mobile rail
@@ -1377,10 +1478,17 @@
     });
     m.addEventListener("change", () => { btn.disabled = !m.value; });
     btn.addEventListener("click", () => {
+      const id = KO_USER && KO_USER.id ? KO_USER.id : genUserId(); // ID doimiy — hudud o'zgarsa ham saqlanadi
+      KO_USER = { id, viloyat: v.value, tuman: t.value, mahalla: m.value, ts: Date.now() };
+      saveUser(KO_USER);
       $("#regFormBody").style.display = "none";
       $("#regSuccess").classList.add("show");
       $("#regWhere").textContent = `${v.value} → ${t.value} → ${m.value}`;
+      const idEl = $("#regId"); if (idEl) idEl.textContent = id;
       $("#topRegion").textContent = v.value;
+      applyUserChip();
+      updateQuizLock();
+      if ($("#view-quiz").classList.contains("is-active")) { startQuiz(); quizBuilt = true; }
     });
     $("#regReset").addEventListener("click", () => {
       $("#regSuccess").classList.remove("show");
@@ -2642,8 +2750,12 @@
     renderAdmin();
     renderMahalla();
     setupPermitModal();
+    setupLogin();
     bindRoleSwitch();
-    applyRole("superadmin");
+    applyRole("user");           // boshlang'ich — oddiy fuqaro; imtiyozli rollar login talab qiladi
+    applyUserChip();
+    showRegSaved();
+    updateQuizLock();
     animateDash(); dashAnimated = true;
     startLive();
   }

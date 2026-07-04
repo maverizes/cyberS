@@ -32,7 +32,7 @@
     <button data-role="user">User</button>
   </div>
   <div class="region-pill"><span class="dot"></span> Hudud: <b id="topRegion">Toshkent viloyati</b></div>
-  <button class="btn btn--gold" data-view="reg"><span class="btn--cta-text">Ro'yxatdan o'tish</span></button>
+  <button class="btn btn--gold" data-view="reg" id="topRegBtn"><span class="btn--cta-text">Ro'yxatdan o'tish</span></button>
 </header>
 
 <div class="rail-scrim" id="railScrim"></div>
@@ -253,8 +253,9 @@
             <h3 style="font-size:22px">Xush kelibsiz!</h3>
             <p style="color:var(--muted);margin-top:6px">Siz quyidagi mahalla qamroviga qo'shildingiz:</p>
             <div class="where" id="regWhere"></div>
-            <p style="color:var(--muted);font-size:13px;margin-top:14px;max-width:42ch;margin-left:auto;margin-right:auto">Tizimda faqat shu hudud va foydalanuvchilar soni saqlanadi. Aniq manzilingiz hech qaerda yozilmaydi.</p>
-            <button class="btn btn--ghost" id="regReset" style="margin-top:8px">Boshqatdan</button>
+            <div class="reg-id"><span class="reg-id__lab">Sizning doimiy ID raqamingiz</span><div class="reg-id__val" id="regId"></div></div>
+            <p style="color:var(--muted);font-size:13px;margin-top:14px;max-width:44ch;margin-left:auto;margin-right:auto">ID qurilmangizda saqlandi — endi har kirganingizda <b style="color:var(--navy)">avtomatik tanilasiz</b>. Qayta login-parol so'ralmaydi, chiqish (logout) ham talab qilinmaydi. Tizimda faqat hudud va foydalanuvchilar soni saqlanadi.</p>
+            <button class="btn btn--ghost" id="regReset" style="margin-top:8px">Hududni o'zgartirish</button>
           </div>
         </div>
         <div class="card privacy-aside">
@@ -500,5 +501,21 @@
 </div>
 
 <script src="app.js"></script>
+<!-- ===== LOGIN MODAL (imtiyozli rollar) ===== -->
+<div class="login-modal" id="loginModal" aria-hidden="true">
+  <div class="login-card">
+    <div class="login-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
+    <h3>Tizimga kirish</h3>
+    <p class="login-card__sub"><b id="loginRole">Rol</b> paneli himoyalangan — login va parolni kiriting.</p>
+    <div class="field"><label for="loginUser">Login</label><input type="text" id="loginUser" autocomplete="username" placeholder="admin"></div>
+    <div class="field"><label for="loginPass">Parol</label><input type="password" id="loginPass" autocomplete="current-password" placeholder="••••"></div>
+    <div class="login-err" id="loginErr">Login yoki parol noto'g'ri. Qayta urinib ko'ring.</div>
+    <div class="login-actions">
+      <button class="btn btn--ghost" id="loginCancel">Bekor qilish</button>
+      <button class="btn btn--gold" id="loginGo">Kirish</button>
+    </div>
+    <div class="login-hint">Demo hisob: <code>admin</code> / <code>1234</code></div>
+  </div>
+</div>
 </body>
 </html>
