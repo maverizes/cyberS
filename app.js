@@ -210,21 +210,9 @@
     { big:"5 000+", y2:"2-yil: 30 000+", lab:"Qora ro'yxatdagi raqamlar" }
   ];
 
+  // Platforma hozircha Toshkent viloyatida ishlaydi
   const REGIONS = {
-    "Toshkent shahri": ["Bektemir","Chilonzor","Mirobod","Mirzo Ulug'bek","Olmazor","Sergeli","Shayxontohur","Uchtepa","Yakkasaroy","Yashnobod","Yunusobod","Yangihayot"],
-    "Toshkent viloyati": ["Nurafshon shahri","Angren shahri","Bekobod shahri","Olmaliq shahri","Ohangaron shahri","Chirchiq shahri","Yangiyo'l shahri","Bekobod tumani","Bo'ka tumani","Bo'stonliq tumani","Qibray tumani","Quyi Chirchiq tumani","Oqqo'rg'on tumani","Ohangaron tumani","Parkent tumani","Piskent tumani","Toshkent tumani","Zangiota tumani","O'rta Chirchiq tumani","Chinoz tumani","Yuqori Chirchiq tumani","Yangiyo'l tumani"],
-    "Andijon": ["Andijon shahri","Asaka","Baliqchi","Izboskan","Marhamat","Oltinko'l","Paxtaobod","Shahrixon","Xo'jaobod"],
-    "Farg'ona": ["Farg'ona shahri","Marg'ilon","Qo'qon","Quva","Rishton","Beshariq","Oltiariq","Furqat"],
-    "Namangan": ["Namangan shahri","Chust","Pop","To'raqo'rg'on","Uchqo'rg'on","Kosonsoy","Mingbuloq"],
-    "Samarqand": ["Samarqand shahri","Kattaqo'rg'on","Urgut","Bulung'ur","Jomboy","Ishtixon","Payariq"],
-    "Buxoro": ["Buxoro shahri","Kogon","G'ijduvon","Vobkent","Romitan","Shofirkon","Olot"],
-    "Xorazm": ["Urganch","Xiva","Hazorasp","Gurlan","Shovot","Yangiariq","Bog'ot"],
-    "Qashqadaryo": ["Qarshi","Shahrisabz","Kitob","G'uzor","Koson","Muborak","Yakkabog'"],
-    "Surxondaryo": ["Termiz","Denov","Sho'rchi","Sariosiyo","Boysun","Jarqo'rg'on","Qumqo'rg'on"],
-    "Jizzax": ["Jizzax shahri","G'allaorol","Zomin","Forish","Do'stlik","Paxtakor"],
-    "Sirdaryo": ["Guliston","Yangiyer","Sirdaryo","Boyovut","Sayxunobod","Mirzaobod"],
-    "Navoiy": ["Navoiy shahri","Zarafshon","Karmana","Konimex","Nurota","Uchquduq"],
-    "Qoraqalpog'iston": ["Nukus","Xo'jayli","Chimboy","To'rtko'l","Beruniy","Qo'ng'irot","Mo'ynoq"]
+    "Toshkent viloyati": ["Nurafshon shahri","Angren shahri","Bekobod shahri","Olmaliq shahri","Ohangaron shahri","Chirchiq shahri","Yangiyo'l shahri","Bekobod tumani","Bo'ka tumani","Bo'stonliq tumani","Qibray tumani","Quyi Chirchiq tumani","Oqqo'rg'on tumani","Ohangaron tumani","Parkent tumani","Piskent tumani","Toshkent tumani","Zangiota tumani","O'rta Chirchiq tumani","Chinoz tumani","Yuqori Chirchiq tumani","Yangiyo'l tumani"]
   };
   const MFY_POOL = ["Bunyodkor MFY","Navbahor MFY","Do'stlik MFY","Yangiobod MFY","Guliston MFY","Birlik MFY","Istiqlol MFY","Obod MFY","Mustaqillik MFY","Bog'bon MFY"];
 
@@ -705,9 +693,14 @@
     const btn = $("#topRegBtn"); if (!btn) return;
     if (KO_USER) {
       btn.classList.remove("btn--gold"); btn.classList.add("uid-chip");
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M6 16c.7-1.5 1.9-2.2 3-2.2s2.3.7 3 2.2M14 9h5M14 12.5h5" stroke-linecap="round"/></svg><span class="uid-chip__id">${KO_USER.id}</span>`;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M6 16c.7-1.5 1.9-2.2 3-2.2s2.3.7 3 2.2M14 9h5M14 12.5h5" stroke-linecap="round"/></svg>${KO_USER.name ? `<span class="uid-chip__name">${KO_USER.name}</span>` : ""}<span class="uid-chip__id">${KO_USER.id}</span>`;
       btn.title = "Sizning doimiy ID raqamingiz — qayta kirish talab qilinmaydi";
     }
+  }
+  function applyUserName() {
+    const n = KO_USER && KO_USER.name;
+    const h = $("#helloName"); if (h && n) h.textContent = n;
+    const hi = $("#regHi"); if (hi) hi.textContent = n ? `Xush kelibsiz, ${n}!` : "Xush kelibsiz!";
   }
   function showRegSaved() {
     if (!KO_USER) return;
@@ -716,6 +709,7 @@
     if (sc) sc.classList.add("show");
     const w = $("#regWhere"); if (w) w.textContent = `${KO_USER.viloyat} → ${KO_USER.tuman} → ${KO_USER.mahalla}`;
     const idEl = $("#regId"); if (idEl) idEl.textContent = KO_USER.id;
+    applyUserName();
     const tr = $("#topRegion"); if (tr) tr.textContent = KO_USER.viloyat;
   }
 
@@ -1248,7 +1242,7 @@
         <div class="ripple__title">${ICON.spark} Natijangiz qayerga ta'sir qiladi</div>
         <div class="ripple__node ripple--you">
           <span class="ripple__ico">${ICON.users}</span>
-          <div class="ripple__body"><div class="ripple__t">Siz — Alisher (Abdullayevlar)</div>
+          <div class="ripple__body"><div class="ripple__t">Siz — ${(KO_USER && KO_USER.name) || "Alisher"}</div>
             <div class="ripple__p">Shaxsiy ball: <b>${fmtN(prev)} → ${fmtN(userBall)}</b> <span class="ripple__delta">+${earned}</span></div></div>
         </div>
         <div class="ripple__link">${ICON.caret}<span>hissa qo'shadi</span></div>
@@ -1462,13 +1456,17 @@
     sel.innerHTML = `<option value="">${placeholder}</option>` + items.map(i => `<option value="${i}">${i}</option>`).join("");
   }
   function setupReg() {
-    const v = $("#selViloyat"), t = $("#selTuman"), m = $("#selMahalla"), btn = $("#regSubmit");
-    fillSelect(v, Object.keys(REGIONS), "Tanlang…");
-    v.addEventListener("change", () => {
-      if (v.value) { fillSelect(t, REGIONS[v.value], "Tumanni tanlang…"); t.disabled = false; }
-      else { t.innerHTML = `<option value="">Avval viloyatni tanlang</option>`; t.disabled = true; }
-      m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; btn.disabled = true;
-    });
+    const v = $("#selViloyat"), t = $("#selTuman"), m = $("#selMahalla"), btn = $("#regSubmit"), nm = $("#regName");
+    const validName = () => nm.value.trim().length >= 2;
+    const check = () => { btn.disabled = !(validName() && m.value); };
+    if (KO_USER && KO_USER.name) nm.value = KO_USER.name;   // hudud o'zgartirilganda ism saqlanadi
+    nm.addEventListener("input", check);
+    // Platforma hozircha faqat Toshkent viloyatida — maydon avtomatik tanlangan va qulflangan
+    const REG = "Toshkent viloyati";
+    v.innerHTML = `<option value="${REG}" selected>${REG}</option>`;
+    v.disabled = true;
+    fillSelect(t, REGIONS[REG], "Tumanni tanlang…");
+    t.disabled = false;
     t.addEventListener("change", () => {
       if (t.value) {
         const pool = MFY_POOL.slice(0, 6 + (t.value.length % 4));
@@ -1476,11 +1474,12 @@
       } else { m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; }
       btn.disabled = true;
     });
-    m.addEventListener("change", () => { btn.disabled = !m.value; });
+    m.addEventListener("change", check);
     btn.addEventListener("click", () => {
       const id = KO_USER && KO_USER.id ? KO_USER.id : genUserId(); // ID doimiy — hudud o'zgarsa ham saqlanadi
-      KO_USER = { id, viloyat: v.value, tuman: t.value, mahalla: m.value, ts: Date.now() };
+      KO_USER = { id, name: nm.value.trim(), viloyat: v.value, tuman: t.value, mahalla: m.value, ts: Date.now() };
       saveUser(KO_USER);
+      applyUserName();
       $("#regFormBody").style.display = "none";
       $("#regSuccess").classList.add("show");
       $("#regWhere").textContent = `${v.value} → ${t.value} → ${m.value}`;
@@ -1489,12 +1488,6 @@
       applyUserChip();
       updateQuizLock();
       if ($("#view-quiz").classList.contains("is-active")) { startQuiz(); quizBuilt = true; }
-    });
-    $("#regReset").addEventListener("click", () => {
-      $("#regSuccess").classList.remove("show");
-      $("#regFormBody").style.display = "";
-      v.value = ""; t.innerHTML = `<option value="">Avval viloyatni tanlang</option>`; t.disabled = true;
-      m.innerHTML = `<option value="">Avval tumanni tanlang</option>`; m.disabled = true; btn.disabled = true;
     });
   }
 

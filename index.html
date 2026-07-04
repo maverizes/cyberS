@@ -235,7 +235,11 @@
         <div class="card reg__form">
           <div id="regFormBody">
             <div class="field">
-              <label for="selViloyat">Viloyat <span class="hint">— majburiy</span></label>
+              <label for="regName">Ismingiz <span class="hint">— majburiy</span></label>
+              <input type="text" id="regName" class="txt" placeholder="Masalan: Azizbek" maxlength="30" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label for="selViloyat">Viloyat <span class="hint">— platforma hozircha Toshkent viloyatida</span></label>
               <div class="select"><select id="selViloyat"><option value="">Tanlang…</option></select></div>
             </div>
             <div class="field">
@@ -250,12 +254,11 @@
           </div>
           <div class="reg-success" id="regSuccess">
             <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <h3 style="font-size:22px">Xush kelibsiz!</h3>
+            <h3 style="font-size:22px" id="regHi">Xush kelibsiz!</h3>
             <p style="color:var(--muted);margin-top:6px">Siz quyidagi mahalla qamroviga qo'shildingiz:</p>
             <div class="where" id="regWhere"></div>
             <div class="reg-id"><span class="reg-id__lab">Sizning doimiy ID raqamingiz</span><div class="reg-id__val" id="regId"></div></div>
             <p style="color:var(--muted);font-size:13px;margin-top:14px;max-width:44ch;margin-left:auto;margin-right:auto">ID qurilmangizda saqlandi — endi har kirganingizda <b style="color:var(--navy)">avtomatik tanilasiz</b>. Qayta login-parol so'ralmaydi, chiqish (logout) ham talab qilinmaydi. Tizimda faqat hudud va foydalanuvchilar soni saqlanadi.</p>
-            <button class="btn btn--ghost" id="regReset" style="margin-top:8px">Hududni o'zgartirish</button>
           </div>
         </div>
         <div class="card privacy-aside">

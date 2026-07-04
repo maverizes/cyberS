@@ -1661,3 +1661,9 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 .quiz-gate__btns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
 .nav-item .rlock{ margin-left:auto; opacity:.6; }
 .nav-item .rlock svg{ width:12px; height:12px; }
+
+/* ism maydoni + chipdagi ism */
+.field .txt{ width:100%; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; font-size:15px; font-family:var(--ui); background:#fff; color:var(--ink); outline:none; transition:border .15s ease, box-shadow .15s ease; }
+.field .txt:focus{ border-color:var(--gold); box-shadow:0 0 0 4px var(--gold-soft); }
+.uid-chip__name{ color:#fff; font-weight:700; }
+.uid-chip__name::after{ content:"·"; margin:0 2px 0 8px; color:rgba(255,255,255,.45); }
