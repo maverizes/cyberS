@@ -388,6 +388,21 @@
       <div class="card" style="padding:10px 6px"><div id="adminMahallalar"></div></div>
       <div class="section-title"><h2>Rollar va ruxsatlar (RBAC)</h2></div>
       <div class="card card--pad" id="permMatrix"></div>
+
+      <div class="section-title" id="platformAnalytics"><h2>Platforma tahlili</h2><span class="hint">umumiy voronka — kirishdan sertifikatgacha</span></div>
+      <div class="grid stat-grid stat-grid--5" id="paCards"></div>
+      <div class="card card--pad">
+        <div class="map-card__head" style="margin-bottom:16px"><h3>Bosqichma-bosqich voronka</h3><span class="hint">har bosqich — oldingisining davomi</span></div>
+        <div class="pa-funnel" id="paFunnel"></div>
+      </div>
+      <div class="card pa-export">
+        <div class="pa-export__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke-linejoin="round"/><path d="M14 3v5h5" stroke-linejoin="round"/><path d="M12 11v6M9.5 14.5 12 17l2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pa-export__body">
+          <h3>Hisobotni Word formatida yuklab olish</h3>
+          <p>To'liq hisobot: umumiy voronka, 22 hudud kesimidagi jadval (ro'yxatdan o'tgan → faol → test → offlayn → sertifikat), sana va imzo joyi bilan — rasmiy taqdimotga tayyor.</p>
+        </div>
+        <button class="btn btn--gold btn--lg" id="paWord">Word (.doc) yuklab olish</button>
+      </div>
     </section>
 
     <!-- ===== MAHALLA PANELI ===== -->

@@ -359,11 +359,11 @@
   /* ---- RBAC: rollar, mahallalar, ruxsatlar ---- */
   const ROLE_META = {
     superadmin: { name:"Superadmin", scope:"Butun platforma" },
-    tuman:      { name:"Tuman mas'uli", scope:"Zangiota tumani" },
-    raisi:      { name:"Yoshlar yetakchisi", scope:"Navbahor MFY" },
+    tuman:      { name:"Tuman mas'uli", scope:"Nurafshon shahri" },
+    raisi:      { name:"Yoshlar yetakchisi", scope:"Navro'z MFY" },
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
-  const MY_TUMAN = "Zangiota tumani";
+  const MY_TUMAN = "Nurafshon shahri";
   /* ---- Autentifikatsiya (demo) ---- */
   const AUTH = { login: "admin", pass: "1234" };            // imtiyozli rollar uchun
   const LOCKED_ROLES = ["superadmin", "tuman", "raisi"];    // login talab qilinadi
@@ -371,9 +371,9 @@
   function loadUser() { try { return JSON.parse(localStorage.getItem("ko_user") || "null"); } catch (e) { return null; } }
   function saveUser(u) { try { localStorage.setItem("ko_user", JSON.stringify(u)); } catch (e) {} }
   let KO_USER = loadUser();                                  // user: bir marta ro'yxat — ID saqlanadi, logout yo'q
-  const MY_MAHALLA = "Navbahor MFY";
+  const MY_MAHALLA = "Navro'z MFY";
   const MAHALLALAR = [
-    { name:"Navbahor MFY", region:"Toshkent vil. · Zangiota", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
+    { name:"Navro'z MFY", region:"Toshkent vil. · Nurafshon sh.", raisi:"Akmal Yusupov", users:142, active:96, avg:1180, own:true },
     { name:"Do'stlik MFY", region:"Toshkent vil. · Qibray", raisi:"Sevara Olimova", users:165, active:110, avg:1340 },
     { name:"Bunyodkor MFY", region:"Toshkent vil. · Chirchiq sh.", raisi:"Dilshod Karimov", users:128, active:74, avg:1020 },
     { name:"Guliston MFY", region:"Toshkent vil. · Yangiyo'l", raisi:"Nilufar Sodiqova", users:113, active:81, avg:1090 },
@@ -403,15 +403,24 @@
     { k:"Ogohlantirishlarni ko'rish", w:15 }
   ];
   // sub: [faollik, test, firibgarlikdan himoya, ko'ngillilar, ogohlantirish] — har biri 0–100
+  // Nurafshon shahri — 16 rasmiy mahalla (aholi, xonadon, oila — real statistika)
   const KXI_MAHALLALAR = [
-    { name:"Navbahor MFY", sub:[96,92,95,90,93], own:true },
-    { name:"Bunyodkor MFY", sub:[88,85,90,84,86] },
-    { name:"Do'stlik MFY", sub:[84,80,85,78,82] },
-    { name:"Mustaqillik MFY", sub:[75,70,72,74,73] },
-    { name:"Guliston MFY", sub:[70,66,64,72,68] },
-    { name:"Obod MFY", sub:[58,52,55,60,54] },
-    { name:"Yangiobod MFY", sub:[44,40,38,45,42] },
-    { name:"Birlik MFY", sub:[40,35,34,42,38] }
+    { name:"Navro'z MFY",      aholi:4296, xon:1023, oila:1540, sub:[91,88,90,86,89], own:true },
+    { name:"Ma'rifat MFY",     aholi:5205, xon:1003, oila:1293, sub:[86,82,85,81,84] },
+    { name:"Yangiobod MFY",    aholi:4955, xon:1531, oila:1542, sub:[83,79,82,78,81] },
+    { name:"Tuy-tepa MFY",     aholi:5092, xon:865,  oila:1250, sub:[80,76,79,75,78] },
+    { name:"Nurafshon MFY",    aholi:3606, xon:1018, oila:1254, sub:[78,74,77,73,76] },
+    { name:"Taraqqiyot MFY",   aholi:3844, xon:1192, oila:1232, sub:[76,72,75,71,74] },
+    { name:"Dehqonobod MFY",   aholi:3527, xon:646,  oila:1005, sub:[74,70,73,69,72] },
+    { name:"Obod turmush MFY", aholi:3911, xon:894,  oila:1169, sub:[71,67,70,66,69] },
+    { name:"Xurriyat MFY",     aholi:4405, xon:657,  oila:1275, sub:[68,64,67,63,66] },
+    { name:"Muqumiy MFY",      aholi:2991, xon:641,  oila:741,  sub:[65,61,64,60,63] },
+    { name:"Degantepa MFY",    aholi:2523, xon:505,  oila:598,  sub:[62,58,61,57,60] },
+    { name:"Oybek MFY",        aholi:3086, xon:543,  oila:650,  sub:[59,55,58,54,57] },
+    { name:"Qumariq MFY",      aholi:3260, xon:564,  oila:647,  sub:[54,50,53,49,52] },
+    { name:"Birlik MFY",       aholi:2881, xon:555,  oila:800,  sub:[51,47,50,46,49] },
+    { name:"Obod MFY",         aholi:2478, xon:677,  oila:823,  sub:[48,44,47,43,46] },
+    { name:"Oppoq MFY",        aholi:2472, xon:374,  oila:576,  sub:[45,41,44,40,43] }
   ];
   const kxiScore = m => Math.round(m.sub.reduce((s, v, i) => s + v * KXI_WEIGHTS[i].w / 100, 0));
   function kxiLevel(score) {
@@ -472,7 +481,7 @@
     "Angren shahri": {w:776,h:546,o:"M52,513L53,505L42,505L30,501L31,496L23,496L23,487L31,486L57,478L82,475L94,462L115,453L125,451L131,458L155,449L167,437L199,423L212,403L206,379L205,335L213,318L214,300L217,286L226,252L233,236L221,191L241,184L246,180L258,179L251,165L263,145L317,123L374,12L383,9L401,9L405,60L415,82L457,156L471,177L484,187L505,158L624,163L683,200L711,187L717,191L722,210L716,213L723,229L730,225L767,229L768,243L746,243L730,246L646,279L616,307L601,312L592,287L570,290L558,297L553,286L517,305L323,423L215,455L197,465L194,460L166,469L133,501L51,525L10,539L8,536Z",c:[{d:"M358,89L380,92L409,70L405,60L401,9L383,9L374,12L343,73Z",cx:382,cy:36},{d:"M342,145L358,89L343,73L317,123L304,128Z",cx:340,cy:106},{d:"M358,89L342,145L355,165L369,169L372,167L399,129L380,92Z",cx:369,cy:137},{d:"M399,129L432,125L437,121L415,82L409,70L380,92Z",cx:408,cy:107},{d:"M372,167L436,171L432,125L399,129Z",cx:410,cy:148},{d:"M432,125L436,171L451,188L468,172L457,156L437,121Z",cx:441,cy:141},{d:"M275,179L279,177L292,133L263,145L251,165L256,176Z",cx:271,cy:155},{d:"M273,242L274,243L319,216L321,189L279,177L275,179Z",cx:297,cy:202},{d:"M355,165L342,145L304,128L292,133L279,177L321,189Z",cx:317,cy:155},{d:"M321,189L319,216L338,233L388,224L369,169L355,165Z",cx:350,cy:202},{d:"M388,224L392,227L402,227L451,198L451,188L436,171L372,167L369,169Z",cx:414,cy:193},{d:"M451,188L451,198L469,216L481,217L515,194L522,159L505,158L484,187L471,177L468,172Z",cx:484,cy:187},{d:"M561,224L562,190L526,159L522,159L515,194L544,237Z",cx:543,cy:209},{d:"M562,190L593,177L599,162L526,159Z",cx:567,cy:170},{d:"M561,224L608,226L609,223L593,177L562,190Z",cx:582,cy:207},{d:"M593,177L609,223L665,189L624,163L599,162Z",cx:620,cy:206},{d:"M241,276L272,242L228,219L233,236L226,252L220,277Z",cx:248,cy:247},{d:"M273,242L275,179L256,176L258,179L246,180L241,184L221,191L228,219Z",cx:249,cy:205},{d:"M274,243L297,268L327,271L338,233L319,216Z",cx:309,cy:255},{d:"M330,274L383,275L392,227L388,224L338,233L327,271Z",cx:360,cy:252},{d:"M396,302L412,304L457,281L458,276L457,272L402,227L392,227L383,275Z",cx:409,cy:250},{d:"M402,227L457,272L469,216L451,198Z",cx:446,cy:249},{d:"M458,276L522,258L481,217L469,216L457,272Z",cx:483,cy:237},{d:"M522,258L535,260L544,237L515,194L481,217Z",cx:514,cy:227},{d:"M608,226L610,236L644,267L684,221L684,199L665,189L609,223Z",cx:643,cy:231},{d:"M684,221L644,267L645,279L708,255Z",cx:683,cy:238},{d:"M684,221L708,255L730,246L746,243L768,243L767,229L730,225L723,229L716,213L722,210L717,191L711,187L684,199Z",cx:701,cy:217},{d:"M229,360L243,346L258,304L241,276L220,277L214,300L213,318L205,335L206,361Z",cx:229,cy:327},{d:"M241,276L258,304L286,300L297,268L273,242Z",cx:270,cy:272},{d:"M243,346L307,330L286,300L258,304Z",cx:275,cy:317},{d:"M286,300L307,330L318,335L321,335L330,328L330,274L327,271L297,268Z",cx:313,cy:314},{d:"M330,328L376,326L396,302L383,275L330,274Z",cx:360,cy:288},{d:"M457,281L412,304L440,352L486,324Z",cx:448,cy:314},{d:"M535,260L522,258L458,276L457,281L486,324L517,305L548,288Z",cx:500,cy:297},{d:"M544,237L535,260L548,288L553,286L558,297L573,290L610,236L608,226L561,224Z",cx:563,cy:273},{d:"M644,267L610,236L573,290L592,287L601,312L616,307L645,279Z",cx:615,cy:273},{d:"M229,360L272,391L284,392L318,335L307,330L243,346Z",cx:272,cy:376},{d:"M343,379L321,335L318,335L284,392L316,415Z",cx:318,cy:357},{d:"M343,379L388,379L376,326L330,328L321,335Z",cx:357,cy:357},{d:"M376,326L388,379L390,381L440,352L412,304L396,302Z",cx:405,cy:339},{d:"M202,418L199,423L167,437L154,449L156,478L166,469L194,460L197,465L215,455L243,447Z",cx:197,cy:448},{d:"M243,447L249,446L272,391L229,360L206,361L206,379L212,403L202,418Z",cx:235,cy:410},{d:"M316,415L284,392L272,391L249,446L319,424Z",cx:289,cy:420},{d:"M388,379L343,379L316,415L319,424L390,381Z",cx:345,cy:398},{d:"M81,485L72,476L57,478L31,486L23,487L23,496L31,496L30,501L42,505L53,505L52,513L8,536L10,539L76,518Z",cx:65,cy:509},{d:"M81,485L76,518L133,501L146,488Z",cx:91,cy:509},{d:"M146,488L156,478L154,449L131,458L125,451L115,453L94,462L82,475L72,476L81,485Z",cx:122,cy:469}]},
     "Bekobod shahri": {w:775,h:636,o:"M8,312L38,318L56,338L81,370L111,375L116,401L171,415L203,425L225,436L243,431L260,435L322,438L345,437L383,454L405,472L420,457L456,488L454,496L475,513L533,494L616,531L634,556L687,589L744,629L757,627L768,602L746,566L742,556L744,550L725,516L725,445L659,343L653,305L649,229L708,181L744,82L711,70L659,55L645,43L636,28L597,8L577,13L583,31L570,54L550,100L496,67L485,69L457,102L448,120L443,136L442,154L421,174L418,185L409,194L379,162L302,154L296,233L270,235L220,245L154,253L105,279L98,292L57,294L33,278L28,302L12,299Z",c:[{d:"M608,73L639,32L636,28L597,8L577,13L583,31L570,54L561,75Z",cx:603,cy:43},{d:"M635,102L676,92L682,61L659,55L645,43L639,32L608,73Z",cx:647,cy:67},{d:"M439,208L442,210L461,206L503,165L510,76L496,67L485,69L457,102L448,120L443,136L442,154L421,174L420,178Z",cx:473,cy:145},{d:"M581,153L555,87L550,100L510,76L503,165L566,169Z",cx:538,cy:126},{d:"M635,102L608,73L561,75L555,87L581,153L625,154Z",cx:601,cy:127},{d:"M625,154L681,203L708,181L721,144L676,92L635,102Z",cx:673,cy:149},{d:"M676,92L721,144L744,82L711,70L682,61Z",cx:715,cy:118},{d:"M291,234L302,235L354,160L302,154L296,233Z",cx:314,cy:196},{d:"M566,169L568,230L649,230L681,203L625,154L581,153Z",cx:614,cy:186},{d:"M215,311L242,312L292,234L270,235L220,245L169,251L176,274Z",cx:223,cy:263},{d:"M347,265L439,208L420,178L418,185L409,194L379,162L354,160L302,235Z",cx:364,cy:222},{d:"M453,285L503,302L551,272L550,247L461,206L442,210Z",cx:500,cy:259},{d:"M550,247L568,230L566,169L503,165L461,206Z",cx:527,cy:218},{d:"M564,289L653,307L649,230L568,230L550,247L551,272Z",cx:601,cy:259},{d:"M127,319L176,274L169,251L154,253L105,279L98,292L57,294L33,278L31,291Z",cx:133,cy:285},{d:"M271,339L318,342L355,314L347,265L302,235L292,234L242,312Z",cx:304,cy:288},{d:"M355,314L416,345L453,285L442,210L439,208L347,265Z",cx:400,cy:275},{d:"M416,345L421,359L513,356L503,302L453,285Z",cx:468,cy:324},{d:"M513,356L536,374L555,373L564,289L551,272L503,302Z",cx:534,cy:329},{d:"M127,319L31,291L28,302L12,299L8,312L38,318L56,338L81,370L111,375L116,401L142,407Z",cx:101,cy:354},{d:"M127,319L142,407L159,412L215,311L176,274Z",cx:160,cy:363},{d:"M271,339L242,312L215,311L159,412L203,425L225,436L243,431L251,433Z",cx:221,cy:376},{d:"M251,433L260,435L322,438L340,437L318,342L271,339Z",cx:294,cy:387},{d:"M318,342L340,437L345,437L354,441L418,383L421,359L416,345L355,314Z",cx:372,cy:371},{d:"M592,389L652,307L564,289L555,373Z",cx:593,cy:340},{d:"M592,389L602,409L669,426L704,413L659,343L653,307Z",cx:641,cy:366},{d:"M471,434L418,383L354,441L383,454L405,472L420,457L454,487Z",cx:414,cy:437},{d:"M471,434L498,427L536,374L513,356L421,359L418,383Z",cx:477,cy:405},{d:"M555,373L536,374L498,427L540,466L589,442L602,409L592,389Z",cx:551,cy:418},{d:"M454,487L456,488L454,496L475,513L533,494L540,466L498,427L471,434Z",cx:497,cy:476},{d:"M533,494L616,531L621,538L622,536L589,442L540,466Z",cx:569,cy:480},{d:"M589,442L622,536L651,523L669,426L602,409Z",cx:631,cy:483},{d:"M651,523L671,526L725,496L725,445L704,413L669,426Z",cx:693,cy:471},{d:"M671,526L761,617L768,602L746,566L742,556L744,550L725,516L725,496Z",cx:725,cy:561},{d:"M671,526L651,523L621,538L634,556L687,589L744,629L757,627L761,617Z",cx:689,cy:573}]},
     "Ohangaron shahri": {w:776,h:556,o:"M582,544L664,549L702,527L747,491L743,443L731,382L730,338L752,289L768,268L743,226L676,153L595,175L579,173L541,136L483,123L502,20L498,17L485,54L463,149L447,128L429,113L406,100L380,89L304,68L30,8L10,57L167,106L139,168L99,295L50,285L20,303L21,319L8,322L14,340L157,368L162,332L254,318L244,383L247,439L282,476L350,503L487,520Z",c:[{d:"M158,100L150,34L30,8L10,57L154,102Z",cx:83,cy:45},{d:"M158,100L236,128L280,63L150,34Z",cx:212,cy:81},{d:"M240,142L328,194L400,97L380,89L280,63L236,128Z",cx:305,cy:135},{d:"M328,194L403,230L497,126L483,123L502,20L498,17L485,54L463,149L447,128L429,113L400,97Z",cx:411,cy:125},{d:"M240,142L236,128L158,100L154,102L167,106L139,168L116,240L119,243L199,224Z",cx:171,cy:196},{d:"M418,305L513,273L539,136L497,126L403,230Z",cx:488,cy:183},{d:"M302,330L413,313L418,305L403,230L327,194L284,318Z",cx:356,cy:267},{d:"M513,273L574,344L649,321L666,303L608,172L595,175L579,173L541,136L539,136Z",cx:577,cy:224},{d:"M666,303L751,291L768,268L743,226L676,153L608,172Z",cx:698,cy:247},{d:"M119,243L116,240L99,295L50,285L20,303L21,319L8,322L14,340L121,361Z",cx:73,cy:299},{d:"M121,361L157,368L162,332L254,318L252,333L282,317L199,224L119,243Z",cx:184,cy:280},{d:"M199,224L282,317L284,318L327,194L240,142Z",cx:270,cy:271},{d:"M314,397L302,330L284,318L282,317L252,333L244,383L247,439L261,453Z",cx:278,cy:390},{d:"M314,397L368,449L452,407L413,313L302,330Z",cx:371,cy:364},{d:"M413,313L452,407L495,426L537,419L574,344L513,273L418,305Z",cx:499,cy:376},{d:"M574,344L537,419L591,478L683,437L649,321Z",cx:611,cy:381},{d:"M666,303L649,321L683,437L745,463L743,443L731,382L730,338L751,291Z",cx:696,cy:360},{d:"M368,449L314,397L261,453L282,476L350,503L361,504Z",cx:315,cy:451},{d:"M361,504L465,518L495,426L452,407L368,449Z",cx:421,cy:476},{d:"M591,478L537,419L495,426L465,518L487,520L582,544L598,545Z",cx:532,cy:498},{d:"M683,437L591,478L598,545L664,549L702,527L747,491L745,463Z",cx:659,cy:509}]},
-    "Nurafshon shahri": {w:776,h:680,o:"M171,487L187,495L218,504L243,510L289,512L290,476L320,474L328,520L354,518L362,506L378,505L401,524L378,552L383,556L366,582L403,596L422,600L427,585L452,590L443,627L470,635L469,661L478,660L479,673L568,617L571,592L542,585L554,526L650,547L655,530L671,529L673,485L614,446L597,458L580,443L602,429L626,416L636,417L672,385L672,370L693,364L718,383L733,385L768,337L733,294L724,288L708,266L680,298L652,270L604,335L577,336L573,334L574,302L549,276L542,271L511,229L486,248L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L409,148L377,93L387,83L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L379,45L378,54L348,65L315,70L300,60L289,65L279,63L236,69L214,106L201,93L186,113L158,119L152,113L142,117L138,130L129,134L131,140L75,163L79,174L39,195L8,218L26,222L92,182L157,152L169,169L181,132L271,96L289,110L321,185L316,194L348,248L328,266L330,269L310,286L203,363L214,366L214,385L220,386L217,427L195,461L199,469L181,479L169,483Z",c:[{d:"M284,106L289,110L305,146L391,119L377,93L387,83L405,78L406,37L379,45L378,54L348,65L315,70L300,60L289,65L279,63L270,64Z",cx:330,cy:88},{d:"M405,78L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L406,37Z",cx:443,cy:55},{d:"M270,64L236,69L214,106L201,93L186,113L158,119L152,113L142,117L138,130L129,134L131,140L75,163L79,174L39,195L8,218L26,222L92,182L157,152L169,169L181,132L271,96L284,106Z",cx:146,cy:146},{d:"M368,258L457,158L409,148L391,119L305,146L321,185L316,194L348,248L334,260Z",cx:374,cy:189},{d:"M464,301L484,244L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L457,158L368,258Z",cx:434,cy:230},{d:"M321,336L315,282L295,297L203,363L214,366L214,371L263,387Z",cx:293,cy:317},{d:"M321,336L371,390L387,391L468,310L464,301L368,258L334,260L328,266L330,269L315,282Z",cx:387,cy:323},{d:"M497,328L570,297L549,276L542,271L511,229L486,248L484,244L464,301L468,310Z",cx:514,cy:286},{d:"M633,305L750,362L768,337L733,294L724,288L708,266L680,298L652,270L630,299Z",cx:711,cy:321},{d:"M448,449L463,451L516,395L497,328L468,310L387,391Z",cx:462,cy:360},{d:"M630,299L602,336L577,336L573,334L574,302L570,297L497,328L516,395L603,421L633,305Z",cx:562,cy:365},{d:"M633,305L603,421L606,427L626,416L636,417L672,385L672,370L693,364L718,383L733,385L750,362Z",cx:650,cy:367},{d:"M267,465L263,387L214,371L214,385L220,386L217,427L203,451Z",cx:241,cy:407},{d:"M263,387L267,465L290,493L290,476L319,474L371,390L321,336Z",cx:306,cy:427},{d:"M267,465L203,451L195,461L199,469L181,479L169,483L171,487L187,495L218,504L243,510L289,512L290,493Z",cx:227,cy:481},{d:"M448,449L387,391L371,390L319,474L328,520L354,518L362,506L378,505L381,508Z",cx:380,cy:462},{d:"M381,508L401,524L387,541L464,567L495,510L463,451L448,449Z",cx:438,cy:509},{d:"M495,510L519,511L590,452L580,443L606,427L603,421L516,395L463,451Z",cx:517,cy:481},{d:"M519,511L552,538L554,526L650,547L655,530L671,529L673,485L614,446L597,458L590,452Z",cx:604,cy:498},{d:"M469,591L464,567L387,541L378,552L383,556L366,582L403,596L422,600L427,585L452,590L443,624Z",cx:418,cy:583},{d:"M464,567L469,591L549,629L568,617L571,592L542,585L552,538L519,511L495,510Z",cx:505,cy:576},{d:"M469,591L443,627L470,635L469,661L478,660L479,673L549,629Z",cx:502,cy:632}]},
+    "Nurafshon shahri": {w:776,h:680,o:"M171,487L187,495L218,504L243,510L289,512L290,476L320,474L328,520L354,518L362,506L378,505L401,524L378,552L383,556L366,582L403,596L422,600L427,585L452,590L443,627L470,635L469,661L478,660L479,673L568,617L571,592L542,585L554,526L650,547L655,530L671,529L673,485L614,446L597,458L580,443L602,429L626,416L636,417L672,385L672,370L693,364L718,383L733,385L768,337L733,294L724,288L708,266L680,298L652,270L604,335L577,336L573,334L574,302L549,276L542,271L511,229L486,248L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L409,148L377,93L387,83L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L379,45L378,54L348,65L315,70L300,60L289,65L279,63L236,69L214,106L201,93L186,113L158,119L152,113L142,117L138,130L129,134L131,140L75,163L79,174L39,195L8,218L26,222L92,182L157,152L169,169L181,132L271,96L289,110L321,185L316,194L348,248L328,266L330,269L310,286L203,363L214,366L214,385L220,386L217,427L195,461L199,469L181,479L169,483Z",c:[{d:"M378,97L377,93L387,83L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L379,45L378,54L348,65L334,67Z",cx:433,cy:50},{d:"M178,141L181,132L271,96L289,110L321,185L316,194L348,248L334,260L492,249L508,232L486,248L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L409,148L378,97L334,67L315,70L300,60L289,65L279,63L236,69L214,106L201,93L186,113L158,119L152,113L148,114Z",cx:386,cy:162},{d:"M263,387L321,336L315,282L295,297L203,363L214,366L214,371Z",cx:293,cy:317},{d:"M371,390L387,391L486,293L492,249L334,260L328,266L330,269L315,282L321,336Z",cx:391,cy:315},{d:"M492,249L486,293L516,395L603,421L633,305L630,299L604,335L577,336L573,334L574,302L549,276L542,271L511,229Z",cx:534,cy:320},{d:"M633,305L750,362L768,337L733,294L724,288L708,266L680,298L652,270L630,299Z",cx:711,cy:321},{d:"M448,449L463,451L516,395L486,293L387,391Z",cx:468,cy:342},{d:"M633,305L603,421L606,427L626,416L636,417L672,385L672,370L693,364L718,383L733,385L750,362Z",cx:650,cy:367},{d:"M267,465L263,387L214,371L214,385L220,386L217,427L203,451Z",cx:241,cy:407},{d:"M263,387L267,465L290,493L290,476L319,474L371,390L321,336Z",cx:306,cy:427},{d:"M267,465L203,451L195,461L199,469L181,479L169,483L171,487L187,495L218,504L243,510L289,512L290,493Z",cx:227,cy:481},{d:"M448,449L387,391L371,390L319,474L328,520L354,518L362,506L378,505L381,508Z",cx:380,cy:462},{d:"M495,510L659,518L619,449L614,446L597,458L580,443L606,427L603,421L516,395L463,451Z",cx:529,cy:455},{d:"M423,596L427,585L443,588L454,584L495,510L463,451L448,449L381,508L401,524L378,552L383,556L366,582L403,596L415,599Z",cx:435,cy:538},{d:"M454,584L549,629L568,617L571,592L542,585L554,526L650,547L655,530L671,529L671,527L659,518L495,510Z",cx:505,cy:565},{d:"M454,584L443,588L452,590L443,627L470,635L469,661L478,660L479,673L549,629Z",cx:497,cy:628}]},
     "Chirchiq shahri": {w:776,h:844,o:"M342,316L274,257L269,231L290,231L415,164L463,141L494,133L513,116L544,82L576,63L631,50L642,31L646,26L653,32L651,42L694,78L706,66L703,61L707,59L710,61L719,52L718,45L719,39L729,36L739,25L747,25L766,8L768,11L697,83L698,84L696,87L704,94L708,104L669,159L646,187L620,224L589,245L559,290L499,372L493,399L460,448L464,489L442,526L441,537L443,540L486,552L501,563L495,610L492,620L466,671L450,683L429,690L417,667L407,682L403,695L361,669L353,683L330,686L313,698L348,712L364,726L369,734L361,761L345,751L356,732L337,722L330,723L326,730L318,735L316,732L309,737L303,733L302,728L306,725L301,719L294,715L269,726L259,733L257,732L245,718L222,729L220,727L193,753L95,837L91,827L91,801L87,799L72,812L66,805L31,767L50,748L38,741L31,741L22,732L18,720L21,719L34,709L40,702L44,696L42,691L35,693L34,691L36,682L31,681L30,679L48,651L38,634L45,618L14,614L13,596L8,595L15,588L13,584L18,556L15,546L29,543L49,531L56,541L79,528L108,508L113,508L159,459L179,475L194,456L207,452L228,471L251,504L292,486L321,451L312,437L294,449L284,451L256,469L248,466L246,457L255,440L267,427L276,425L284,397L283,382L302,378L303,372L294,366L296,342L310,329L333,332Z",c:[{d:"M533,118L576,141L588,137L645,27L642,31L631,50L576,63L544,82L523,106Z",cx:572,cy:94},{d:"M658,157L664,164L708,104L704,94L696,87L698,84L697,83L768,11L766,8L747,25L739,25L729,36L719,39L718,45L719,52L710,61L707,59L703,61L706,66L694,78L678,65Z",cx:685,cy:85},{d:"M678,65L651,42L653,32L646,26L588,137L658,157Z",cx:638,cy:101},{d:"M359,222L418,198L427,175L422,161L341,204Z",cx:398,cy:187},{d:"M488,194L533,118L523,106L494,133L463,141L422,161L427,175Z",cx:478,cy:151},{d:"M508,226L570,200L576,141L533,118L488,194Z",cx:539,cy:168},{d:"M658,157L588,137L576,141L570,200L601,237L620,224L646,187L664,164Z",cx:606,cy:193},{d:"M334,288L354,273L359,222L341,204L290,231L269,231L274,257L285,267L304,284Z",cx:314,cy:244},{d:"M354,273L396,274L426,236L418,198L359,222Z",cx:384,cy:255},{d:"M426,236L462,257L507,232L508,226L488,194L427,175L418,198Z",cx:460,cy:212},{d:"M507,232L535,292L553,299L589,245L601,237L570,200L508,226Z",cx:549,cy:269},{d:"M355,340L449,338L449,338L396,274L354,273L334,288Z",cx:386,cy:313},{d:"M449,338L458,327L462,257L426,236L396,274Z",cx:439,cy:300},{d:"M458,327L535,292L507,232L462,257Z",cx:494,cy:274},{d:"M338,385L355,340L334,288L304,284L342,316L333,332L310,329L296,342L294,366L303,372L301,378Z",cx:328,cy:336},{d:"M342,392L374,407L460,385L449,338L355,340L338,385Z",cx:401,cy:362},{d:"M449,338L460,385L492,400L499,372L553,299L535,292L458,327Z",cx:482,cy:355},{d:"M342,392L338,385L301,378L283,382L284,397L276,425L267,427L255,440L248,454L256,466L259,467L284,451L294,449L312,437L318,446Z",cx:307,cy:411},{d:"M318,446L321,451L310,464L303,481L383,464L374,407L342,392Z",cx:352,cy:426},{d:"M383,464L414,483L461,386L460,385L374,407Z",cx:408,cy:435},{d:"M277,570L314,587L358,538L303,481L296,482Z",cx:311,cy:510},{d:"M358,538L383,540L421,503L414,483L383,464L304,481Z",cx:366,cy:493},{d:"M450,512L464,489L460,448L492,400L461,386L414,483L421,503Z",cx:442,cy:466},{d:"M48,597L61,538L56,541L49,531L29,543L15,546L18,556L13,584L15,588L8,595L13,596L14,609Z",cx:35,cy:570},{d:"M48,597L75,607L123,581L120,501L113,508L108,508L61,538Z",cx:89,cy:560},{d:"M200,540L126,494L120,501L123,581L157,600L204,552Z",cx:162,cy:546},{d:"M200,540L240,487L228,471L207,452L194,456L179,475L159,459L126,494Z",cx:190,cy:517},{d:"M204,552L243,581L277,570L296,482L292,486L251,504L240,487L200,540Z",cx:251,cy:522},{d:"M326,612L401,598L383,540L358,538L314,587Z",cx:363,cy:564},{d:"M164,647L157,600L123,581L75,607L98,647L150,658Z",cx:124,cy:627},{d:"M164,647L180,649L239,610L243,581L204,552L157,600Z",cx:199,cy:605},{d:"M383,540L401,598L417,611L444,607L488,553L443,540L441,537L442,526L450,512L421,503Z",cx:432,cy:576},{d:"M444,607L478,648L492,620L495,610L501,563L488,553Z",cx:480,cy:585},{d:"M65,695L98,647L75,607L48,597L14,609L14,614L45,618L38,634L48,651L30,679L31,681L36,682L35,693L42,691L43,694Z",cx:68,cy:641},{d:"M93,722L142,724L150,658L98,647L65,695Z",cx:113,cy:677},{d:"M239,610L180,649L224,689L273,668Z",cx:229,cy:658},{d:"M273,668L317,681L326,612L314,587L277,570L243,581L239,610Z",cx:290,cy:640},{d:"M317,681L324,690L330,686L353,683L361,669L389,687L417,611L401,598L326,612Z",cx:364,cy:641},{d:"M444,607L417,611L389,687L403,695L407,682L417,667L429,690L450,683L466,671L478,648Z",cx:437,cy:658},{d:"M65,780L93,722L65,695L43,694L40,702L34,709L18,720L22,732L31,741L38,741L50,748L31,767L50,787Z",cx:59,cy:741},{d:"M65,780L141,798L176,767L142,724L93,722Z",cx:120,cy:746},{d:"M224,689L180,649L164,647L150,658L142,724L176,767L210,737Z",cx:181,cy:707},{d:"M210,737L220,727L222,729L245,718L257,732L259,733L269,726L294,715L301,719L306,725L302,728L303,733L309,737L316,732L318,735L326,730L330,723L332,722L339,722L353,729L337,708L313,698L324,690L317,681L273,668L224,689Z",cx:272,cy:703},{d:"M65,780L50,787L72,812L87,799L91,801L91,827L95,837L141,798Z",cx:111,cy:806}]},
     "Yangiyo'l shahri": {w:680,h:916,o:"M8,727L16,741L32,756L36,760L43,779L52,790L57,807L37,824L32,831L17,831L87,865L88,866L100,862L111,853L122,854L128,852L133,844L143,836L151,829L150,822L148,817L170,823L177,827L166,848L140,888L167,908L202,842L213,825L228,825L258,842L268,845L280,847L286,846L294,844L307,836L314,842L334,802L379,719L379,746L462,592L487,620L493,612L518,635L522,632L523,598L510,581L517,572L506,561L519,546L506,531L673,215L654,207L648,184L649,173L646,165L638,157L619,173L610,163L610,161L615,154L612,147L608,135L592,138L562,140L554,134L524,105L515,89L512,51L506,45L487,31L469,9L466,8L461,11L461,14L467,24L467,29L461,31L456,37L434,55L441,77L424,116L410,130L398,134L381,157L371,164L362,174L353,188L347,201L352,212L352,219L353,225L350,230L339,239L335,246L326,253L308,258L304,264L303,272L297,280L287,285L277,286L267,291L263,298L265,310L263,318L258,325L260,333L260,338L263,351L261,354L257,355L248,354L224,367L215,368L208,378L200,386L174,404L173,406L178,417L176,432L171,444L163,455L160,462L155,467L144,469L131,468L128,471L124,484L122,487L114,487L110,489L111,497L109,499L122,526L134,541L119,551L118,554L112,558L108,555L103,546L98,550L94,566L96,572L91,617L65,654L58,660L13,722Z",c:[{d:"M525,163L548,129L524,105L518,97L514,83L512,51L506,45L487,31L466,8L461,11L461,14L467,24L467,29L461,31L456,37L434,55L441,77L424,116L410,130L398,134L394,141Z",cx:476,cy:90},{d:"M525,163L531,209L560,253L643,271L673,215L654,207L648,184L649,173L646,165L638,157L619,173L610,163L610,161L615,154L608,135L592,138L562,140L548,129Z",cx:590,cy:196},{d:"M531,209L525,163L394,141L381,157L371,164L362,174L353,188L347,201L352,212L353,225L350,230L339,239L335,246L326,252L386,305Z",cx:435,cy:218},{d:"M407,372L429,383L538,333L560,253L531,209L386,305Z",cx:489,cy:279},{d:"M560,253L538,333L581,389L643,271Z",cx:587,cy:302},{d:"M247,417L317,438L407,372L386,305L326,252L308,258L304,264L303,272L297,280L287,285L277,286L267,291L263,298L265,310L263,318L258,325L263,351L261,354L248,354L224,367L215,368L213,370Z",cx:328,cy:338},{d:"M501,511L513,518L581,389L538,333L429,383Z",cx:508,cy:450},{d:"M159,573L174,562L247,417L213,370L208,378L200,386L174,404L178,417L176,432L171,444L163,455L160,462L155,467L144,469L131,468L128,471L124,484L122,487L114,487L110,489L111,497L109,499L122,526L134,541L119,551L118,554L112,558L108,555L103,546L98,550L95,559L94,566L95,569Z",cx:171,cy:477},{d:"M339,535L317,438L247,417L174,562L335,543Z",cx:270,cy:487},{d:"M339,535L501,511L429,383L407,372L317,438Z",cx:403,cy:475},{d:"M347,618L335,543L174,562L159,573L207,636L317,651Z",cx:260,cy:595},{d:"M335,543L347,618L432,648L462,592L487,620L493,612L518,635L522,632L523,598L510,581L517,572L506,561L519,546L506,531L513,518L501,511L339,535Z",cx:427,cy:577},{d:"M209,734L207,636L159,573L95,569L96,572L91,617L79,634L125,737L186,749Z",cx:155,cy:685},{d:"M125,737L79,634L8,727L16,741L36,760L43,779L52,790L57,806Z",cx:72,cy:680},{d:"M209,734L318,770L317,651L207,636Z",cx:263,cy:693},{d:"M347,618L317,651L318,770L338,795L379,719L379,746L432,648Z",cx:364,cy:685},{d:"M186,749L125,737L28,836L88,866L100,862L111,853L122,854L128,852L133,844L151,829L148,817L170,823L176,826Z",cx:131,cy:783},{d:"M318,770L209,734L186,749L166,908L202,842L213,825L228,825L258,842L268,845L280,847L286,846L294,844L307,836L314,842L338,795Z",cx:254,cy:810}]},
   };
@@ -480,7 +489,7 @@
   const REGION_NAME = "Toshkent viloyati";
   // Real ma'lumotlar: aholi soni va mahallalar soni — rasmiy statistika; users — demo (KXI bilan bog'liq qamrov)
   const TUMANLAR = [
-    { name:"Nurafshon", city:true, kxi:88, aholi:58763, users:9002, mahallas:22 },
+    { name:"Nurafshon", city:true, kxi:88, aholi:58532, users:9002, mahallas:16, own:true },
     { name:"Chirchiq", city:true, kxi:86, aholi:178270, users:26585, mahallas:44 },
     { name:"Olmaliq", city:true, kxi:81, aholi:151022, users:21293, mahallas:51 },
     { name:"Qibray", kxi:79, aholi:181732, users:21310, mahallas:67 },
@@ -489,7 +498,7 @@
     { name:"Yangiyo'l", city:true, kxi:72, aholi:88884, users:11250, mahallas:18 },
     { name:"Toshkent tumani", kxi:71, aholi:209794, users:23835, mahallas:68, label:"Toshkent t." },
     { name:"Ohangaron", city:true, kxi:69, aholi:42731, users:4590, mahallas:21 },
-    { name:"Zangiota", kxi:68, aholi:180533, users:19830, mahallas:72, own:true },
+    { name:"Zangiota", kxi:68, aholi:180533, users:19830, mahallas:72 },
     { name:"Yangiyo'l tumani", kxi:66, aholi:207692, users:23170, mahallas:69, label:"Yangiyo'l t." },
     { name:"Quyi Chirchiq", kxi:64, aholi:119390, users:12555, mahallas:37 },
     { name:"Parkent", kxi:62, aholi:185049, users:21505, mahallas:62 },
@@ -527,7 +536,7 @@
     };
     if (t.own) {
       // birinchi 8 tasi — nomli KXI namunasi, qolganlari generatsiya (jami real son: t.mahallas)
-      const sample = KXI_MAHALLALAR.map(m => ({ name: m.name, score: kxiScore(m) }));
+      const sample = KXI_MAHALLALAR.map(m => ({ name: m.name, score: kxiScore(m), aholi: m.aholi, xon: m.xon, oila: m.oila }));
       const extra = Array.from({ length: Math.max(0, t.mahallas - sample.length) }, (_, i) =>
         ({ name: gen(i), score: Math.max(22, Math.min(98, Math.round(t.kxi + (rand() * 2 - 1) * 17))) }));
       return sample.concat(extra);
@@ -1248,7 +1257,7 @@
         <div class="ripple__link">${ICON.caret}<span>hissa qo'shadi</span></div>
         <div class="ripple__node ripple--mahalla">
           <span class="ripple__ico">${ICON.building}</span>
-          <div class="ripple__body"><div class="ripple__t">Navbahor MFY</div>
+          <div class="ripple__body"><div class="ripple__t">${MY_MAHALLA}</div>
             <div class="ripple__p">Mahalla o'rtacha balli va xonadonlar reytingi ko'tariladi</div></div>
         </div>
         <div class="ripple__link">${ICON.caret}<span>hissa qo'shadi</span></div>
@@ -1995,6 +2004,108 @@
   /* =========================================================
      SUPERADMIN PANELI
      ========================================================= */
+  /* =========================================================
+     PLATFORMA TAHLILI — umumiy voronka + Word hisobot (superadmin)
+     ========================================================= */
+  function platformStats() {
+    const rows = TUMANLAR.map(t => {
+      const active = Math.round(t.users * (0.50 + t.kxi * 0.003));
+      const tests = Math.round(t.users * (0.35 + t.kxi * 0.004));
+      const offline = Math.round(t.users * (0.05 + t.kxi * 0.0012));
+      const cert = Math.round(offline * (0.55 + t.kxi * 0.003));
+      return { name: tumFull(t), kxi: t.kxi, aholi: t.aholi, users: t.users, active, tests, offline, cert, own: t.own };
+    }).sort((a, b) => b.users - a.users);
+    const tot = rows.reduce((s, r) => ({ aholi: s.aholi + r.aholi, users: s.users + r.users, active: s.active + r.active, tests: s.tests + r.tests, offline: s.offline + r.offline, cert: s.cert + r.cert }), { aholi: 0, users: 0, active: 0, tests: 0, offline: 0, cert: 0 });
+    return { rows, tot };
+  }
+  const PA_STEPS = [
+    { key: "users",   t: "Ro'yxatdan o'tgan",        d: "platformaga kirgan fuqarolar",     cls: "i-blue",  ico: () => ICON.users },
+    { key: "active",  t: "Faol foydalanuvchi",        d: "oxirgi 30 kunda faoliyat yuritgan", cls: "i-teal",  ico: () => ICON.spark },
+    { key: "tests",   t: "Test yechayotgan",          d: "kamida 1 ta sinovni bajargan",      cls: "i-gold",  ico: () => ICON.exam },
+    { key: "offline", t: "Offlayn testga chaqirilgan", d: "mahalla markazidagi sinovga",       cls: "i-purple", ico: () => ICON.building },
+    { key: "cert",    t: "Sertifikat olgan",          d: "offlayn sinovdan muvaffaqiyatli o'tgan", cls: "i-amber", ico: () => ICON.cert }
+  ];
+  function renderPlatformAnalytics() {
+    const cardsEl = $("#paCards"), funnelEl = $("#paFunnel");
+    if (!cardsEl || !funnelEl) return;
+    const { tot } = platformStats();
+    cardsEl.innerHTML = PA_STEPS.map(s => `<div class="card stat"><div class="stat__ico ${s.cls}">${s.ico()}</div><div class="stat__num">${fmtN(tot[s.key])}</div><div class="stat__label">${s.t}</div></div>`).join("");
+    funnelEl.innerHTML = PA_STEPS.map((s, i) => {
+      const v = tot[s.key];
+      const pct = v / tot.users * 100;
+      const prev = i === 0 ? null : (v / tot[PA_STEPS[i - 1].key] * 100);
+      return `<div class="pa-step">
+        <div class="pa-step__meta"><span class="pa-step__n">${i + 1}</span><div><div class="pa-step__t">${s.t}</div><div class="pa-step__d">${s.d}</div></div></div>
+        <div class="pa-step__barwrap"><div class="pa-step__bar" style="width:${Math.max(6, pct)}%"><span>${fmtN(v)}</span></div></div>
+        <div class="pa-step__pct">${pct.toFixed(1)}%${prev !== null ? `<small>oldingidan ${prev.toFixed(0)}%</small>` : `<small>asos — 100%</small>`}</div>
+      </div>`;
+    }).join("");
+    const btn = $("#paWord");
+    if (btn && !btn._wired) { btn._wired = true; btn.addEventListener("click", downloadPlatformWord); }
+  }
+  function downloadPlatformWord() {
+    const { rows, tot } = platformStats();
+    const now = new Date();
+    const sana = `${String(now.getDate()).padStart(2, "0")}.${String(now.getMonth() + 1).padStart(2, "0")}.${now.getFullYear()}`;
+    const pct = (a, b) => (b ? (a / b * 100).toFixed(1).replace(".", ",") + "%" : "—");
+    const num = n => fmtN(n);
+    const rowsHtml = rows.map((r, i) => `
+      <tr${r.own ? ' style="background:#FEF6E4"' : ""}>
+        <td style="text-align:center">${i + 1}</td>
+        <td>${r.name}${r.own ? " ★" : ""}</td>
+        <td style="text-align:right">${num(r.aholi)}</td>
+        <td style="text-align:right">${num(r.users)}</td>
+        <td style="text-align:right">${num(r.active)}</td>
+        <td style="text-align:right">${num(r.tests)}</td>
+        <td style="text-align:right">${num(r.offline)}</td>
+        <td style="text-align:right">${num(r.cert)}</td>
+        <td style="text-align:center">${r.kxi}</td>
+      </tr>`).join("");
+    const html = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>KiberOgoh UZ — Platforma tahlili</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+  body{ font-family:"Times New Roman", serif; font-size:12pt; color:#111; }
+  h1{ font-size:16pt; text-align:center; margin:0 0 4pt; }
+  h2{ font-size:13pt; margin:14pt 0 6pt; }
+  .sub{ text-align:center; font-size:11pt; color:#444; margin:0 0 14pt; }
+  table{ border-collapse:collapse; width:100%; font-size:10.5pt; }
+  th,td{ border:1pt solid #333; padding:4pt 6pt; }
+  th{ background:#DCE6F4; text-align:center; }
+  .tot td{ background:#EFEFEF; font-weight:bold; }
+  .note{ font-size:10pt; color:#555; margin-top:8pt; }
+  .sign{ margin-top:28pt; }
+</style></head><body>
+<h1>«KiberOgoh UZ» platformasi bo'yicha umumiy tahliliy hisobot</h1>
+<p class="sub">Toshkent viloyati · Hisobot sanasi: ${sana} · Manba: platforma monitoring tizimi (demo)</p>
+
+<h2>1. Umumiy voronka ko'rsatkichlari</h2>
+<table>
+<tr><th style="width:6%">№</th><th>Bosqich</th><th style="width:18%">Soni</th><th style="width:16%">Jamiga nisbatan</th></tr>
+${PA_STEPS.map((s, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${s.t} <span style="color:#555">(${s.d})</span></td><td style="text-align:right">${num(tot[s.key])}</td><td style="text-align:center">${pct(tot[s.key], tot.users)}</td></tr>`).join("")}
+</table>
+<p class="note">Qamrov: ro'yxatdan o'tganlar viloyat aholisining ${pct(tot.users, tot.aholi)} qismini tashkil etadi (aholi — ${num(tot.aholi)} nafar).</p>
+
+<h2>2. Hududlar kesimida (${rows.length} ta shahar va tuman)</h2>
+<table>
+<tr><th>№</th><th>Hudud</th><th>Aholi</th><th>Ro'yxatdan o'tgan</th><th>Faol</th><th>Test yechgan</th><th>Offlaynga chaqirilgan</th><th>Sertifikat olgan</th><th>KXI</th></tr>
+${rowsHtml}
+<tr class="tot"><td></td><td>JAMI</td><td style="text-align:right">${num(tot.aholi)}</td><td style="text-align:right">${num(tot.users)}</td><td style="text-align:right">${num(tot.active)}</td><td style="text-align:right">${num(tot.tests)}</td><td style="text-align:right">${num(tot.offline)}</td><td style="text-align:right">${num(tot.cert)}</td><td></td></tr>
+</table>
+<p class="note">★ — Nurafshon shahri (joriy e'tibor hududi). Foydalanuvchi ko'rsatkichlari namunaviy (demo) hisoblanadi; aholi va mahallalar soni rasmiy statistikaga asoslangan.</p>
+
+<div class="sign">
+<p>Ma'lumotnoma tuzildi: «KiberOgoh UZ» monitoring bo'limi</p>
+<p>Imzo: ______________________ &nbsp;&nbsp;&nbsp; Sana: ${sana}</p>
+</div>
+</body></html>`;
+    const blob = new Blob(["\ufeff" + html], { type: "application/msword;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `KiberOgoh_Platforma_tahlili_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}.doc`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+
   function renderAdmin() {
     const sc = $("#adminScope");
     if (sc) sc.innerHTML = `
@@ -2252,7 +2363,7 @@
   function mahallaStats(distRef, m, idx) {
     let s = 0; for (const ch of (m.name + distRef.name)) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
     const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-    const aholi = Math.max(600, Math.round(distRef.aholi / distRef.mahallas * (0.75 + rnd() * 0.5)));
+    const aholi = m.aholi || Math.max(600, Math.round(distRef.aholi / distRef.mahallas * (0.75 + rnd() * 0.5)));
     const baseCov = distRef.users / distRef.aholi;
     const users = Math.max(40, Math.round(aholi * baseCov * (0.75 + rnd() * 0.5)));
     const faol = Math.min(96, Math.max(28, Math.round(m.score * 0.75 + rnd() * 20)));
@@ -2273,7 +2384,8 @@
     det.innerHTML = `
       <div class="md-head"><div><h3>${m.name}</h3><span class="kxi-badge ${lvl.cls}">${lvl.dot} ${lvl.label}</span></div><div class="md-score" style="color:${kxiColor(m.score)}">${m.score}<span>/100</span></div></div>
       <div class="md-stats md-stats--4">
-        <div><span class="k">Aholi (taxm.)</span><span class="v">${fmtN(st.aholi)}</span></div>
+        <div><span class="k">Aholi ${m.aholi ? "(rasmiy)" : "(taxm.)"}</span><span class="v">${fmtN(st.aholi)}</span></div>
+        ${m.xon ? `<div><span class="k">Xonadon (rasmiy)</span><span class="v">${fmtN(m.xon)}</span></div><div><span class="k">Oila (rasmiy)</span><span class="v">${fmtN(m.oila)}</span></div>` : ""}
         <div><span class="k">Foydalanuvchi</span><span class="v">${fmtN(st.users)}</span></div>
         <div><span class="k">Qamrov</span><span class="v" style="color:${kxiColor(Math.min(100, st.cov * 6))}">${st.cov.toFixed(1)}%</span></div>
         <div><span class="k">Faollik</span><span class="v">${st.faol}%</span></div>
@@ -2524,14 +2636,21 @@
     const back1 = $("#crumbBack"), back2 = $("#crumbReturn");
     [back1, back2].forEach(b => b && b.addEventListener("click", () => { mapDrill = null; renderMap(); }));
 
+    // diqqat markazida — Nurafshon (SIZ): region rejimida avtomatik tanlangan
+    if (mode === "region") {
+      const arr = renderMap._units || [];
+      const ownCell = [...svg.querySelectorAll(".mcell")].find(g => arr[+g.dataset.cell] && arr[+g.dataset.cell].own);
+      if (ownCell) selectMapUnit(ownCell, arr[+ownCell.dataset.cell]);
+    }
+
     // --- izohlar ---
     const th = $("#kxiTableHint");
     const ownMhz = own.mahallas;
     if (th) th.textContent = mode === "district" && role === "tuman"
-      ? `${MY_TUMAN}: ${ownMhz} rasmiy mahalladan 8 tasi nomli namunada · qatorni bosib batafsil ko'ring`
+      ? `${MY_TUMAN}: ${ownMhz} ta rasmiy mahalla — real ro'yxat va aholi soni · qatorni bosib batafsil ko'ring`
       : mode === "mahallaScope"
-        ? `Namunaviy 8 mahalla ichida sizniki ham bor · qatorni bosib batafsil ko'ring`
-        : `Mahalla kesimida namuna: ${MY_TUMAN} (8/${ownMhz}) · qatorni bosib batafsil ko'ring`;
+        ? `${MY_TUMAN}ning ${ownMhz} real mahallasi — sizniki birinchi qatorda`
+        : `Mahalla kesimi: ${MY_TUMAN} (${ownMhz} ta real mahalla) · qatorni bosib batafsil ko'ring`;
     const mh = $("#mapHint");
     if (mh) mh.textContent = mode === "region"
       ? "real ma'muriy chegaralar · rang — KXI darajasi"
@@ -2741,6 +2860,7 @@
     renderCondStatic();
     renderCondTracker();
     renderAdmin();
+    renderPlatformAnalytics();
     renderMahalla();
     setupPermitModal();
     setupLogin();
