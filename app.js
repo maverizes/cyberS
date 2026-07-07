@@ -259,12 +259,14 @@
   const MGOAL = { title:"Mahalla maqsadi", sub:"“Himoyalangan mahalla” maqomi", current:96, total:142 };
 
   /* ---- so'nggi videolar ---- */
+  // src: mahalliy video fayl yo'li (masalan "videos/video1.mp4") — bo'lsa, real pleyer ishlaydi.
+  // src bo'sh qolsa, oldingidek rangli simulyatsiya ko'rsatiladi. poster — video ustidagi rasm (ixtiyoriy).
   const VIDEOS = [
-    { id:1, cat:"Tahdid", c1:"#E25555", c2:"#7d1f1f", ico:ICON.sms, title:"Soxta “Click bloklandi” SMS'ni 10 soniyada tanish", dur:"0:45", views:"12.4K", likes:"1.2K", author:"KiberOgoh UZ",
+    { id:1, cat:"Tahdid", c1:"#E25555", c2:"#7d1f1f", ico:ICON.sms, title:"Soxta “Click bloklandi” SMS'ni 10 soniyada tanish", dur:"0:45", views:"12.4K", likes:"1.2K", author:"KiberOgoh UZ", src:"./videos/video_1.mp4", poster:"",
       cap:"Rasmiy SMS hech qachon havola yubormaydi. Domenni tekshiring: click.uz to'g'ri, clik-uz.xyz soxta. Shubha bo'lsa — ilovani o'zingiz oching." },
-    { id:2, cat:"Himoya", c1:"#3A86D8", c2:"#163f73", ico:ICON.shieldCheck, title:"Telegram akkauntni o'g'irlatmang: ikki bosqichli parol", dur:"1:02", views:"9.8K", likes:"940", author:"KiberOgoh UZ",
+    { id:2, cat:"Himoya", c1:"#3A86D8", c2:"#163f73", ico:ICON.shieldCheck, title:"Telegram akkauntni o'g'irlatmang: ikki bosqichli parol", dur:"1:02", views:"9.8K", likes:"940", author:"KiberOgoh UZ", src:"./videos/video_2.mp4", poster:"",
       cap:"Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash. Parolingiz o'g'irlansa ham, akkauntga begona kira olmaydi." },
-    { id:3, cat:"Aldov", c1:"#F0A92E", c2:"#9a6207", ico:ICON.phone, title:"Bank kodi aldovi: nega hech qachon kod aytmaslik kerak", dur:"0:38", views:"15.1K", likes:"1.6K", author:"KiberOgoh UZ",
+    { id:3, cat:"Aldov", c1:"#F0A92E", c2:"#9a6207", ico:ICON.phone, title:"Bank kodi aldovi: nega hech qachon kod aytmaslik kerak", dur:"0:38", views:"15.1K", likes:"1.6K", author:"KiberOgoh UZ", src:"./videos/video_3.mp4", poster:"",
       cap:"Bank xodimi hech qachon SMS-kod, parol yoki PIN so'ramaydi. Kim so'rasa — firibgar. Darhol go'shakni qo'ying." }
   ];
 
@@ -571,7 +573,7 @@
      ========================================================= */
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
-    assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
+    assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar", appeals:"Murojaatlar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi"
   };
@@ -590,6 +592,7 @@
     $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
+    if (v === "appeals") renderAppeals();
     if (v === "quiz") {
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
       else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
@@ -645,6 +648,8 @@
     mapDrill = null;
     if (typeof renderMap === "function") renderMap();
     if (typeof updateQuizLock === "function") updateQuizLock();
+    if (typeof updateAppealsBadge === "function") updateAppealsBadge();
+    if ($("#view-appeals") && $("#view-appeals").classList.contains("is-active") && typeof renderAppeals === "function") renderAppeals();
     if ($("#view-quiz") && $("#view-quiz").classList.contains("is-active")) {
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
       else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
@@ -1435,6 +1440,159 @@
   }
 
   /* =========================================================
+     MUROJAATLAR — fuqaro yuboradi, mas'ullar ko'rib chiqadi
+     ========================================================= */
+  const APPEAL_TYPES = [
+    { k:"firib",    t:"Firibgarlik haqida xabar", ico:"🚨" },
+    { k:"shikoyat", t:"Shikoyat",                 ico:"📣" },
+    { k:"taklif",   t:"Taklif",                   ico:"💡" },
+    { k:"savol",    t:"Savol",                    ico:"❓" }
+  ];
+  const APPEAL_STATUS = {
+    new:    { t:"Yangi",             cls:"st-new" },
+    review: { t:"Ko'rib chiqilmoqda", cls:"st-review" },
+    done:   { t:"Hal qilindi",        cls:"st-done" }
+  };
+  const DEMO_APPEALS = [
+    { id:"M-2026-482113", name:"Dilnoza R.", mahalla:"Ma'rifat MFY",     type:"firib",    subject:"Telegram orqali \"bank xodimi\" kod so'radi",        desc:"Notanish raqamdan qo'ng'iroq qilib, kartadagi kodni so'rashdi. Kod bermadim, lekin raqamni tekshirishingizni so'rayman.", ts:"05.07.2026", status:"new" },
+    { id:"M-2026-471950", name:"Botir S.",   mahalla:"Yangiobod MFY",    type:"firib",    subject:"\"Pul yutdingiz\" degan soxta SMS havolasi",          desc:"SMSda click-bonus.top havolasi keldi. Bosmadim, ammo mahallada ko'pchilikka kelayotgan ekan.", ts:"04.07.2026", status:"review" },
+    { id:"M-2026-460277", name:"Gulchehra T.",mahalla:"Navro'z MFY",     type:"savol",    subject:"Offline sertifikat sinoviga qanday yozilamiz?",       desc:"Onam ham qatnashmoqchi, yoshi 62. Sinov qayerda va qachon o'tkaziladi?", ts:"03.07.2026", status:"review" },
+    { id:"M-2026-455614", name:"Jasur K.",   mahalla:"Tuy-tepa MFY",     type:"taklif",   subject:"Layfxak videolarini maktablarda ko'rsatish taklifi",  desc:"Qisqa videolarni sinf soatlarida ko'rsatish uchun to'plam qilib bersangiz, foydali bo'lardi.", ts:"02.07.2026", status:"done" },
+    { id:"M-2026-448301", name:"Malika A.",  mahalla:"Dehqonobod MFY",   type:"shikoyat", subject:"Test natijam ballarimga qo'shilmadi",                 desc:"Kecha 5 ta savolga to'g'ri javob berdim, lekin ball o'zgarmadi. Tekshirib bera olasizmi?", ts:"01.07.2026", status:"done" },
+    { id:"M-2026-441188", name:"Olim N.",    mahalla:"Xurriyat MFY",     type:"firib",    subject:"Instagram sahifam nomidan pul so'ralmoqda",           desc:"Sahifam buzilgan shekilli, do'stlarimga mendan pul so'rab yozishibdi. Nima qilay?", ts:"29.06.2026", status:"done" },
+    { id:"M-2026-437052", name:"Zilola B.",  mahalla:"Oybek MFY",        type:"savol",    subject:"KXI balli qanday hisoblanadi?",                       desc:"Mahallamiz balli pastroq ekan, qaysi ko'rsatkichni oshirsak tez ko'tariladi?", ts:"27.06.2026", status:"done" }
+  ];
+  function loadAppeals() { try { return JSON.parse(localStorage.getItem("ko_appeals") || "[]"); } catch (e) { return []; } }
+  function saveAppeals(a) { try { localStorage.setItem("ko_appeals", JSON.stringify(a)); } catch (e) {} }
+  const demoStatus = {}; // demo yozuvlar statusi (sessiya ichida)
+  function allAppeals() {
+    const saved = loadAppeals();
+    const demo = DEMO_APPEALS.map(d => ({ ...d, status: demoStatus[d.id] || d.status, demo: true }));
+    return saved.slice().reverse().concat(demo);
+  }
+  function apType(k) { return APPEAL_TYPES.find(t => t.k === k) || APPEAL_TYPES[3]; }
+  function genAppealId() { return "M-2026-" + String(100000 + Math.floor(Math.random() * 900000)); }
+  function todayStr() { const d = new Date(); return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`; }
+  function updateAppealsBadge() {
+    const b = $("#appealsBadge"); if (!b) return;
+    const priv = ["superadmin", "tuman", "raisi"].includes(currentRole);
+    const n = allAppeals().filter(a => a.status === "new").length;
+    b.textContent = n;
+    b.style.display = priv && n > 0 ? "" : "none";
+  }
+  function renderAppeals() {
+    const wrap = $("#appealsWrap"); if (!wrap) return;
+    const priv = ["superadmin", "tuman", "raisi"].includes(currentRole);
+    const title = $("#appealsTitle"), lead = $("#appealsLead");
+
+    /* --- MAS'UL TOMONI: kelib tushgan murojaatlar --- */
+    if (priv) {
+      if (title) title.textContent = "Kelib tushgan murojaatlar";
+      if (lead) lead.textContent = currentRole === "raisi"
+        ? "Mahallangiz fuqarolaridan kelgan murojaatlar. Holatini yangilab boring — fuqaro o'z panelida ko'radi."
+        : "Fuqarolardan kelgan murojaatlar. Holatini yangilab boring — fuqaro o'z panelida ko'radi.";
+      const list = allAppeals();
+      const c = { new: 0, review: 0, done: 0 }; list.forEach(a => c[a.status]++);
+      const stat = (n, lab, cls, ico) => `<div class="card stat"><div class="stat__ico ${cls}">${ico}</div><div class="stat__num">${n}</div><div class="stat__label">${lab}</div></div>`;
+      wrap.innerHTML = `
+        <div class="grid stat-grid">
+          ${stat(list.length, "Jami murojaat", "i-blue", ICON.map)}
+          ${stat(c.new, "Yangi", "i-amber", ICON.alert)}
+          ${stat(c.review, "Ko'rib chiqilmoqda", "i-gold", ICON.spark)}
+          ${stat(c.done, "Hal qilindi", "i-teal", ICON.check)}
+        </div>
+        <div class="section-title"><h2>Murojaatlar ro'yxati</h2><span class="hint">tugma bilan holatni o'zgartiring</span></div>
+        <div class="ap-list">${list.map(a => {
+          const st = APPEAL_STATUS[a.status], tp = apType(a.type);
+          const next = a.status === "new" ? "review" : a.status === "review" ? "done" : null;
+          return `<div class="card ap-item">
+            <div class="ap-item__top">
+              <span class="ap-type">${tp.ico} ${tp.t}</span>
+              <span class="ap-id">${a.id}</span>
+              <span class="ap-status ${st.cls}">${st.t}</span>
+            </div>
+            <h4>${a.subject}</h4>
+            <p class="ap-desc">${a.desc}</p>
+            <div class="ap-item__foot">
+              <span class="ap-meta">${a.name} · ${a.mahalla} · ${a.ts}</span>
+              ${next ? `<button class="btn btn--ghost ap-next" data-id="${a.id}" data-next="${next}">${next === "review" ? "Ko'rib chiqishga olish" : "Hal qilindi deb belgilash"}</button>` : `<span class="ap-donemark">${ICON.check} Yakunlangan</span>`}
+            </div>
+          </div>`;
+        }).join("")}</div>`;
+      wrap.querySelectorAll(".ap-next").forEach(b => b.addEventListener("click", () => {
+        const id = b.dataset.id, next = b.dataset.next;
+        const saved = loadAppeals();
+        const s = saved.find(x => x.id === id);
+        if (s) { s.status = next; saveAppeals(saved); }
+        else demoStatus[id] = next;
+        renderAppeals(); updateAppealsBadge();
+      }));
+      updateAppealsBadge();
+      return;
+    }
+
+    /* --- FUQARO TOMONI --- */
+    if (title) title.textContent = "Platformaga murojaat yuboring";
+    if (lead) lead.textContent = "Firibgarlik holati haqida xabar bering, shikoyat, taklif yoki savol yo'llang — murojaatingiz mas'ullarga yetkaziladi va holatini shu yerda kuzatasiz.";
+    if (!KO_USER) {
+      wrap.innerHTML = `
+        <div class="card quiz-gate">
+          <div class="quiz-gate__ico">${ICON.lock}</div>
+          <h3>Avval ro'yxatdan o'ting</h3>
+          <p>Murojaat <b>doimiy ID</b> raqamingizga bog'lanadi — shunda javobini kuzata olasiz va mas'ullar qaysi mahalladan ekaningizni biladi.</p>
+          <p class="quiz-gate__soft">Ro'yxatdan bir marta o'tasiz — login-parol talab qilinmaydi.</p>
+          <div class="quiz-gate__btns">
+            <button class="btn btn--gold btn--lg" data-view="reg">Ro'yxatdan o'tish →</button>
+            <button class="btn btn--ghost" data-view="dash">Bosh sahifa</button>
+          </div>
+        </div>`;
+      wireViewBtns(wrap);
+      return;
+    }
+    const mine = loadAppeals().filter(a => a.uid === KO_USER.id).reverse();
+    wrap.innerHTML = `
+      <div class="ap-layout">
+        <div class="card card--pad">
+          <div class="map-card__head" style="margin-bottom:16px"><h3>Yangi murojaat</h3><span class="hint">${KO_USER.name} · ${KO_USER.mahalla}</span></div>
+          <div class="field"><label>Murojaat turi</label>
+            <div class="ap-types" id="apTypes">${APPEAL_TYPES.map((t, i) => `<button class="ap-typebtn${i === 0 ? " is-on" : ""}" data-k="${t.k}">${t.ico} ${t.t}</button>`).join("")}</div>
+          </div>
+          <div class="field"><label for="apSubject">Mavzu <span class="hint">— qisqa sarlavha</span></label><input type="text" id="apSubject" class="txt" maxlength="90" placeholder="Masalan: Telegram orqali kod so'rashdi"></div>
+          <div class="field"><label for="apDesc">Tavsif</label><textarea id="apDesc" class="txt ap-ta" rows="4" maxlength="600" placeholder="Nima bo'lganini qisqacha yozing — raqam, havola yoki vaqtni ko'rsatsangiz, tezroq yordam beramiz."></textarea></div>
+          <button class="btn btn--gold btn--block" id="apSend" disabled>Murojaatni yuborish</button>
+          <p class="ap-note">Shoshilinch xavf bo'lsa — <b>102</b> (IIV) raqamiga qo'ng'iroq qiling. Murojaat ma'lumotlari faqat mas'ullarga ko'rinadi.</p>
+        </div>
+        <div>
+          <div class="section-title" style="margin-top:0"><h2>Mening murojaatlarim</h2><span class="hint">${mine.length} ta</span></div>
+          <div class="ap-list" id="apMine">${mine.length ? mine.map(a => {
+            const st = APPEAL_STATUS[a.status], tp = apType(a.type);
+            return `<div class="card ap-item ap-item--mine">
+              <div class="ap-item__top"><span class="ap-type">${tp.ico} ${tp.t}</span><span class="ap-id">${a.id}</span><span class="ap-status ${st.cls}">${st.t}</span></div>
+              <h4>${a.subject}</h4>
+              <div class="ap-item__foot"><span class="ap-meta">${a.ts}</span></div>
+            </div>`;
+          }).join("") : `<div class="card ap-empty">${ICON.map}<p>Hozircha murojaat yubormagansiz. Birinchisini chapdagi forma orqali yuboring.</p></div>`}</div>
+        </div>
+      </div>`;
+    let apKind = APPEAL_TYPES[0].k;
+    wrap.querySelectorAll(".ap-typebtn").forEach(b => b.addEventListener("click", () => {
+      apKind = b.dataset.k;
+      wrap.querySelectorAll(".ap-typebtn").forEach(x => x.classList.toggle("is-on", x === b));
+    }));
+    const subj = $("#apSubject"), desc = $("#apDesc"), send = $("#apSend");
+    const chk = () => { send.disabled = !(subj.value.trim().length >= 4 && desc.value.trim().length >= 10); };
+    subj.addEventListener("input", chk); desc.addEventListener("input", chk);
+    send.addEventListener("click", () => {
+      const saved = loadAppeals();
+      const rec = { id: genAppealId(), uid: KO_USER.id, name: KO_USER.name, mahalla: KO_USER.mahalla, type: apKind, subject: subj.value.trim(), desc: desc.value.trim(), ts: todayStr(), status: "new" };
+      saved.push(rec); saveAppeals(saved);
+      renderAppeals(); updateAppealsBadge();
+      const mineEl = $("#apMine");
+      if (mineEl) { const f = document.createElement("div"); f.className = "ap-flash"; f.innerHTML = `${ICON.check} Murojaat qabul qilindi — raqami <b>${rec.id}</b>`; mineEl.prepend(f); setTimeout(() => f.remove(), 5200); }
+    });
+  }
+
+  /* =========================================================
      YORDAM (help accordion)
      ========================================================= */
   function renderHelp() {
@@ -1497,6 +1655,7 @@
       applyUserChip();
       updateQuizLock();
       if ($("#view-quiz").classList.contains("is-active")) { startQuiz(); quizBuilt = true; }
+      if ($("#view-appeals").classList.contains("is-active")) renderAppeals();
     });
   }
 
@@ -1634,10 +1793,11 @@
   function reelCard(v, mini) {
     return `<button class="reel" data-reel="${v.id}" aria-label="${v.title}">
       <div class="reel__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"></div>
+      ${v.poster ? `<img class="reel__poster" src="${v.poster}" alt="">` : ""}
       <div class="reel__noise"></div>
       <span class="reel__cat">${v.cat}</span>
       <span class="reel__dur">${v.dur}</span>
-      <span class="reel__icon">${v.ico}</span>
+      ${v.src ? "" : `<span class="reel__icon">${v.ico}</span>`}
       <div class="reel__grad"></div>
       <span class="reel__play">${ICON.play}</span>
       <div class="reel__info">
@@ -1679,6 +1839,27 @@
   function openReel(id) {
     const v = VIDEOS.find(x => x.id === +id); if (!v) return;
     const modal = $("#reelModal"), player = $("#reelPlayer");
+    if (v.src) {
+      // === REAL VIDEO ===
+      player.innerHTML = `
+        <button class="reel-player__close" data-reel-close aria-label="Yopish">&times;</button>
+        <video class="reel-player__video" id="reelVideoEl" src="${v.src}" ${v.poster ? `poster="${v.poster}"` : ""} controls autoplay playsinline></video>
+        <div class="reel-player__gradSoft"></div>
+        <div class="reel-player__info reel-player__info--video">
+          <span class="reel-player__cat">${v.cat} · ${v.dur}</span>
+          <div class="reel-player__title">${v.title}</div>
+          <div class="reel-player__cap">${v.cap}</div>
+          <div class="reel-player__author">${ICON.shieldCheck} ${v.author} · ${v.views} ko'rishlar · ${v.likes} like</div>
+        </div>`;
+      reelBar = null; reelCenter = null; reelPaused = true; reelElapsed = 0; reelStart = null;
+      if (reelRAF) { cancelAnimationFrame(reelRAF); reelRAF = null; }
+      modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
+      player.onclick = null;
+      modal._videoEl = $("#reelVideoEl");
+      modal.classList.add("has-video");
+      return;
+    }
+    modal.classList.remove("has-video");
     player.innerHTML = `
       <div class="reel-player__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"></div>
       <button class="reel-player__close" data-reel-close aria-label="Yopish">&times;</button>
@@ -1703,6 +1884,7 @@
   function closeReel() {
     const modal = $("#reelModal");
     reelPaused = true; if (reelRAF) cancelAnimationFrame(reelRAF); reelRAF = null; reelElapsed = 0; reelStart = null;
+    if (modal._videoEl) { modal._videoEl.pause(); modal._videoEl = null; }
     modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true");
   }
   function setupReelModal() {
@@ -2861,6 +3043,7 @@ ${rowsHtml}
     renderCondTracker();
     renderAdmin();
     renderPlatformAnalytics();
+    updateAppealsBadge();
     renderMahalla();
     setupPermitModal();
     setupLogin();
