@@ -22,16 +22,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install npm dependencies
         run: npm install
 
       - name: Sync Capacitor iOS
         run: npm run sync-web && npx cap sync ios
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.app
 
       - name: Build for iOS Simulator
         run: |
