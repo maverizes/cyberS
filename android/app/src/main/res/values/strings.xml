@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KiberOgoh UZ</string>
+    <string name="title_activity_main">KiberOgoh UZ</string>
+    <string name="package_name">uz.kiberogoh.app</string>
+    <string name="custom_url_scheme">uz.kiberogoh.app</string>
+</resources>

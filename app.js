@@ -629,7 +629,7 @@
   function applyRole(role) {
     if (LOCKED_ROLES.includes(role) && !unlockedRoles[role]) { openLogin(role); return; }
     currentRole = role;
-    $$("#roleSwitch button").forEach(b => b.classList.toggle("is-active", b.dataset.role === role));
+    $$(".role-switch button").forEach(b => b.classList.toggle("is-active", b.dataset.role === role));
     // rolga tegishli nav elementlarini ko'rsatish/yashirish
     $$(".nav-item[data-role]").forEach(b => {
       const allowed = b.dataset.role.split(/\s+/).includes(role);
@@ -656,14 +656,14 @@
     }
   }
   function bindRoleSwitch() {
-    $$("#roleSwitch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
+    $$(".role-switch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
     updateRoleLocks();
   }
 
   /* ---- Login oynasi (superadmin / tuman mas'uli / yoshlar yetakchisi) ---- */
   let pendingRole = null;
   function updateRoleLocks() {
-    $$("#roleSwitch button").forEach(b => {
+    $$(".role-switch button").forEach(b => {
       const r = b.dataset.role;
       const need = LOCKED_ROLES.includes(r) && !unlockedRoles[r];
       let ic = b.querySelector(".rlock");
@@ -1439,7 +1439,10 @@
       <p>Ushbu ro'yxat asosiy hujjatlarni aks ettiradi. Kiberxavfsizlik sohasida qo'shimcha qonunosti hujjatlari, Vazirlar Mahkamasi qarorlari va idoraviy me'yoriy hujjatlar ham amal qiladi. To'liq matnlar — <b>lex.uz</b> milliy huquqiy axborot bazasida.</p>`;
   }
 
-
+  /* =========================================================
+     MUROJAATLAR — fuqaro yuboradi, mas'ullar ko'rib chiqadi
+     ========================================================= */
+  
   /* =========================================================
      YORDAM (help accordion)
      ========================================================= */
@@ -2179,6 +2182,7 @@ ${rowsHtml}
       const cell = v => v === "y" ? '<span class="perm-y">✓</span>' : v === "own" ? '<span class="perm-s">O‘z mahallasi</span>' : v === "dist" ? '<span class="perm-s">O‘z tumani</span>' : '<span class="perm-n">—</span>';
       pm.innerHTML = `
         <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Tuman mas'uli</b> o'z tumani, <b style="color:var(--navy)">Yoshlar yetakchisi</b> o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
+        <div class="table-scroll-hint">Barcha rollarni ko'rish uchun jadvalni chapga suring →</div>
         <div style="overflow-x:auto"><table class="permtable">
           <thead><tr><th>Ruxsat / Ma'lumot</th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--gold)"></span>Superadmin</span></th>
@@ -2891,7 +2895,6 @@ ${rowsHtml}
     renderCondTracker();
     renderAdmin();
     renderPlatformAnalytics();
-    updateAppealsBadge();
     renderMahalla();
     setupPermitModal();
     setupLogin();

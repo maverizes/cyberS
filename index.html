@@ -7,11 +7,6 @@
   <title>KiberOgoh UZ — Mahalla kiber qalqoni</title>
   <meta name="description"
     content="KiberOgoh UZ — mahalla darajasidagi milliy kiber qalqon platformasi. Fuqarolarni onlayn firibgarlik va kiber tahdidlardan himoya qiladi.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap"
-    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/x-icon" href="./logo.jpg">
 </head>
@@ -51,6 +46,15 @@
   <div class="shell">
     <!-- ============ SIDEBAR ============ -->
     <nav class="rail" id="rail" aria-label="Asosiy navigatsiya">
+      <div class="rail__role" id="railRole">
+        <div class="rail__label">Rol</div>
+        <div class="role-switch role-switch--rail" role="tablist" aria-label="Rol">
+          <button data-role="superadmin" class="is-active">Superadmin</button>
+          <button data-role="tuman">Tuman mas'uli</button>
+          <button data-role="raisi">Yoshlar yetakchisi</button>
+          <button data-role="user">User</button>
+        </div>
+      </div>
       <div class="rail__group" data-admin-group>
         <div class="rail__label">Boshqaruv</div>
         <button class="nav-item" data-view="admin" data-role="superadmin">
@@ -235,7 +239,17 @@
         <div class="feed" id="dashFeed"></div>
       </section>
 
-      
+      <!-- ===== THREAT FEED ===== -->
+      <!-- ===== MUROJAATLAR ===== -->
+      <section class="view" id="view-appeals">
+        <div class="page-head">
+          <span class="eyebrow">Murojaatlar</span>
+          <h1 id="appealsTitle">Platformaga murojaat yuboring</h1>
+          <p class="lead" id="appealsLead">Firibgarlik holati haqida xabar bering, shikoyat, taklif yoki savol yo'llang
+            — murojaatingiz mas'ullarga yetkaziladi va holatini shu yerda kuzatasiz.</p>
+        </div>
+        <div id="appealsWrap"></div>
+      </section>
 
       <section class="view" id="view-feed">
         <div class="page-head">
