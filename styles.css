@@ -27,33 +27,34 @@
 @font-face { font-family:'Spline Sans Mono'; font-style:normal; font-weight:600; font-display:swap; src:url('fonts/splinesansmono-600-latin.woff2') format('woff2'); unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
 :root{
-  /* Brand / structure */
-  --navy:      #161F3D;
-  --navy-2:    #1E284A;
-  --navy-3:    #2A3556;
-  --gold:      #EE9B1C;
-  --gold-700:  #C97E0C;
-  --gold-soft: #FCEBC9;
+  /* Brand / structure — midnight blue */
+  --navy:      #022A5B;
+  --navy-2:    #083C7A;
+  --navy-3:    #12508F;
+  /* Aksent — yorqin marigold (midnight ustida yaxshi porlaydi) */
+  --gold:      #FF9F1C;
+  --gold-700:  #E07E00;
+  --gold-soft: #FFEFD6;
 
-  /* Ink & surfaces */
-  --ink:       #1B2233;
-  --muted:     #69718C;
-  --faint:     #98A0B8;
-  --line:      #E5E9F2;
-  --line-2:    #EEF1F7;
+  /* Ink & surfaces — yorug', havodor */
+  --ink:       #12213B;
+  --muted:     #5B6B85;
+  --faint:     #9AA7BE;
+  --line:      #E1E8F1;
+  --line-2:    #EDF1F7;
   --surface:   #FFFFFF;
-  --canvas:    #F3F5FA;
+  --canvas:    #EEF3FA;
 
-  /* Functional / categories */
-  --red:       #DD4D4D;
-  --red-soft:  #FBE7E7;
-  --teal:      #1B9E86;
-  --teal-soft: #DCF3EE;
-  --purple:    #6B5AD8;
-  --purple-soft:#E9E6FA;
-  --blue:      #2E78C7;
-  --blue-soft: #E2EEFB;
-  --amber-soft:#FBEFD3;
+  /* Functional / categories — jonli ranglar */
+  --red:       #E5484D;
+  --red-soft:  #FCE4E4;
+  --teal:      #12A594;
+  --teal-soft: #D6F3EE;
+  --purple:    #8E4EC6;
+  --purple-soft:#EFE4F7;
+  --blue:      #3E7BFA;
+  --blue-soft: #E1EBFE;
+  --amber-soft:#FFF0D4;
 
   /* Type */
   --display: "Lora", Georgia, "Times New Roman", serif;
@@ -62,12 +63,12 @@
 
   /* Radius & shadow */
   --r-sm: 8px;
-  --r:    14px;
-  --r-lg: 20px;
-  --r-xl: 26px;
-  --shadow-sm: 0 1px 2px rgba(22,31,61,.05), 0 1px 3px rgba(22,31,61,.06);
-  --shadow:    0 6px 22px rgba(22,31,61,.08), 0 2px 6px rgba(22,31,61,.05);
-  --shadow-lg: 0 20px 50px rgba(22,31,61,.16);
+  --r:    12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --shadow-sm: 0 1px 2px rgba(2,42,91,.06), 0 1px 3px rgba(2,42,91,.08);
+  --shadow:    0 6px 20px rgba(2,42,91,.10), 0 2px 6px rgba(2,42,91,.06);
+  --shadow-lg: 0 20px 44px rgba(2,42,91,.16);
 
   /* Layout */
   --bar-h: calc(64px + env(safe-area-inset-top, 0px));
@@ -201,7 +202,7 @@ img,svg{ display:block; }
 .main{ padding:30px clamp(18px,4vw,44px) 64px; max-width:var(--maxw); width:100%; min-width:0; }
 
 /* ---------- views ---------- */
-.view{ display:none; animation:viewIn .32s ease both; }
+.view{ display:none; animation:viewIn .44s cubic-bezier(.22,.61,.36,1) both; }
 .view.is-active{ display:block; }
 @keyframes viewIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
 
@@ -237,7 +238,7 @@ img,svg{ display:block; }
 .dash-grid{ grid-template-columns:1.5fr 1fr; align-items:start; }
 
 /* shield status */
-.shield-card{ background:linear-gradient(160deg,var(--navy) 0%, #10172e 100%); color:#fff; border:0; padding:26px; position:relative; overflow:hidden; }
+.shield-card{ background:linear-gradient(160deg,var(--navy) 0%, #001A3D 100%); color:#fff; border:0; padding:26px; position:relative; overflow:hidden; }
 .shield-card .eyebrow{ color:var(--gold); }
 .shield-card h3{ color:#fff; font-size:20px; margin:6px 0 2px; }
 .shield-ring{ position:relative; width:168px; height:168px; margin:14px auto 6px; }
@@ -455,7 +456,7 @@ img,svg{ display:block; }
 /* =========================================================
    LOYIHA HAQIDA (about — compiled deck)
    ========================================================= */
-.about-hero{ background:linear-gradient(150deg,var(--navy),#10172e); color:#fff; border:0; padding:38px; border-radius:var(--r-xl); position:relative; overflow:hidden; margin-bottom:26px; }
+.about-hero{ background:linear-gradient(150deg,var(--navy),#001A3D); color:#fff; border:0; padding:38px; border-radius:var(--r-xl); position:relative; overflow:hidden; margin-bottom:26px; }
 .about-hero .eyebrow{ color:var(--gold); }
 .about-hero h2{ color:#fff; font-size:clamp(24px,3vw,32px); max-width:18ch; margin:10px 0 12px; }
 .about-hero p{ color:#c5cbe6; max-width:60ch; font-size:15.5px; }
@@ -674,7 +675,7 @@ img,svg{ display:block; }
 .cert--lg .cert__desc{ font-size:13px; }
 
 /* spotlight banner (dashboard hero) */
-.spotlight{ position:relative; overflow:hidden; background:linear-gradient(125deg,#1c2649 0%,#0f1730 62%); border:0; border-radius:var(--r-xl); padding:26px 30px; margin-bottom:24px; display:grid; grid-template-columns:1fr auto; gap:26px; align-items:center; box-shadow:0 20px 46px rgba(16,23,46,.3); }
+.spotlight{ position:relative; overflow:hidden; background:linear-gradient(125deg,#022A5B 0%,#001A3D 62%); border:0; border-radius:var(--r-xl); padding:26px 30px; margin-bottom:24px; display:grid; grid-template-columns:1fr auto; gap:26px; align-items:center; box-shadow:0 20px 46px rgba(16,23,46,.3); }
 .spotlight__glow{ position:absolute; right:-8%; top:-70%; width:55%; height:230%; background:radial-gradient(circle, rgba(238,155,28,.24), transparent 62%); pointer-events:none; }
 .spotlight__live{ display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); }
 .spotlight__live .pulse{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 0 rgba(238,155,28,.6); animation:pulse 1.8s infinite; }
@@ -717,7 +718,7 @@ img,svg{ display:block; }
 .vac-card__cta{ margin-top:8px; font-size:13px; font-weight:700; color:#1f8fd0; }
 
 /* privileges view */
-.priv-hero{ background:linear-gradient(140deg,#1c2649,#0f1730); border:0; border-radius:var(--r-xl); padding:32px; display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:center; margin-bottom:26px; position:relative; overflow:hidden; }
+.priv-hero{ background:linear-gradient(140deg,#022A5B,#001A3D); border:0; border-radius:var(--r-xl); padding:32px; display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:center; margin-bottom:26px; position:relative; overflow:hidden; }
 .priv-hero__glow{ position:absolute; left:-10%; bottom:-80%; width:50%; height:200%; background:radial-gradient(circle, rgba(238,155,28,.18), transparent 60%); }
 .priv-hero__cert{ position:relative; z-index:1; }
 .priv-hero__text{ position:relative; z-index:1; }
@@ -750,7 +751,7 @@ img,svg{ display:block; }
 /* =========================================================
    IMTIYOZ SHARTI (verification conditions)
    ========================================================= */
-.cond-why{ position:relative; overflow:hidden; background:linear-gradient(150deg,var(--navy),#10172e); border:0; padding:26px 28px; color:#fff; }
+.cond-why{ position:relative; overflow:hidden; background:linear-gradient(150deg,var(--navy),#001A3D); border:0; padding:26px 28px; color:#fff; }
 .cond-why__rays{ position:absolute; right:-80px; top:-80px; width:280px; height:280px; border-radius:50%;
   background:radial-gradient(circle at center, transparent 40%, rgba(238,155,28,.12) 41%, rgba(238,155,28,.12) 48%, transparent 49%); }
 .cond-why__inner{ position:relative; display:flex; gap:18px; align-items:flex-start; }
@@ -896,13 +897,52 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 #mapSvg{ width:100%; height:auto; display:block; overflow:visible; }
 #mapSvg.mapsvg--geo{ width:auto; max-width:100%; max-height:640px; margin:0 auto; filter:drop-shadow(0 10px 26px rgba(22,31,61,.16)); }
 .mcell{ cursor:pointer; }
-.mcell path{ transition:filter .18s ease, transform .18s ease, stroke .18s ease; transform-origin:center; transform-box:fill-box; }
-.mcell:hover path{ filter:brightness(1.09) saturate(1.06) drop-shadow(0 5px 12px rgba(16,23,46,.3)); }
-.mapsvg--geo .mcell:hover path{ transform:scale(1.012); }
-#mapSvg:not(.mapsvg--geo) .mcell:hover path{ transform:scale(1.04); }
-.mcell.is-sel path{ stroke:var(--navy); stroke-width:3; filter:brightness(1.06) drop-shadow(0 6px 16px rgba(16,23,46,.35)); }
-.mcell--tiny path{ stroke-width:1.4; }
-.mcell--tiny:hover path{ transform:scale(1.12); filter:brightness(1.12) drop-shadow(0 4px 10px rgba(16,23,46,.4)); }
+.mcell path{ transition:filter .3s cubic-bezier(.22,.61,.36,1), opacity .3s ease; transform-origin:center; transform-box:fill-box; }
+.mcell:hover path{ filter:brightness(1.06); }
+.mcell.is-sel path{ stroke:var(--gold); stroke-width:3.4; filter:brightness(1.06) drop-shadow(0 8px 20px rgba(8,12,28,.4)); }
+/* kichik hududlar uchun ko'rinmas, kattaroq bosish maydoni */
+.mcell__hit{ fill:transparent; stroke:transparent; }
+
+/* mahalla ko'rinishida har bir mahalla alohida plita bo'lib turadi */
+.mapsvg--mhz .mcell path{ transform:scale(.982); }
+
+/* hover pop — asl katakcha ustidagi alohida qatlam (DOM'da ko'chirilmaydi) */
+.mhi{ pointer-events:none; }
+.mcell--pop{ pointer-events:none; }
+.mcell--pop path{
+  transition:transform .34s cubic-bezier(.22,.61,.36,1), filter .34s cubic-bezier(.22,.61,.36,1),
+             stroke-width .3s ease;
+  transform-origin:center; transform-box:fill-box;
+}
+.mcell--pop.is-on path{
+  transform:scale(1.07);
+  stroke:#fff; stroke-width:3.6;
+  filter:brightness(1.14) saturate(1.04) drop-shadow(0 12px 26px rgba(8,12,28,.5));
+}
+.mapsvg--mhz .mcell--pop path{ transform:scale(.982); }
+.mapsvg--mhz .mcell--pop.is-on path{ transform:scale(1.07); }
+.mcell--pop.mcell--tiny.is-on path{ transform:scale(1.5); }
+
+/* Nurafshon chaqiruv belgisi (viloyat xaritasida) */
+.mcall{ cursor:pointer; }
+.mcall__lead{ stroke:var(--gold); stroke-width:2; stroke-dasharray:4 3; }
+.mcall__ring{ fill:none; stroke:var(--gold); stroke-width:2.5; opacity:.9; transform-origin:center; transform-box:fill-box; animation:nurPulse 2.4s ease-out infinite; }
+.mcall__dot{ fill:var(--gold); stroke:#fff; stroke-width:2; }
+.mcall__box{ fill:var(--navy); stroke:var(--gold); stroke-width:2; }
+.mcall__t{ font-family:var(--ui); font-weight:700; font-size:25px; fill:#fff; text-anchor:middle; }
+.mcall__s{ font-family:var(--ui); font-weight:600; font-size:19px; fill:var(--gold); text-anchor:middle; }
+.mcall__lead{ stroke-width:3.5; }
+/* viloyat xaritasi kattaroq viewBox — yozuvlar mos ravishda kattaroq */
+.mapsvg--region .mcell__name{ font-size:23px; stroke-width:3px; }
+.mapsvg--region .mcell__name--sm{ font-size:18px; stroke-width:2.4px; }
+.mapsvg--region .mcell__val{ font-size:25px; }
+.mapsvg--region .mcell__val--sm{ font-size:20px; }
+/* mahalla xaritasi */
+.mapsvg--mhz .mcell__name--sm{ font-size:17px; stroke-width:2.6px; }
+.mapsvg--mhz .mcell__val--sm{ font-size:19px; }
+.mcall:hover .mcall__box{ fill:var(--navy-2); }
+.mcall:hover .mcall__dot{ r:8; }
+@keyframes nurPulse{ 0%{ transform:scale(1); opacity:.95; } 70%{ transform:scale(2.1); opacity:0; } 100%{ transform:scale(2.1); opacity:0; } }
 .mcell__name{ font-family:var(--ui); font-weight:700; font-size:15px; text-anchor:middle; pointer-events:none; paint-order:stroke; stroke:rgba(16,23,46,.18); stroke-width:2px; }
 .mcell__name--sm{ font-size:11.5px; stroke-width:1.6px; }
 .mcell__val{ font-family:var(--display); font-weight:700; font-size:17px; text-anchor:middle; pointer-events:none; }
@@ -913,8 +953,8 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 .mcell:hover .mcell__name, .mcell:hover .mcell__val, .mcell.is-sel .mcell__name, .mcell.is-sel .mcell__val{ }
 
 /* tooltip */
-.mtip{ position:absolute; z-index:10; pointer-events:none; transform:translate(-50%,calc(-100% - 14px)); background:var(--navy); color:#fff; border-radius:11px; padding:11px 13px; min-width:165px; box-shadow:0 12px 30px rgba(8,12,28,.4); opacity:0; transition:opacity .14s ease; }
-.mtip.is-on{ opacity:1; }
+.mtip{ position:absolute; z-index:10; pointer-events:none; transform:translate(-50%,calc(-100% - 6px)); background:var(--navy); color:#fff; border-radius:11px; padding:11px 13px; min-width:165px; box-shadow:0 14px 34px rgba(8,12,28,.45); opacity:0; transition:opacity .22s ease, transform .28s cubic-bezier(.22,.61,.36,1); }
+.mtip.is-on{ opacity:1; transform:translate(-50%,calc(-100% - 14px)); }
 .mtip::after{ content:""; position:absolute; left:50%; bottom:-6px; transform:translateX(-50%) rotate(45deg); width:12px; height:12px; background:var(--navy); }
 .mtip__t{ font-family:var(--display); font-weight:700; font-size:14.5px; margin-bottom:7px; }
 .mtip__row{ display:flex; justify-content:space-between; gap:16px; font-size:12.5px; color:#aeb6d4; padding:2px 0; }
@@ -1000,7 +1040,7 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 /* =========================================================
    HUQUQIY ASOSLAR (legal panel)
    ========================================================= */
-.legal-hero{ position:relative; overflow:hidden; padding:26px 28px; background:linear-gradient(135deg,#161f3d,#28335f); border:0; color:#fff; margin-bottom:22px; }
+.legal-hero{ position:relative; overflow:hidden; padding:26px 28px; background:linear-gradient(135deg,#022A5B,#0A4A8C); border:0; color:#fff; margin-bottom:22px; }
 .legal-hero .eyebrow{ color:var(--gold); }
 .legal-hero h2{ font-family:var(--display); font-weight:700; font-size:22px; margin:6px 0 10px; color:#fff; }
 .legal-hero p{ font-size:14.5px; color:#c9d0e8; line-height:1.6; max-width:70ch; }
@@ -1206,6 +1246,89 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 
 @media (max-width:900px){ .dash-hero{ grid-template-columns:1fr; } .lifehack-grid, .lifehack-grid--full{ grid-template-columns:1fr; } }
 @media (max-width:560px){ .dash-hello h1{ font-size:25px; } }
+
+/* ---- Dashboard: Murojaatlar bo'limi (rasmiy tahlil) ---- */
+.gov-block{ margin:30px 0 8px; }
+.gov-head{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  background:linear-gradient(120deg,var(--navy),var(--navy-2)); color:#fff;
+  border-left:4px solid var(--gold);
+  border-radius:14px; padding:15px 22px; margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.gov-head .eyebrow{ color:var(--gold); }
+.gov-head h2{ color:#fff; font-size:20px; margin-top:3px; }
+.gov-head__meta{ font-family:var(--mono); font-size:12px; color:#9DB6D6; white-space:nowrap; }
+
+.appeals-2col{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; align-items:start; }
+#dashAppealsStats{ margin-top:0; }
+.appeals-card__h{ font-family:var(--ui); font-weight:700; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--navy); }
+.appeals-card__sub{ font-size:12.5px; color:var(--muted); margin:6px 0 15px; }
+.appeals-barwrap{ display:grid; grid-template-columns:1fr 1fr; gap:2px 30px; }
+@media (max-width:860px){ .appeals-2col{ grid-template-columns:1fr; } }
+@media (max-width:680px){ .appeals-barwrap{ grid-template-columns:1fr; } }
+
+.gov-block .card{ border-color:var(--line); border-radius:14px; }
+
+/* midnight KPI tiles — KXI xaritasi + Murojaatlar */
+#dashAppealsStats .stat,
+#view-kxi #mapSummary .stat{
+  background:linear-gradient(150deg,var(--navy),var(--navy-2));
+  border-color:var(--navy-3);
+}
+#dashAppealsStats .stat .stat__num,
+#view-kxi #mapSummary .stat .stat__num{ color:#fff; }
+#dashAppealsStats .stat .stat__label,
+#view-kxi #mapSummary .stat .stat__label{ color:#9DB6D6; }
+#dashAppealsStats .stat__ico,
+#view-kxi #mapSummary .stat__ico{ background:rgba(255,159,28,.18); color:var(--gold); }
+
+/* risk callouts (dashboard) — yorqin */
+#dashAppealsRisk .kxi-rec{ border-radius:12px; align-items:flex-start; }
+#dashAppealsRisk .kxi-rec.kxi-red{ background:var(--red-soft); color:#B4282D; border:1px solid #F3C0C2; }
+#dashAppealsRisk .kxi-rec.kxi-red svg{ color:var(--red); }
+#dashAppealsRisk .kxi-rec.kxi-green{ background:var(--teal-soft); color:#0B7A6B; border:1px solid #B7E5DC; }
+#dashAppealsRisk .kxi-rec.kxi-green svg{ color:var(--teal); }
+
+/* ---- KXI xaritasi — midnight sahna ---- */
+#view-kxi .map-stage{ background:linear-gradient(165deg,#022A5B,#001835); border:1px solid var(--navy-3); }
+#view-kxi #mapSvg.mapsvg--geo{ filter:drop-shadow(0 16px 36px rgba(1,15,40,.55)); }
+#view-kxi .dist-under{ fill:#0C3768; }
+#view-kxi .dist-outline{ stroke:rgba(255,255,255,.5); stroke-width:3; }
+#view-kxi .mcell.is-sel path{ stroke:var(--gold); stroke-width:3.6; filter:brightness(1.1) drop-shadow(0 10px 24px rgba(0,0,0,.55)); }
+#view-kxi .mcell--pop.is-on path{ filter:brightness(1.16) saturate(1.04) drop-shadow(0 14px 30px rgba(0,0,0,.65)); }
+#view-kxi .mcell--own path{ stroke:var(--gold); stroke-width:2.6; }
+#view-kxi .mcell__name, #view-kxi .mcell__name--sm{ fill:#fff; stroke:rgba(1,12,32,.62); stroke-width:2.6px; }
+#view-kxi .mcell__val, #view-kxi .mcell__val--sm{ fill:rgba(255,255,255,.94); stroke:rgba(1,12,32,.5); stroke-width:2px; paint-order:stroke; }
+#view-kxi .map-scale{ color:var(--muted); font-family:var(--mono); }
+#view-kxi .map-scale span:first-child, #view-kxi .map-scale__lab{ font-family:var(--ui); font-weight:600; }
+#view-kxi .map-scale__bar{ background:linear-gradient(90deg,#e5484d,#f5a623 45%,#40af6e 78%,#12a594); max-width:260px; }
+
+/* KXI map aside/detail — yorqin nishonlar */
+#view-kxi .kxi-badge.kxi-red{ background:var(--red-soft); color:#B4282D; }
+#view-kxi .kxi-badge.kxi-yellow{ background:var(--amber-soft); color:#9A6A12; }
+#view-kxi .kxi-badge.kxi-green{ background:var(--teal-soft); color:#0B7A6B; }
+#view-kxi .map-detail .kxi-rec{ border-radius:12px; }
+#view-kxi .map-detail .kxi-rec.kxi-red{ background:var(--red-soft); color:#B4282D; border:1px solid #F3C0C2; }
+#view-kxi .map-detail .kxi-rec.kxi-red svg{ color:var(--red); }
+#view-kxi .map-detail .kxi-rec.kxi-green{ background:var(--teal-soft); color:#0B7A6B; border:1px solid #B7E5DC; }
+#view-kxi .map-detail .kxi-rec.kxi-green svg{ color:var(--teal); }
+#view-kxi .map-detail .kxi-rec.kxi-yellow{ background:var(--amber-soft); color:#8A5E10; border:1px solid #F1DBAE; }
+
+/* holat nuqtasi */
+.kxi-leg.kxi-green .kxi-leg__dot{ color:#40af6e; }
+.kxi-leg.kxi-yellow .kxi-leg__dot{ color:#f5a623; }
+.kxi-leg.kxi-red .kxi-leg__dot{ color:#e5484d; }
+.kxi-leg__dot{ font-size:14px; }
+#view-kxi .kxi-leg.kxi-green{ border-top-color:#40af6e; }
+#view-kxi .kxi-leg.kxi-yellow{ border-top-color:#f5a623; }
+#view-kxi .kxi-leg.kxi-red{ border-top-color:#e5484d; }
+#view-kxi .kxitable__row.kxi-green{ border-left-color:#40af6e; }
+#view-kxi .kxitable__row.kxi-yellow{ border-left-color:#f5a623; }
+#view-kxi .kxitable__row.kxi-red{ border-left-color:#e5484d; }
+#view-kxi .kxi-green .kxitable__bar i{ background:#40af6e; }
+#view-kxi .kxi-yellow .kxitable__bar i{ background:#f5a623; }
+#view-kxi .kxi-red .kxitable__bar i{ background:#e5484d; }
 
 /* =========================================================
    KIBERSINOV — ball + ta'sir zanjiri
@@ -1737,7 +1860,7 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 .pa-step__pct{ font-family:var(--display); font-weight:700; font-size:16px; color:var(--navy); text-align:right; }
 .pa-step__pct small{ display:block; font-family:var(--ui); font-weight:600; font-size:10.5px; color:var(--faint); margin-top:2px; }
 
-.pa-export{ display:flex; align-items:center; gap:18px; padding:20px 24px; margin-top:16px; background:linear-gradient(135deg,#161f3d,#28335f); border:0; }
+.pa-export{ display:flex; align-items:center; gap:18px; padding:20px 24px; margin-top:16px; background:linear-gradient(135deg,#022A5B,#0A4A8C); border:0; }
 .pa-export__ico{ width:52px; height:52px; flex:0 0 52px; border-radius:14px; background:rgba(238,155,28,.16); color:var(--gold); display:grid; place-items:center; }
 .pa-export__ico svg{ width:27px; height:27px; }
 .pa-export__body{ flex:1; }

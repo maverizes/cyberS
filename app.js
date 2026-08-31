@@ -426,15 +426,57 @@
   ];
   const kxiScore = m => Math.round(m.sub.reduce((s, v, i) => s + v * KXI_WEIGHTS[i].w / 100, 0));
   function kxiLevel(score) {
-    if (score >= 81) return { key:"green", label:"Xavfsiz", dot:"🟢", cls:"kxi-green" };
-    if (score >= 51) return { key:"yellow", label:"Ogohlantirish", dot:"🟡", cls:"kxi-yellow" };
-    return { key:"red", label:"Yuqori xavf", dot:"🔴", cls:"kxi-red" };
+    if (score >= 81) return { key:"green", label:"Xavfsiz", dot:"●", cls:"kxi-green" };
+    if (score >= 51) return { key:"yellow", label:"Ogohlantirish", dot:"●", cls:"kxi-yellow" };
+    return { key:"red", label:"Yuqori xavf", dot:"●", cls:"kxi-red" };
   }
   const KXI_REC = {
     green: "Mahalla holati barqaror. Faollikni shu darajada saqlang va tajribani boshqa mahallalarga ulashing.",
     yellow: "Kiber faollik pasaygan. Aholini testlarga jalb qiling, ko'ngillilarni faollashtiring va qo'shimcha ogohlantirishlar yuboring.",
     red: "Yuqori xavf — zudlik bilan chora ko'ring: mahallada targ'ibot o'tkazing, jonli seminar tashkil qiling va qo'shimcha ogohlantirish yuboring."
   };
+
+  /* ---- Nurafshon shahri — murojaatlar (rasmiy ma'lumot) ----
+     Har mahalla: aholi soni, kelib tushgan murojaatlar, jabrlanuvchilar ijtimoiy tarkibi,
+     o'rtacha yosh va eng ko'p uchragan sodir etish usuli.
+     Tartib KXI_MAHALLALAR bilan bir xil — TV_DIST["Nurafshon shahri"].c katakchalariga mos keladi. */
+  const NUR_APPEALS = [
+    { name:"Navro'z MFY",      aholi:4614, murojaat:4,  band:56.3, ishsiz:2.3,  nafaqa:8.5,  yosh:"30",    usul:"Pul yechish va zararli ilova" },
+    { name:"Ma'rifat MFY",     aholi:4300, murojaat:2,  band:96.0, ishsiz:4.3,  nafaqa:0.0,  yosh:"30",    usul:"Kartadan pul yechish" },
+    { name:"Yangiobod MFY",    aholi:5600, murojaat:13, band:87.6, ishsiz:10.3, nafaqa:3.1,  yosh:"35–45", usul:"Pul yechish va zararli ilova", ish:12, ish2025:3 },
+    { name:"Tuy-tepa MFY",     aholi:4904, murojaat:4,  band:91.9, ishsiz:3.1,  nafaqa:6.0,  yosh:"25–30", usul:"Zararli ilovalar" },
+    { name:"Nurafshon MFY",    aholi:4500, murojaat:2,  band:92.7, ishsiz:3.3,  nafaqa:0.0,  yosh:"25–30", usul:"Kartadan pul yechish" },
+    { name:"Taraqqiyot MFY",   aholi:4809, murojaat:4,  band:77.8, ishsiz:6.7,  nafaqa:3.6,  yosh:"35–45", usul:"Kartadan pul yechish" },
+    { name:"Dehqonobod MFY",   aholi:4680, murojaat:6,  band:82.5, ishsiz:3.8,  nafaqa:18.8, yosh:"30–55", usul:"Firibgarlik" },
+    { name:"Obod turmush MFY", aholi:4700, murojaat:6,  band:71.4, ishsiz:4.3,  nafaqa:4.3,  yosh:"35",    usul:"Kartadan pul yechish" },
+    { name:"Xurriyat MFY",     aholi:5100, murojaat:4,  band:60.0, ishsiz:3.0,  nafaqa:0.0,  yosh:"30–40", usul:"Firibgarlik" },
+    { name:"Muqumiy MFY",      aholi:5322, murojaat:4,  band:50.0, ishsiz:4.8,  nafaqa:6.3,  yosh:"35–50", usul:"Onlayn do'kon" },
+    { name:"Degantepa MFY",    aholi:3550, murojaat:5,  band:88.0, ishsiz:2.0,  nafaqa:10.0, yosh:"35–40", usul:"Firibgarlik" },
+    { name:"Oybek MFY",        aholi:5268, murojaat:4,  band:83.4, ishsiz:1.3,  nafaqa:4.3,  yosh:"30–35", usul:"Pul yechish va zararli ilova" },
+    { name:"Qumariq MFY",      aholi:5478, murojaat:3,  band:83.3, ishsiz:2.7,  nafaqa:0.0,  yosh:"25",    usul:"Firibgarlik" },
+    { name:"Birlik MFY",       aholi:5012, murojaat:0,  band:71.4, ishsiz:4.3,  nafaqa:4.3,  yosh:"30",    usul:"Kartadan pul yechish" },
+    { name:"Obod MFY",         aholi:6005, murojaat:7,  band:79.2, ishsiz:3.7,  nafaqa:4.2,  yosh:"30–40", usul:"Firibgarlik" },
+    { name:"Oppoq MFY",        aholi:5405, murojaat:2,  band:85.7, ishsiz:4.3,  nafaqa:0.0,  yosh:"25",    usul:"Firibgarlik" }
+  ];
+  // kiberjinoyatlarning sodir etilish usullari — mahallalar kesimidagi ulush
+  // rang: bitta ohangdagi to'q shkala (eng ko'p tarqalgani — eng to'q)
+  const NUR_METHODS = [
+    { k:"Kartadan pul yechish",              mfy:5, pct:38.2, c:"#C62828" },
+    { k:"Firibgarlik (ijtimoiy muhandislik)", mfy:3, pct:32.5, c:"#E5484D" },
+    { k:"Pul yechish + zararli ilova",       mfy:2, pct:18.8, c:"#EF7A6D" },
+    { k:"Zararli ilovalar",                  mfy:1, pct:6.2,  c:"#F3A99F" },
+    { k:"Onlayn do'kon",                     mfy:1, pct:6.2,  c:"#F7CFC9" }
+  ];
+  const NUR_SUMMARY = {
+    aholi:79247, murojaat:70,
+    band:87.6, ishsiz:9.3, nafaqa:3.1, erkak:6, ayol:7,
+    topRisk:"Yangiobod MFY", topRiskMurojaat:13, topRiskIsh:12, topRiskIsh2025:3,
+    yoshAsosiy:"25–45", yoshNote:"Dehqonobod 30–55 · Muqumiy 35–50"
+  };
+  // 1000 aholiga to'g'ri keladigan murojaatlar
+  const nurRate = m => m.aholi ? m.murojaat / m.aholi * 1000 : 0;
+  // murojaat zichligini 0–100 xavfsizlik balliga aylantirish (100 = xavfsiz, 0 = yuqori xavf)
+  const nurSafety = m => Math.max(4, Math.min(100, Math.round(100 - nurRate(m) / 2.6 * 100)));
 
   /* ---- Platforma kartasi: Toshkent viloyati → tuman/shahar → mahalla ---- */
   const TV_VIEW = {w:992,h:1057};
@@ -483,7 +525,7 @@
     "Angren shahri": {w:776,h:546,o:"M52,513L53,505L42,505L30,501L31,496L23,496L23,487L31,486L57,478L82,475L94,462L115,453L125,451L131,458L155,449L167,437L199,423L212,403L206,379L205,335L213,318L214,300L217,286L226,252L233,236L221,191L241,184L246,180L258,179L251,165L263,145L317,123L374,12L383,9L401,9L405,60L415,82L457,156L471,177L484,187L505,158L624,163L683,200L711,187L717,191L722,210L716,213L723,229L730,225L767,229L768,243L746,243L730,246L646,279L616,307L601,312L592,287L570,290L558,297L553,286L517,305L323,423L215,455L197,465L194,460L166,469L133,501L51,525L10,539L8,536Z",c:[{d:"M358,89L380,92L409,70L405,60L401,9L383,9L374,12L343,73Z",cx:382,cy:36},{d:"M342,145L358,89L343,73L317,123L304,128Z",cx:340,cy:106},{d:"M358,89L342,145L355,165L369,169L372,167L399,129L380,92Z",cx:369,cy:137},{d:"M399,129L432,125L437,121L415,82L409,70L380,92Z",cx:408,cy:107},{d:"M372,167L436,171L432,125L399,129Z",cx:410,cy:148},{d:"M432,125L436,171L451,188L468,172L457,156L437,121Z",cx:441,cy:141},{d:"M275,179L279,177L292,133L263,145L251,165L256,176Z",cx:271,cy:155},{d:"M273,242L274,243L319,216L321,189L279,177L275,179Z",cx:297,cy:202},{d:"M355,165L342,145L304,128L292,133L279,177L321,189Z",cx:317,cy:155},{d:"M321,189L319,216L338,233L388,224L369,169L355,165Z",cx:350,cy:202},{d:"M388,224L392,227L402,227L451,198L451,188L436,171L372,167L369,169Z",cx:414,cy:193},{d:"M451,188L451,198L469,216L481,217L515,194L522,159L505,158L484,187L471,177L468,172Z",cx:484,cy:187},{d:"M561,224L562,190L526,159L522,159L515,194L544,237Z",cx:543,cy:209},{d:"M562,190L593,177L599,162L526,159Z",cx:567,cy:170},{d:"M561,224L608,226L609,223L593,177L562,190Z",cx:582,cy:207},{d:"M593,177L609,223L665,189L624,163L599,162Z",cx:620,cy:206},{d:"M241,276L272,242L228,219L233,236L226,252L220,277Z",cx:248,cy:247},{d:"M273,242L275,179L256,176L258,179L246,180L241,184L221,191L228,219Z",cx:249,cy:205},{d:"M274,243L297,268L327,271L338,233L319,216Z",cx:309,cy:255},{d:"M330,274L383,275L392,227L388,224L338,233L327,271Z",cx:360,cy:252},{d:"M396,302L412,304L457,281L458,276L457,272L402,227L392,227L383,275Z",cx:409,cy:250},{d:"M402,227L457,272L469,216L451,198Z",cx:446,cy:249},{d:"M458,276L522,258L481,217L469,216L457,272Z",cx:483,cy:237},{d:"M522,258L535,260L544,237L515,194L481,217Z",cx:514,cy:227},{d:"M608,226L610,236L644,267L684,221L684,199L665,189L609,223Z",cx:643,cy:231},{d:"M684,221L644,267L645,279L708,255Z",cx:683,cy:238},{d:"M684,221L708,255L730,246L746,243L768,243L767,229L730,225L723,229L716,213L722,210L717,191L711,187L684,199Z",cx:701,cy:217},{d:"M229,360L243,346L258,304L241,276L220,277L214,300L213,318L205,335L206,361Z",cx:229,cy:327},{d:"M241,276L258,304L286,300L297,268L273,242Z",cx:270,cy:272},{d:"M243,346L307,330L286,300L258,304Z",cx:275,cy:317},{d:"M286,300L307,330L318,335L321,335L330,328L330,274L327,271L297,268Z",cx:313,cy:314},{d:"M330,328L376,326L396,302L383,275L330,274Z",cx:360,cy:288},{d:"M457,281L412,304L440,352L486,324Z",cx:448,cy:314},{d:"M535,260L522,258L458,276L457,281L486,324L517,305L548,288Z",cx:500,cy:297},{d:"M544,237L535,260L548,288L553,286L558,297L573,290L610,236L608,226L561,224Z",cx:563,cy:273},{d:"M644,267L610,236L573,290L592,287L601,312L616,307L645,279Z",cx:615,cy:273},{d:"M229,360L272,391L284,392L318,335L307,330L243,346Z",cx:272,cy:376},{d:"M343,379L321,335L318,335L284,392L316,415Z",cx:318,cy:357},{d:"M343,379L388,379L376,326L330,328L321,335Z",cx:357,cy:357},{d:"M376,326L388,379L390,381L440,352L412,304L396,302Z",cx:405,cy:339},{d:"M202,418L199,423L167,437L154,449L156,478L166,469L194,460L197,465L215,455L243,447Z",cx:197,cy:448},{d:"M243,447L249,446L272,391L229,360L206,361L206,379L212,403L202,418Z",cx:235,cy:410},{d:"M316,415L284,392L272,391L249,446L319,424Z",cx:289,cy:420},{d:"M388,379L343,379L316,415L319,424L390,381Z",cx:345,cy:398},{d:"M81,485L72,476L57,478L31,486L23,487L23,496L31,496L30,501L42,505L53,505L52,513L8,536L10,539L76,518Z",cx:65,cy:509},{d:"M81,485L76,518L133,501L146,488Z",cx:91,cy:509},{d:"M146,488L156,478L154,449L131,458L125,451L115,453L94,462L82,475L72,476L81,485Z",cx:122,cy:469}]},
     "Bekobod shahri": {w:775,h:636,o:"M8,312L38,318L56,338L81,370L111,375L116,401L171,415L203,425L225,436L243,431L260,435L322,438L345,437L383,454L405,472L420,457L456,488L454,496L475,513L533,494L616,531L634,556L687,589L744,629L757,627L768,602L746,566L742,556L744,550L725,516L725,445L659,343L653,305L649,229L708,181L744,82L711,70L659,55L645,43L636,28L597,8L577,13L583,31L570,54L550,100L496,67L485,69L457,102L448,120L443,136L442,154L421,174L418,185L409,194L379,162L302,154L296,233L270,235L220,245L154,253L105,279L98,292L57,294L33,278L28,302L12,299Z",c:[{d:"M608,73L639,32L636,28L597,8L577,13L583,31L570,54L561,75Z",cx:603,cy:43},{d:"M635,102L676,92L682,61L659,55L645,43L639,32L608,73Z",cx:647,cy:67},{d:"M439,208L442,210L461,206L503,165L510,76L496,67L485,69L457,102L448,120L443,136L442,154L421,174L420,178Z",cx:473,cy:145},{d:"M581,153L555,87L550,100L510,76L503,165L566,169Z",cx:538,cy:126},{d:"M635,102L608,73L561,75L555,87L581,153L625,154Z",cx:601,cy:127},{d:"M625,154L681,203L708,181L721,144L676,92L635,102Z",cx:673,cy:149},{d:"M676,92L721,144L744,82L711,70L682,61Z",cx:715,cy:118},{d:"M291,234L302,235L354,160L302,154L296,233Z",cx:314,cy:196},{d:"M566,169L568,230L649,230L681,203L625,154L581,153Z",cx:614,cy:186},{d:"M215,311L242,312L292,234L270,235L220,245L169,251L176,274Z",cx:223,cy:263},{d:"M347,265L439,208L420,178L418,185L409,194L379,162L354,160L302,235Z",cx:364,cy:222},{d:"M453,285L503,302L551,272L550,247L461,206L442,210Z",cx:500,cy:259},{d:"M550,247L568,230L566,169L503,165L461,206Z",cx:527,cy:218},{d:"M564,289L653,307L649,230L568,230L550,247L551,272Z",cx:601,cy:259},{d:"M127,319L176,274L169,251L154,253L105,279L98,292L57,294L33,278L31,291Z",cx:133,cy:285},{d:"M271,339L318,342L355,314L347,265L302,235L292,234L242,312Z",cx:304,cy:288},{d:"M355,314L416,345L453,285L442,210L439,208L347,265Z",cx:400,cy:275},{d:"M416,345L421,359L513,356L503,302L453,285Z",cx:468,cy:324},{d:"M513,356L536,374L555,373L564,289L551,272L503,302Z",cx:534,cy:329},{d:"M127,319L31,291L28,302L12,299L8,312L38,318L56,338L81,370L111,375L116,401L142,407Z",cx:101,cy:354},{d:"M127,319L142,407L159,412L215,311L176,274Z",cx:160,cy:363},{d:"M271,339L242,312L215,311L159,412L203,425L225,436L243,431L251,433Z",cx:221,cy:376},{d:"M251,433L260,435L322,438L340,437L318,342L271,339Z",cx:294,cy:387},{d:"M318,342L340,437L345,437L354,441L418,383L421,359L416,345L355,314Z",cx:372,cy:371},{d:"M592,389L652,307L564,289L555,373Z",cx:593,cy:340},{d:"M592,389L602,409L669,426L704,413L659,343L653,307Z",cx:641,cy:366},{d:"M471,434L418,383L354,441L383,454L405,472L420,457L454,487Z",cx:414,cy:437},{d:"M471,434L498,427L536,374L513,356L421,359L418,383Z",cx:477,cy:405},{d:"M555,373L536,374L498,427L540,466L589,442L602,409L592,389Z",cx:551,cy:418},{d:"M454,487L456,488L454,496L475,513L533,494L540,466L498,427L471,434Z",cx:497,cy:476},{d:"M533,494L616,531L621,538L622,536L589,442L540,466Z",cx:569,cy:480},{d:"M589,442L622,536L651,523L669,426L602,409Z",cx:631,cy:483},{d:"M651,523L671,526L725,496L725,445L704,413L669,426Z",cx:693,cy:471},{d:"M671,526L761,617L768,602L746,566L742,556L744,550L725,516L725,496Z",cx:725,cy:561},{d:"M671,526L651,523L621,538L634,556L687,589L744,629L757,627L761,617Z",cx:689,cy:573}]},
     "Ohangaron shahri": {w:776,h:556,o:"M582,544L664,549L702,527L747,491L743,443L731,382L730,338L752,289L768,268L743,226L676,153L595,175L579,173L541,136L483,123L502,20L498,17L485,54L463,149L447,128L429,113L406,100L380,89L304,68L30,8L10,57L167,106L139,168L99,295L50,285L20,303L21,319L8,322L14,340L157,368L162,332L254,318L244,383L247,439L282,476L350,503L487,520Z",c:[{d:"M158,100L150,34L30,8L10,57L154,102Z",cx:83,cy:45},{d:"M158,100L236,128L280,63L150,34Z",cx:212,cy:81},{d:"M240,142L328,194L400,97L380,89L280,63L236,128Z",cx:305,cy:135},{d:"M328,194L403,230L497,126L483,123L502,20L498,17L485,54L463,149L447,128L429,113L400,97Z",cx:411,cy:125},{d:"M240,142L236,128L158,100L154,102L167,106L139,168L116,240L119,243L199,224Z",cx:171,cy:196},{d:"M418,305L513,273L539,136L497,126L403,230Z",cx:488,cy:183},{d:"M302,330L413,313L418,305L403,230L327,194L284,318Z",cx:356,cy:267},{d:"M513,273L574,344L649,321L666,303L608,172L595,175L579,173L541,136L539,136Z",cx:577,cy:224},{d:"M666,303L751,291L768,268L743,226L676,153L608,172Z",cx:698,cy:247},{d:"M119,243L116,240L99,295L50,285L20,303L21,319L8,322L14,340L121,361Z",cx:73,cy:299},{d:"M121,361L157,368L162,332L254,318L252,333L282,317L199,224L119,243Z",cx:184,cy:280},{d:"M199,224L282,317L284,318L327,194L240,142Z",cx:270,cy:271},{d:"M314,397L302,330L284,318L282,317L252,333L244,383L247,439L261,453Z",cx:278,cy:390},{d:"M314,397L368,449L452,407L413,313L302,330Z",cx:371,cy:364},{d:"M413,313L452,407L495,426L537,419L574,344L513,273L418,305Z",cx:499,cy:376},{d:"M574,344L537,419L591,478L683,437L649,321Z",cx:611,cy:381},{d:"M666,303L649,321L683,437L745,463L743,443L731,382L730,338L751,291Z",cx:696,cy:360},{d:"M368,449L314,397L261,453L282,476L350,503L361,504Z",cx:315,cy:451},{d:"M361,504L465,518L495,426L452,407L368,449Z",cx:421,cy:476},{d:"M591,478L537,419L495,426L465,518L487,520L582,544L598,545Z",cx:532,cy:498},{d:"M683,437L591,478L598,545L664,549L702,527L747,491L745,463Z",cx:659,cy:509}]},
-    "Nurafshon shahri": {w:776,h:680,o:"M171,487L187,495L218,504L243,510L289,512L290,476L320,474L328,520L354,518L362,506L378,505L401,524L378,552L383,556L366,582L403,596L422,600L427,585L452,590L443,627L470,635L469,661L478,660L479,673L568,617L571,592L542,585L554,526L650,547L655,530L671,529L673,485L614,446L597,458L580,443L602,429L626,416L636,417L672,385L672,370L693,364L718,383L733,385L768,337L733,294L724,288L708,266L680,298L652,270L604,335L577,336L573,334L574,302L549,276L542,271L511,229L486,248L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L409,148L377,93L387,83L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L379,45L378,54L348,65L315,70L300,60L289,65L279,63L236,69L214,106L201,93L186,113L158,119L152,113L142,117L138,130L129,134L131,140L75,163L79,174L39,195L8,218L26,222L92,182L157,152L169,169L181,132L271,96L289,110L321,185L316,194L348,248L328,266L330,269L310,286L203,363L214,366L214,385L220,386L217,427L195,461L199,469L181,479L169,483Z",c:[{d:"M378,97L377,93L387,83L414,76L442,84L456,93L473,85L465,69L497,41L472,8L456,12L422,32L379,45L378,54L348,65L334,67Z",cx:433,cy:50},{d:"M178,141L181,132L271,96L289,110L321,185L316,194L348,248L334,260L492,249L508,232L486,248L476,233L474,227L475,219L467,220L465,219L465,198L461,165L462,159L409,148L378,97L334,67L315,70L300,60L289,65L279,63L236,69L214,106L201,93L186,113L158,119L152,113L148,114Z",cx:386,cy:162},{d:"M263,387L321,336L315,282L295,297L203,363L214,366L214,371Z",cx:293,cy:317},{d:"M371,390L387,391L486,293L492,249L334,260L328,266L330,269L315,282L321,336Z",cx:391,cy:315},{d:"M492,249L486,293L516,395L603,421L633,305L630,299L604,335L577,336L573,334L574,302L549,276L542,271L511,229Z",cx:534,cy:320},{d:"M633,305L750,362L768,337L733,294L724,288L708,266L680,298L652,270L630,299Z",cx:711,cy:321},{d:"M448,449L463,451L516,395L486,293L387,391Z",cx:468,cy:342},{d:"M633,305L603,421L606,427L626,416L636,417L672,385L672,370L693,364L718,383L733,385L750,362Z",cx:650,cy:367},{d:"M267,465L263,387L214,371L214,385L220,386L217,427L203,451Z",cx:241,cy:407},{d:"M263,387L267,465L290,493L290,476L319,474L371,390L321,336Z",cx:306,cy:427},{d:"M267,465L203,451L195,461L199,469L181,479L169,483L171,487L187,495L218,504L243,510L289,512L290,493Z",cx:227,cy:481},{d:"M448,449L387,391L371,390L319,474L328,520L354,518L362,506L378,505L381,508Z",cx:380,cy:462},{d:"M495,510L659,518L619,449L614,446L597,458L580,443L606,427L603,421L516,395L463,451Z",cx:529,cy:455},{d:"M423,596L427,585L443,588L454,584L495,510L463,451L448,449L381,508L401,524L378,552L383,556L366,582L403,596L415,599Z",cx:435,cy:538},{d:"M454,584L549,629L568,617L571,592L542,585L554,526L650,547L655,530L671,529L671,527L659,518L495,510Z",cx:505,cy:565},{d:"M454,584L443,588L452,590L443,627L470,635L469,661L478,660L479,673L549,629Z",cx:497,cy:628}]},
+    "Nurafshon shahri": {w:720,h:940,o:"M250,48L300,70L352,118L398,150L430,204L438,232L398,236L372,262L398,300L378,330L432,356L500,392L548,452L566,520L556,588L520,636L512,700L486,792L470,900L442,866L430,792L404,742L356,706L300,690L250,700L214,636L238,566L150,520L110,470L150,356L210,300L188,236L150,214L196,150L230,108Z",c:[{d:"M250,48L300,70L324.0,92.2L265.2,199.1L193.4,153.6L196,150L230,108Z",cx:261,cy:123},{d:"M338.0,227.0L266.0,201.9L265.2,199.1L324.0,92.2L352,118L391.5,145.5Z",cx:328,cy:165},{d:"M265.2,199.1L266.0,201.9L234.8,268.3L203.8,281.9L188,236L150,214L193.4,153.6Z",cx:211,cy:215},{d:"M303.4,317.3L234.8,268.3L266.0,201.9L338.0,227.0L365.7,277.8Z",cx:299,cy:260},{d:"M365.7,277.8L338.0,227.0L391.5,145.5L398,150L430,204L438,232L398,236L372,262L386.8,283.7Z",cx:386,cy:213},{d:"M234.8,268.3L303.4,317.3L296.7,374.1L224.1,390.1L197.3,311.8L210,300L203.8,281.9Z",cx:249,cy:332},{d:"M224.1,390.1L209.5,411.1L127.5,420.1L150,356L197.3,311.8Z",cx:179,cy:376},{d:"M377.6,405.4L334.8,408.8L296.7,374.1L303.4,317.3L365.7,277.8L386.8,283.7L398,300L378,330L414.1,347.4Z",cx:352,cy:347},{d:"M427.0,464.9L377.6,405.4L414.1,347.4L432,356L500,392L536.1,437.1Z",cx:449,cy:411},{d:"M299.2,493.1L248.0,504.3L209.5,411.1L224.1,390.1L296.7,374.1L334.8,408.8Z",cx:272,cy:434},{d:"M209.5,411.1L248.0,504.3L212.0,552.4L150,520L110,470L127.5,420.1Z",cx:181,cy:476},{d:"M379.1,548.2L299.2,493.1L334.8,408.8L377.6,405.4L427.0,464.9L397.4,542.4Z",cx:365,cy:474},{d:"M397.4,542.4L427.0,464.9L536.1,437.1L548,452L566,520L556,588L532.9,618.8Z",cx:493,cy:522},{d:"M248.0,504.3L299.2,493.1L379.1,548.2L299.1,690.2L250,700L214,636L238,566L212.0,552.4Z",cx:286,cy:590},{d:"M379.1,548.2L397.4,542.4L532.9,618.8L520,636L515.6,671.5L358.0,707.5L356,706L300,690L299.1,690.2Z",cx:414,cy:634},{d:"M515.6,671.5L512,700L486,792L470,900L442,866L430,792L404,742L358.0,707.5Z",cx:453,cy:758}]},
     "Chirchiq shahri": {w:776,h:844,o:"M342,316L274,257L269,231L290,231L415,164L463,141L494,133L513,116L544,82L576,63L631,50L642,31L646,26L653,32L651,42L694,78L706,66L703,61L707,59L710,61L719,52L718,45L719,39L729,36L739,25L747,25L766,8L768,11L697,83L698,84L696,87L704,94L708,104L669,159L646,187L620,224L589,245L559,290L499,372L493,399L460,448L464,489L442,526L441,537L443,540L486,552L501,563L495,610L492,620L466,671L450,683L429,690L417,667L407,682L403,695L361,669L353,683L330,686L313,698L348,712L364,726L369,734L361,761L345,751L356,732L337,722L330,723L326,730L318,735L316,732L309,737L303,733L302,728L306,725L301,719L294,715L269,726L259,733L257,732L245,718L222,729L220,727L193,753L95,837L91,827L91,801L87,799L72,812L66,805L31,767L50,748L38,741L31,741L22,732L18,720L21,719L34,709L40,702L44,696L42,691L35,693L34,691L36,682L31,681L30,679L48,651L38,634L45,618L14,614L13,596L8,595L15,588L13,584L18,556L15,546L29,543L49,531L56,541L79,528L108,508L113,508L159,459L179,475L194,456L207,452L228,471L251,504L292,486L321,451L312,437L294,449L284,451L256,469L248,466L246,457L255,440L267,427L276,425L284,397L283,382L302,378L303,372L294,366L296,342L310,329L333,332Z",c:[{d:"M533,118L576,141L588,137L645,27L642,31L631,50L576,63L544,82L523,106Z",cx:572,cy:94},{d:"M658,157L664,164L708,104L704,94L696,87L698,84L697,83L768,11L766,8L747,25L739,25L729,36L719,39L718,45L719,52L710,61L707,59L703,61L706,66L694,78L678,65Z",cx:685,cy:85},{d:"M678,65L651,42L653,32L646,26L588,137L658,157Z",cx:638,cy:101},{d:"M359,222L418,198L427,175L422,161L341,204Z",cx:398,cy:187},{d:"M488,194L533,118L523,106L494,133L463,141L422,161L427,175Z",cx:478,cy:151},{d:"M508,226L570,200L576,141L533,118L488,194Z",cx:539,cy:168},{d:"M658,157L588,137L576,141L570,200L601,237L620,224L646,187L664,164Z",cx:606,cy:193},{d:"M334,288L354,273L359,222L341,204L290,231L269,231L274,257L285,267L304,284Z",cx:314,cy:244},{d:"M354,273L396,274L426,236L418,198L359,222Z",cx:384,cy:255},{d:"M426,236L462,257L507,232L508,226L488,194L427,175L418,198Z",cx:460,cy:212},{d:"M507,232L535,292L553,299L589,245L601,237L570,200L508,226Z",cx:549,cy:269},{d:"M355,340L449,338L449,338L396,274L354,273L334,288Z",cx:386,cy:313},{d:"M449,338L458,327L462,257L426,236L396,274Z",cx:439,cy:300},{d:"M458,327L535,292L507,232L462,257Z",cx:494,cy:274},{d:"M338,385L355,340L334,288L304,284L342,316L333,332L310,329L296,342L294,366L303,372L301,378Z",cx:328,cy:336},{d:"M342,392L374,407L460,385L449,338L355,340L338,385Z",cx:401,cy:362},{d:"M449,338L460,385L492,400L499,372L553,299L535,292L458,327Z",cx:482,cy:355},{d:"M342,392L338,385L301,378L283,382L284,397L276,425L267,427L255,440L248,454L256,466L259,467L284,451L294,449L312,437L318,446Z",cx:307,cy:411},{d:"M318,446L321,451L310,464L303,481L383,464L374,407L342,392Z",cx:352,cy:426},{d:"M383,464L414,483L461,386L460,385L374,407Z",cx:408,cy:435},{d:"M277,570L314,587L358,538L303,481L296,482Z",cx:311,cy:510},{d:"M358,538L383,540L421,503L414,483L383,464L304,481Z",cx:366,cy:493},{d:"M450,512L464,489L460,448L492,400L461,386L414,483L421,503Z",cx:442,cy:466},{d:"M48,597L61,538L56,541L49,531L29,543L15,546L18,556L13,584L15,588L8,595L13,596L14,609Z",cx:35,cy:570},{d:"M48,597L75,607L123,581L120,501L113,508L108,508L61,538Z",cx:89,cy:560},{d:"M200,540L126,494L120,501L123,581L157,600L204,552Z",cx:162,cy:546},{d:"M200,540L240,487L228,471L207,452L194,456L179,475L159,459L126,494Z",cx:190,cy:517},{d:"M204,552L243,581L277,570L296,482L292,486L251,504L240,487L200,540Z",cx:251,cy:522},{d:"M326,612L401,598L383,540L358,538L314,587Z",cx:363,cy:564},{d:"M164,647L157,600L123,581L75,607L98,647L150,658Z",cx:124,cy:627},{d:"M164,647L180,649L239,610L243,581L204,552L157,600Z",cx:199,cy:605},{d:"M383,540L401,598L417,611L444,607L488,553L443,540L441,537L442,526L450,512L421,503Z",cx:432,cy:576},{d:"M444,607L478,648L492,620L495,610L501,563L488,553Z",cx:480,cy:585},{d:"M65,695L98,647L75,607L48,597L14,609L14,614L45,618L38,634L48,651L30,679L31,681L36,682L35,693L42,691L43,694Z",cx:68,cy:641},{d:"M93,722L142,724L150,658L98,647L65,695Z",cx:113,cy:677},{d:"M239,610L180,649L224,689L273,668Z",cx:229,cy:658},{d:"M273,668L317,681L326,612L314,587L277,570L243,581L239,610Z",cx:290,cy:640},{d:"M317,681L324,690L330,686L353,683L361,669L389,687L417,611L401,598L326,612Z",cx:364,cy:641},{d:"M444,607L417,611L389,687L403,695L407,682L417,667L429,690L450,683L466,671L478,648Z",cx:437,cy:658},{d:"M65,780L93,722L65,695L43,694L40,702L34,709L18,720L22,732L31,741L38,741L50,748L31,767L50,787Z",cx:59,cy:741},{d:"M65,780L141,798L176,767L142,724L93,722Z",cx:120,cy:746},{d:"M224,689L180,649L164,647L150,658L142,724L176,767L210,737Z",cx:181,cy:707},{d:"M210,737L220,727L222,729L245,718L257,732L259,733L269,726L294,715L301,719L306,725L302,728L303,733L309,737L316,732L318,735L326,730L330,723L332,722L339,722L353,729L337,708L313,698L324,690L317,681L273,668L224,689Z",cx:272,cy:703},{d:"M65,780L50,787L72,812L87,799L91,801L91,827L95,837L141,798Z",cx:111,cy:806}]},
     "Yangiyo'l shahri": {w:680,h:916,o:"M8,727L16,741L32,756L36,760L43,779L52,790L57,807L37,824L32,831L17,831L87,865L88,866L100,862L111,853L122,854L128,852L133,844L143,836L151,829L150,822L148,817L170,823L177,827L166,848L140,888L167,908L202,842L213,825L228,825L258,842L268,845L280,847L286,846L294,844L307,836L314,842L334,802L379,719L379,746L462,592L487,620L493,612L518,635L522,632L523,598L510,581L517,572L506,561L519,546L506,531L673,215L654,207L648,184L649,173L646,165L638,157L619,173L610,163L610,161L615,154L612,147L608,135L592,138L562,140L554,134L524,105L515,89L512,51L506,45L487,31L469,9L466,8L461,11L461,14L467,24L467,29L461,31L456,37L434,55L441,77L424,116L410,130L398,134L381,157L371,164L362,174L353,188L347,201L352,212L352,219L353,225L350,230L339,239L335,246L326,253L308,258L304,264L303,272L297,280L287,285L277,286L267,291L263,298L265,310L263,318L258,325L260,333L260,338L263,351L261,354L257,355L248,354L224,367L215,368L208,378L200,386L174,404L173,406L178,417L176,432L171,444L163,455L160,462L155,467L144,469L131,468L128,471L124,484L122,487L114,487L110,489L111,497L109,499L122,526L134,541L119,551L118,554L112,558L108,555L103,546L98,550L94,566L96,572L91,617L65,654L58,660L13,722Z",c:[{d:"M525,163L548,129L524,105L518,97L514,83L512,51L506,45L487,31L466,8L461,11L461,14L467,24L467,29L461,31L456,37L434,55L441,77L424,116L410,130L398,134L394,141Z",cx:476,cy:90},{d:"M525,163L531,209L560,253L643,271L673,215L654,207L648,184L649,173L646,165L638,157L619,173L610,163L610,161L615,154L608,135L592,138L562,140L548,129Z",cx:590,cy:196},{d:"M531,209L525,163L394,141L381,157L371,164L362,174L353,188L347,201L352,212L353,225L350,230L339,239L335,246L326,252L386,305Z",cx:435,cy:218},{d:"M407,372L429,383L538,333L560,253L531,209L386,305Z",cx:489,cy:279},{d:"M560,253L538,333L581,389L643,271Z",cx:587,cy:302},{d:"M247,417L317,438L407,372L386,305L326,252L308,258L304,264L303,272L297,280L287,285L277,286L267,291L263,298L265,310L263,318L258,325L263,351L261,354L248,354L224,367L215,368L213,370Z",cx:328,cy:338},{d:"M501,511L513,518L581,389L538,333L429,383Z",cx:508,cy:450},{d:"M159,573L174,562L247,417L213,370L208,378L200,386L174,404L178,417L176,432L171,444L163,455L160,462L155,467L144,469L131,468L128,471L124,484L122,487L114,487L110,489L111,497L109,499L122,526L134,541L119,551L118,554L112,558L108,555L103,546L98,550L95,559L94,566L95,569Z",cx:171,cy:477},{d:"M339,535L317,438L247,417L174,562L335,543Z",cx:270,cy:487},{d:"M339,535L501,511L429,383L407,372L317,438Z",cx:403,cy:475},{d:"M347,618L335,543L174,562L159,573L207,636L317,651Z",cx:260,cy:595},{d:"M335,543L347,618L432,648L462,592L487,620L493,612L518,635L522,632L523,598L510,581L517,572L506,561L519,546L506,531L513,518L501,511L339,535Z",cx:427,cy:577},{d:"M209,734L207,636L159,573L95,569L96,572L91,617L79,634L125,737L186,749Z",cx:155,cy:685},{d:"M125,737L79,634L8,727L16,741L36,760L43,779L52,790L57,806Z",cx:72,cy:680},{d:"M209,734L318,770L317,651L207,636Z",cx:263,cy:693},{d:"M347,618L317,651L318,770L338,795L379,719L379,746L432,648Z",cx:364,cy:685},{d:"M186,749L125,737L28,836L88,866L100,862L111,853L122,854L128,852L133,844L151,829L148,817L170,823L176,826Z",cx:131,cy:783},{d:"M318,770L209,734L186,749L166,908L202,842L213,825L228,825L258,842L268,845L280,847L286,846L294,844L307,836L314,842L338,795Z",cx:254,cy:810}]},
   };
@@ -517,9 +559,9 @@
   // hudud nomini ko'rsatish: shahar => "X sh.", tuman => qisqa nom
   const tumDisp = t => t.label || (t.city ? t.name + " sh." : t.name);
   const tumFull = t => t.label ? t.name : (t.city ? t.name + " shahri" : t.name + " tumani");
-  // 0=qizil, 50=sariq, 100=yashil — uzluksiz rang shkalasi
+  // 0=to'q qizil, 45=to'q oxra, 78=to'q yashil, 100=to'q archa — jiddiy, og'ir rang shkalasi
   function kxiColor(score) {
-    const stops = [[0, [221, 77, 77]], [50, [232, 165, 50]], [81, [122, 184, 92]], [100, [27, 158, 134]]];
+    const stops = [[0, [229, 72, 77]], [50, [245, 159, 28]], [81, [64, 175, 110]], [100, [18, 165, 148]]];
     let a = stops[0], b = stops[stops.length - 1];
     for (let i = 0; i < stops.length - 1; i++) if (score >= stops[i][0] && score <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
     const t = b[0] === a[0] ? 0 : (score - a[0]) / (b[0] - a[0]);
@@ -1014,7 +1056,7 @@
     const C = 2 * Math.PI * 34;
     wrap.innerHTML = `
       <div class="hero-card hero-card--sec">
-        <div class="hero-card__top"><span>🛡 Kiber darajangiz</span></div>
+        <div class="hero-card__top"><span>Kiber darajangiz</span></div>
         <div class="sec-ring">
           <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-track"/><circle cx="40" cy="40" r="34" class="sr-prog" style="stroke-dasharray:${C};stroke-dashoffset:${C * (1 - secPct / 100)};stroke:${kxiColor(secPct)}"/></svg>
           <div class="sec-ring__c"><div class="sec-ring__pct">${secPct}%</div></div>
@@ -1022,12 +1064,12 @@
         <p class="hero-card__sub">${USER_SEC.length} tekshiruvdan <b>${done} tasi</b> bajarildi</p>
       </div>
       <div class="hero-card hero-card--task">
-        <div class="hero-card__top"><span>🔥 Bugungi vazifa</span></div>
+        <div class="hero-card__top"><span>Bugungi vazifa</span></div>
         <div class="task-body"><div class="task-ico">${ICON.exam}</div><div><div class="task-t">3 ta phishing savolini ishlang</div><div class="task-d">2 daqiqa · +10 ball</div></div></div>
         <button class="btn btn--gold btn--block" data-view="quiz">Boshlash</button>
       </div>
       <div class="hero-card hero-card--ball">
-        <div class="hero-card__top"><span>🏆 Mening ballarim</span></div>
+        <div class="hero-card__top"><span>Mening ballarim</span></div>
         <div class="ball-num">${fmtN(userBall)}<span>ball</span></div>
         <div class="ball-next">Keyingi badge: <b>${bi.next.name}</b></div>
         <div class="ball-bar"><i style="width:${bi.pct}%"></i></div>
@@ -1040,7 +1082,7 @@
     const secPct = USER_SEC.filter(s => s.ok).reduce((s, x) => s + x.w, 0);
     c.innerHTML = `
       <div class="seclevel__head">
-        <div><span class="eyebrow">🛡 Mening kiber pasportim</span><h3>Profilingiz qanchalik himoyalangan</h3></div>
+        <div><span class="eyebrow">Mening kiber pasportim</span><h3>Profilingiz qanchalik himoyalangan</h3></div>
         <div class="seclevel__pct" style="color:${kxiColor(secPct)}">${secPct}<span>%</span></div>
       </div>
       <div class="seclevel__bar"><i style="width:${secPct}%;background:${kxiColor(secPct)}"></i></div>
@@ -1052,6 +1094,67 @@
         </div>`).join("")}
       </div>`;
     wireViewBtns(c);
+  }
+  /* Dashboard — Murojaatlar bo'limi (Nurafshon shahri, rasmiy ma'lumot) */
+  function renderDashAppeals() {
+    const S = NUR_SUMMARY;
+    const rows = NUR_APPEALS.map(m => ({ ...m, rate: nurRate(m), safety: nurSafety(m), short: m.name.replace(" MFY", "") }));
+    const tot = rows.reduce((s, r) => s + r.murojaat, 0);
+    const per1000 = (tot / S.aholi * 1000).toFixed(2);
+
+    const st = $("#dashAppealsStats");
+    if (st) {
+      const cards = [
+        { num: tot, lab: "Jami murojaat · 16 mahalla", cls: "i-blue", ico: ICON.sms },
+        { num: fmtN(S.aholi), lab: "Qamrab olingan aholi", cls: "i-purple", ico: ICON.users },
+        { num: per1000, lab: "1000 aholiga murojaat", cls: "i-gold", ico: ICON.spark },
+        { num: S.topRiskIsh, lab: `Jinoyat ishi · ${S.topRisk.replace(" MFY", "")} (${S.topRiskIsh2025} tasi 2025)`, cls: "i-red", ico: ICON.alert }
+      ];
+      st.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+    }
+
+    const bars = $("#dashAppealsBars");
+    if (bars) {
+      const sorted = [...rows].sort((a, b) => b.murojaat - a.murojaat);
+      const max = sorted[0].murojaat || 1;
+      bars.innerHTML = `<div class="appeals-card__h">Mahallalar bo'yicha murojaatlar</div>
+        <div class="appeals-card__sub">Aholi soniga nisbatan zichlik bo'yicha ranglangan · eng ko'p — ${sorted[0].short} (${sorted[0].murojaat})</div>
+        <div class="appeals-barwrap">` +
+        sorted.map(r => `<div class="mbar"><div class="mbar__name">${r.short}</div><div class="mbar__track"><i style="width:${r.murojaat / max * 100}%;background:${kxiColor(r.safety)}"></i></div><div class="mbar__val">${r.murojaat}</div></div>`).join("") +
+        `</div>`;
+    }
+
+    const meth = $("#dashAppealsMethods");
+    if (meth) {
+      let acc = 0;
+      const stops = NUR_METHODS.map(m => { const a = acc; acc += m.pct; return `${m.c} ${a}% ${Math.min(100, acc)}%`; }).join(", ");
+      meth.innerHTML = `<div class="appeals-card__h">Jinoyat sodir etish usullari</div>
+        <div class="appeals-card__sub">Mahallalar kesimidagi ulush · jami ${tot} holat</div>
+        <div class="donut-wrap">
+          <div class="donut" style="background:conic-gradient(${stops})"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">holat</div></div></div>
+          <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${m.pct}%</b></div>`).join("")}</div>
+        </div>`;
+    }
+
+    const demo = $("#dashAppealsDemo");
+    if (demo) {
+      const soc = [["Ish bilan band", S.band, "#12A594"], ["Ishsiz", S.ishsiz, "#F5A623"], ["Nafaqada", S.nafaqa, "#3E7BFA"]];
+      demo.innerHTML = `<div class="appeals-card__h">Jabrlanuvchilar — ijtimoiy tarkib</div>
+        <div class="appeals-card__sub">${S.erkak + S.ayol} jabrlanuvchi · erkaklar ${S.erkak} · ayollar ${S.ayol}</div>
+        <div class="kxi-breakdown" style="padding:0">
+          ${soc.map(([k, v, c]) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${k}</span><span class="kxi-ind__w">${v}%</span></div><div class="kxi-ind__bar"><i style="width:${Math.min(100, v)}%;background:${c}"></i></div></div>`).join("")}
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:12px">O'rtacha yosh <b style="color:var(--navy)">${S.yoshAsosiy}</b> — mehnatga layoqatli, raqamli xizmatlardan faol foydalanuvchilar. ${S.yoshNote}.</p>`;
+    }
+
+    const risk = $("#dashAppealsRisk");
+    if (risk) {
+      const safest = [...rows].sort((a, b) => a.rate - b.rate).slice(0, 3).map(r => `${r.short} (${r.murojaat})`).join(" · ");
+      risk.innerHTML = `<div class="appeals-card__h">Xavf darajasi</div>
+        <div class="appeals-card__sub">Aholi soniga nisbatan murojaat zichligi</div>
+        <div class="kxi-rec kxi-red" style="margin:0 0 12px">${ICON.alert}<span><b>Eng yuqori — ${S.topRisk.replace(" MFY", "")}:</b> ${S.topRiskMurojaat} murojaat, ${S.topRiskIsh} ta jinoyat ishi qo'zg'atilgan (${S.topRiskIsh2025} tasi 2025-yil). Aholi zichligi va onlayn xarid yuqori — alohida nazorat talab qiladi.</span></div>
+        <div class="kxi-rec kxi-green" style="margin:0">${ICON.shieldCheck}<span><b>Nisbatan xavfsiz:</b> ${safest}. Bu mahallalarda 1000 aholiga to'g'ri keladigan murojaatlar eng past.</span></div>`;
+    }
   }
   function renderDayTip() {
     const c = $("#dashTip"); if (!c) return;
@@ -2343,9 +2446,9 @@ ${rowsHtml}
     const legend = $("#kxiLegend");
     if (legend) {
       const L = [
-        { cls: "kxi-green", dot: "🟢", t: "Xavfsiz mahalla", range: "81–100 ball", pts: ["Aholining ko'p qismi platformadan foydalanadi", "Test natijalari yuqori, firibgarlik kam", "Ko'ngillilar faol, ogohlantirishlar tez tarqaladi"], msg: "Platformada: «Mahalla holati: Xavfsiz 🟢»" },
-        { cls: "kxi-yellow", dot: "🟡", t: "Ogohlantirish darajasi", range: "51–80 ball", pts: ["Aholi faolligi pasaygan, testlar kam ishlangan", "Firibgarlik urinishlari ko'paygan", "Ko'ngillilar soni yetarli emas"], msg: "Tavsiya: «Mahallangizda kiber faollik pasaygan. Testlarda qatnashing va qo'shnilaringizni ogohlantiring.»" },
-        { cls: "kxi-red", dot: "🔴", t: "Yuqori xavf", range: "0–50 ball", pts: ["Firibgarliklar ko'p, foydalanuvchilar juda kam", "Kiber savodxonlik past", "Ko'ngillilar ishlamayapti"], msg: "Avtomatik tavsiya: targ'ibot o'tkazish, jonli seminar, qo'shimcha ogohlantirish" }
+        { cls: "kxi-green", dot: "●", t: "Xavfsiz mahalla", range: "81–100 ball", pts: ["Aholining ko'p qismi platformadan foydalanadi", "Test natijalari yuqori, firibgarlik kam", "Ko'ngillilar faol, ogohlantirishlar tez tarqaladi"], msg: "Platformada: «Mahalla holati: Xavfsiz»" },
+        { cls: "kxi-yellow", dot: "●", t: "Ogohlantirish darajasi", range: "51–80 ball", pts: ["Aholi faolligi pasaygan, testlar kam ishlangan", "Firibgarlik urinishlari ko'paygan", "Ko'ngillilar soni yetarli emas"], msg: "Tavsiya: «Mahallangizda kiber faollik pasaygan. Testlarda qatnashing va qo'shnilaringizni ogohlantiring.»" },
+        { cls: "kxi-red", dot: "●", t: "Yuqori xavf", range: "0–50 ball", pts: ["Firibgarliklar ko'p, foydalanuvchilar juda kam", "Kiber savodxonlik past", "Ko'ngillilar ishlamayapti"], msg: "Avtomatik tavsiya: targ'ibot o'tkazish, jonli seminar, qo'shimcha ogohlantirish" }
       ];
       legend.innerHTML = L.map(x => `
         <div class="card kxi-leg ${x.cls}">
@@ -2367,7 +2470,7 @@ ${rowsHtml}
           </div>
           <div class="kxitable__detail" id="kxiDetail${i}">
             <div class="kxi-breakdown">
-              ${r.sub.map((v, k) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${KXI_WEIGHTS[k].k}</span><span class="kxi-ind__w">${v}/100 · ulush ${KXI_WEIGHTS[k].w}%</span></div><div class="kxi-ind__bar"><i style="width:${v}%;background:${v >= 81 ? "var(--teal)" : v >= 51 ? "var(--gold)" : "var(--red)"}"></i></div></div>`).join("")}
+              ${r.sub.map((v, k) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${KXI_WEIGHTS[k].k}</span><span class="kxi-ind__w">${v}/100 · ulush ${KXI_WEIGHTS[k].w}%</span></div><div class="kxi-ind__bar"><i style="width:${v}%;background:${kxiColor(v)}"></i></div></div>`).join("")}
             </div>
             <div class="kxi-rec ${r.lvl.cls}">${ICON.alert}<span><b>Tavsiya:</b> ${KXI_REC[r.lvl.key]}</span></div>
           </div>`).join("");
@@ -2433,264 +2536,426 @@ ${rowsHtml}
 
   function districtGeo(distRef) { return TV_DIST[tumFull(distRef)] || null; }
 
+  /* Nurafshon shahri — murojaatlar xaritasi (real ma'muriy kontur + 16 mahalla) */
+  /* ============================================================
+     KXI xaritasi — ikki bosqich:
+       1) Toshkent viloyati (22 hudud) — Nurafshon real, qolganlari DEMO
+       2) hudud ichi — Nurafshon uchun to'liq murojaatlar tahlili,
+          boshqa hududlar uchun demo mahalla ko'rinishi
+     ============================================================ */
+  function mapCards(cards) {
+    const sum = $("#mapSummary"); if (!sum) return;
+    sum.classList.add("stat-grid--5");
+    sum.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
+  }
+  function setMapChrome(title, lo, hi, lab) {
+    const t = $("#mapCardTitle"); if (t) t.textContent = title;
+    const a = $("#mapScaleLo"); if (a) a.textContent = lo;
+    const b = $("#mapScaleHi"); if (b) b.textContent = hi;
+    const c = $("#mapScaleLab"); if (c) c.textContent = lab;
+  }
+  // Hover "pop": asl katakcha joyida qoladi, ustiga alohida qatlamga nusxa chiziladi.
+  // (asl elementni DOM'da ko'chirish hover holatini uzib qo'yadi — shuning uchun nusxa.)
+  let mapPopTimer = null;
+  function mapPopIn(svg, gEl) {
+    const hi = svg.querySelector(".mhi"); if (!hi) return;
+    clearTimeout(mapPopTimer);
+    const clone = gEl.cloneNode(true);
+    clone.removeAttribute("data-cell"); clone.removeAttribute("data-i");
+    clone.classList.add("mcell--pop");
+    hi.replaceChildren(clone);
+    void clone.getBoundingClientRect();   // reflow — o'tish animatsiyasi boshlanishi uchun
+    clone.classList.add("is-on");
+  }
+  function mapPopOut(svg) {
+    const hi = svg.querySelector(".mhi"); if (!hi) return;
+    const clone = hi.firstElementChild;
+    if (clone) clone.classList.remove("is-on");
+    clearTimeout(mapPopTimer);
+    mapPopTimer = setTimeout(() => hi.replaceChildren(), 340);
+  }
+  function wireHover(svg, tip, gEl, tipHtml, onClick) {
+    gEl.addEventListener("mouseenter", () => mapPopIn(svg, gEl));
+    gEl.addEventListener("mousemove", e => {
+      const stage = svg.closest(".map-stage").getBoundingClientRect();
+      tip.style.left = (e.clientX - stage.left) + "px";
+      tip.style.top = (e.clientY - stage.top) + "px";
+      tip.innerHTML = tipHtml();
+      tip.classList.add("is-on");
+    });
+    gEl.addEventListener("mouseleave", () => { tip.classList.remove("is-on"); mapPopOut(svg); });
+    if (onClick) gEl.addEventListener("click", onClick);
+  }
+
   function renderMap() {
     const wrap = $("#view-kxi"); if (!wrap || !$("#mapSvg")) return;
-    const own = TUMANLAR.find(t => t.own);
-    const role = currentRole;
-    // rejim: region | district | mahallaScope
-    let mode = "region", distRef = null;
-    if (role === "raisi") { mode = "mahallaScope"; distRef = own; }
-    else if (role === "tuman") { mode = "district"; distRef = own; }
-    else if (mapDrill) { mode = "district"; distRef = mapDrill; }
+    const svg = $("#mapSvg"), tip = $("#mapTip");
+    if (!mapDrill) return renderRegionMap(svg, tip);
+    if (mapDrill.own) return renderNurafshonMap(svg, tip);
+    return renderDemoDistrictMap(svg, tip, mapDrill);
+  }
 
-    const title = $("#mapTitle"), lead = $("#mapLead"), scope = $("#mapScope");
-    const svg = $("#mapSvg"), tip = $("#mapTip"), crumb = $("#mapCrumb");
-    const geoNorm = x => (x || "").replace(/[\u2018\u2019\u02bb\u02bc`]/g, "'").trim();
+  /* ---- 1-bosqich: Toshkent viloyati ---- */
+  function nurAggSafety() {
+    const arr = NUR_APPEALS.map(m => nurSafety(m));
+    return Math.round(arr.reduce((s, v) => s + v, 0) / arr.length);
+  }
+  // Nurafshon shahri viloyat xaritasida juda kichik — uni ko'rsatuvchi bosiladigan chaqiruv belgisi
+  function nurCallout(drawn) {
+    const hit = drawn.find(x => x.u.own); if (!hit) return "";
+    const g = hit.g, u = hit.u;
+    const bw = 300, bh = 74, bx = g.cx - bw / 2, by = g.cy - 168;
+    return `<g class="mcall" data-call="1">
+      <line class="mcall__lead" x1="${g.cx}" y1="${g.cy - 14}" x2="${g.cx}" y2="${by + bh}"/>
+      <circle class="mcall__ring" cx="${g.cx}" cy="${g.cy}" r="20"/>
+      <circle class="mcall__dot" cx="${g.cx}" cy="${g.cy}" r="11"/>
+      <rect class="mcall__box" x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="14"/>
+      <text class="mcall__t" x="${g.cx}" y="${by + 32}">Nurafshon shahri</text>
+      <text class="mcall__s" x="${g.cx}" y="${by + 57}">KXI ${u.score} · bosing →</text>
+    </g>`;
+  }
 
-    // --- birliklar ---
-    let units;
-    if (mode === "region") {
-      units = TUMANLAR.map(t => ({ name: t.name, disp: tumDisp(t), full: tumFull(t), score: t.kxi, aholi: t.aholi, users: t.users, cov: t.users / t.aholi * 100, mahallas: t.mahallas, own: t.own, ref: t }));
-    } else {
-      units = tumanMahallas(distRef).map((m, i) => ({ name: m.name, score: m.score, idx: i, mhz: m }));
-    }
-    units.forEach(u => u.lvl = kxiLevel(u.score));
-    const ownIdx = 0; // raisi mahallasi — Navbahor (namunaning birinchisi)
+  function renderRegionMap(svg, tip) {
+    const geoByName = {}; TV_GEO.forEach(g => geoByName[g.n] = g);
+    const units = TUMANLAR.map(t => {
+      const score = t.own ? nurAggSafety() : t.kxi;
+      return { t, name: t.name, disp: tumDisp(t), full: tumFull(t), own: !!t.own,
+               score, lvl: kxiLevel(score), aholi: t.aholi, users: t.users, mahallas: t.mahallas };
+    });
+    const avg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
+    const totMahallas = TUMANLAR.reduce((s, t) => s + t.mahallas, 0);
+    const totUsers = TUMANLAR.reduce((s, t) => s + t.users, 0);
+    const totAholi = TUMANLAR.reduce((s, t) => s + t.aholi, 0);
+    const counts = { green: 0, yellow: 0, red: 0 }; units.forEach(u => counts[u.lvl.key]++);
 
-    // --- sarlavha / scope / crumb ---
-    if (mode === "region") {
-      if (title) title.textContent = `${REGION_NAME} — hududlar xaritasi`;
-      if (lead) lead.textContent = "Hudud ustiga bosing — o'sha tumanning real xaritasi ochiladi.";
-      if (scope) { scope.className = "scope-banner scope-banner--admin";
-        scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Superadmin · ${REGION_NAME}</h3><p>Barcha <b>${units.length} hudud</b>, <b>${fmtN(TUMANLAR.reduce((s, t) => s + t.mahallas, 0))} rasmiy mahalla</b>. Hududni tanlang — real tuman xaritasi ochiladi.</p></div>`; }
-      if (crumb) crumb.innerHTML = `<span class="crumb__seg is-cur">${ICON.map} ${REGION_NAME}</span>`;
-    } else if (mode === "district") {
-      const full = tumFull(distRef);
-      if (title) title.textContent = `${full} xaritasi`;
-      if (lead) lead.textContent = `Real kontur ichida ${distRef.mahallas} ta mahalla uchastkasi. Mahalla ustiga bosing — statistikasi ochiladi.`;
-      if (scope) {
-        if (role === "tuman") { scope.className = "scope-banner scope-banner--tuman";
-          scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Tuman mas'uli · ${full}</h3><p>Tumandagi <b>${distRef.mahallas} ta rasmiy mahalla</b>. Boshqa hududlar yopiq.</p></div>`; }
-        else { scope.className = "scope-banner scope-banner--admin";
-          scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Superadmin · ${full}</h3><p><b>${distRef.mahallas} ta mahalla</b> · aholi <b>${fmtN(distRef.aholi)}</b> · foydalanuvchi <b>${fmtN(distRef.users)}</b>.</p></div>`; }
-      }
-      if (crumb) crumb.innerHTML = role === "tuman"
-        ? `<span class="crumb__seg is-cur">${ICON.map} ${full}</span>`
-        : `<button class="crumb__seg crumb__back" id="crumbBack">${ICON.map} ${REGION_NAME}</button><span class="crumb__sep">›</span><span class="crumb__seg is-cur">${full}</span><button class="crumb__return" id="crumbReturn">← Viloyatga qaytish</button>`;
-    } else { // mahallaScope
-      const full = tumFull(distRef);
-      const mName = units[ownIdx].name;
-      if (title) title.textContent = `${mName} — mahalla statistikasi`;
-      if (lead) lead.textContent = "Faqat o'z mahallangiz ma'lumotlari ochiq. Qo'shni mahallalar yopiq ko'rinadi.";
-      if (scope) { scope.className = "scope-banner scope-banner--raisi";
-        scope.innerHTML = `<div class="scope-banner__ico">${ICON.building}</div><div><h3>Yoshlar yetakchisi · ${mName}</h3><p>${full} tarkibida. Faqat <b>o'z mahallangiz</b> statistikasi ko'rinadi — boshqa ${distRef.mahallas - 1} mahalla yopiq.</p></div>`; }
-      if (crumb) crumb.innerHTML = `<span class="crumb__seg">${ICON.map} ${full}</span><span class="crumb__sep">›</span><span class="crumb__seg is-cur">${mName}</span>`;
-    }
+    $("#mapTitle") && ($("#mapTitle").textContent = "Toshkent viloyati — kiberxavfsizlik indeksi");
+    $("#mapLead") && ($("#mapLead").textContent = "Hudud ustiga bosing. Nurafshon shahri — to'liq real tahlil, qolgan hududlar — demo ko'rsatkich.");
+    const scope = $("#mapScope");
+    if (scope) { scope.className = "scope-banner scope-banner--admin";
+      scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Toshkent viloyati</h3><p><b>${units.length} hudud</b> · <b>${fmtN(totMahallas)} mahalla</b> · o'rtacha KXI <b>${avg}</b>. Nurafshon shahri ustiga bosib to'liq murojaatlar tahlilini oching.</p></div>`; }
+    const crumb = $("#mapCrumb");
+    if (crumb) crumb.innerHTML = `<span class="crumb__seg is-cur">${ICON.map} ${REGION_NAME}</span>`;
 
-    // --- summary kartalar ---
-    const sum = $("#mapSummary");
-    if (sum) {
-      let cards;
-      if (mode === "region") {
-        const avg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
-        const totA = TUMANLAR.reduce((s, t) => s + t.aholi, 0), totU = TUMANLAR.reduce((s, t) => s + t.users, 0);
-        cards = [
-          { num: units.length, lab: "Hududlar", cls: "i-blue", ico: ICON.map },
-          { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
-          { num: fmtN(TUMANLAR.reduce((s, t) => s + t.mahallas, 0)), lab: "Mahallalar (rasmiy)", cls: "i-purple", ico: ICON.building },
-          { num: fmtN(totU), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
-          { num: (totU / totA * 100).toFixed(1) + "%", lab: `Qamrov · ${(totA / 1e6).toFixed(2).replace(".", ",")} mln aholidan`, cls: "i-amber", ico: ICON.target }
-        ];
-      } else if (mode === "district") {
-        const avg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
-        cards = [
-          { num: units.length, lab: "Mahallalar", cls: "i-blue", ico: ICON.map },
-          { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
-          { num: fmtN(distRef.aholi), lab: "Aholi soni", cls: "i-purple", ico: ICON.building },
-          { num: fmtN(distRef.users), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
-          { num: (distRef.users / distRef.aholi * 100).toFixed(1) + "%", lab: "Qamrov (aholidan)", cls: "i-amber", ico: ICON.target }
-        ];
-      } else {
-        const m = units[ownIdx]; const st = mahallaStats(distRef, m.mhz, ownIdx);
-        cards = [
-          { num: m.score, lab: "Mahalla KXI", cls: "i-gold", ico: ICON.spark },
-          { num: m.lvl.dot + " " + m.lvl.label, lab: "Holat", cls: "i-blue", ico: ICON.shieldCheck },
-          { num: fmtN(st.aholi), lab: "Aholi (taxm.)", cls: "i-purple", ico: ICON.building },
-          { num: fmtN(st.users), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
-          { num: st.faol + "%", lab: "Faollik darajasi", cls: "i-amber", ico: ICON.target }
-        ];
-      }
-      sum.classList.add("stat-grid--5");
-      sum.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
-    }
+    mapCards([
+      { num: units.length, lab: "Hududlar", cls: "i-blue", ico: ICON.map },
+      { num: avg, lab: "O'rtacha KXI", cls: "i-gold", ico: ICON.spark },
+      { num: fmtN(totMahallas), lab: "Jami mahalla", cls: "i-purple", ico: ICON.building },
+      { num: fmtN(totUsers), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
+      { num: (totUsers / totAholi * 100).toFixed(1) + "%", lab: "Qamrov (aholidan)", cls: "i-amber", ico: ICON.target }
+    ]);
 
-    // --- xarita ---
-    function wireCell(gEl, u, onClick) {
-      gEl.addEventListener("mousemove", e => {
+    svg.classList.add("mapsvg--geo"); svg.classList.add("mapsvg--region"); svg.classList.remove("mapsvg--mhz");
+    svg.setAttribute("viewBox", `0 0 ${TV_VIEW.w} ${TV_VIEW.h}`);
+    const drawn = units.map(u => ({ u, g: geoByName[u.full] })).filter(x => x.g).sort((a, b) => b.g.a - a.g.a);
+    svg.innerHTML = drawn.map(({ u, g }, i) => {
+      const fill = kxiColor(u.score), dark = u.score >= 45;
+      const nameFill = dark ? "#fff" : "rgba(18,33,59,.9)", valFill = dark ? "rgba(255,255,255,.9)" : "rgba(18,33,59,.75)";
+      let label = "";
+      if (g.a >= 6000) label = `<text x="${g.cx}" y="${g.cy - 4}" class="mcell__name" fill="${nameFill}">${u.disp}</text><text x="${g.cx}" y="${g.cy + 16}" class="mcell__val" fill="${valFill}">${u.score}</text>`;
+      else if (g.a >= 2200) label = `<text x="${g.cx}" y="${g.cy - 2}" class="mcell__name mcell__name--sm" fill="${nameFill}">${u.disp}</text><text x="${g.cx}" y="${g.cy + 13}" class="mcell__val mcell__val--sm" fill="${valFill}">${u.score}</text>`;
+      else label = `<circle cx="${g.cx}" cy="${g.cy}" r="5" class="mcell__mark"/>`;
+      // kichik hududlar uchun kengaytirilgan bosish maydoni (aks holda bir necha piksel bo'lib qoladi)
+      const hit = g.a < 2200 ? `<circle cx="${g.cx}" cy="${g.cy}" r="22" class="mcell__hit"/>` : "";
+      return `<g class="mcell${u.own ? " mcell--own" : ""}${g.a < 2200 ? " mcell--tiny" : ""}" data-i="${i}"><path d="${g.d}" fill="${fill}" fill-rule="evenodd" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>${label}${hit}</g>`;
+    }).join("") + nurCallout(drawn) + `<g class="mhi"></g><path class="dist-outline" d="M0 0"/>`;
+
+    svg.querySelectorAll(".mcell").forEach(gEl => {
+      const u = drawn[+gEl.dataset.i].u;
+      wireHover(svg, tip, gEl,
+        () => `<div class="mtip__t">${u.full}${u.own ? " · REAL" : " · demo"}</div>
+          <div class="mtip__row"><span>KXI</span><b>${u.score}</b></div>
+          <div class="mtip__row"><span>Holat</span><b>${u.lvl.dot} ${u.lvl.label}</b></div>
+          <div class="mtip__row"><span>Aholi</span><b>${fmtN(u.aholi)}</b></div>
+          <div class="mtip__row"><span>Mahalla</span><b>${u.mahallas}</b></div>
+          <div class="mtip__cta">${u.own ? "Bosing — to'liq tahlil" : "Bosing — demo ko'rinish"}</div>`,
+        () => { mapDrill = u.t; renderMap(); });
+    });
+
+    // Nurafshon chaqiruv belgisi — bevosita to'liq tahlilga olib kiradi
+    const call = svg.querySelector(".mcall");
+    if (call) {
+      const own = TUMANLAR.find(t => t.own);
+      call.addEventListener("click", () => { mapDrill = own; renderMap(); });
+      call.addEventListener("mousemove", e => {
         const stage = svg.closest(".map-stage").getBoundingClientRect();
-        tip.style.left = (e.clientX - stage.left) + "px"; tip.style.top = (e.clientY - stage.top) + "px";
-        tip.innerHTML = gEl.classList.contains("is-locked")
-          ? `<div class="mtip__t">${u.name}</div><div class="mtip__row"><span>Holat</span><b>🔒 Yopiq</b></div><div class="mtip__cta">Faqat o'z mahallangiz ochiq</div>`
-          : `<div class="mtip__t">${u.full || u.name}</div><div class="mtip__row"><span>KXI</span><b>${u.score}</b></div><div class="mtip__row"><span>Holat</span><b>${u.lvl.dot} ${u.lvl.label}</b></div>${u.aholi ? `<div class="mtip__row"><span>Aholi</span><b>${fmtN(u.aholi)}</b></div>` : ""}${u.users ? `<div class="mtip__row"><span>Foydalanuvchi</span><b>${fmtN(u.users)}</b></div>` : ""}${u.cov ? `<div class="mtip__row"><span>Qamrov</span><b class="mtip__cov">${u.cov.toFixed(1)}%</b></div>` : ""}${u.mahallas ? `<div class="mtip__row"><span>Mahalla</span><b>${u.mahallas}</b></div>` : ""}<div class="mtip__cta">${mode === "region" ? "Bosing — tuman xaritasi ochiladi" : "Bosing — mahalla statistikasi"}</div>`;
+        tip.style.left = (e.clientX - stage.left) + "px";
+        tip.style.top = (e.clientY - stage.top) + "px";
+        tip.innerHTML = `<div class="mtip__t">Nurafshon shahri · REAL</div>
+          <div class="mtip__row"><span>Mahalla</span><b>16</b></div>
+          <div class="mtip__row"><span>Murojaat</span><b>${NUR_SUMMARY.murojaat}</b></div>
+          <div class="mtip__cta">Bosing — mahallalar xaritasi</div>`;
         tip.classList.add("is-on");
       });
-      gEl.addEventListener("mouseleave", () => tip.classList.remove("is-on"));
-      if (onClick) gEl.addEventListener("click", onClick);
-    }
-    function selectMapUnit(gEl, u) {
-      svg.querySelectorAll(".mcell").forEach(x => x.classList.remove("is-sel"));
-      if (gEl) gEl.classList.add("is-sel");
-      if (mode === "region") renderMapDetail(u);
-      else renderMahallaDetail(u.mhz, distRef, u.idx);
-      $$("#mapBars .mbar").forEach(b => b.classList.toggle("is-sel", b.dataset.bar === u.name));
-    }
-    renderMap._select = selectMapUnit;
-
-    if (svg && mode === "region") {
-      const byName = {}; TV_GEO.forEach(g => byName[geoNorm(g.n)] = g);
-      const drawn = [];
-      units.forEach(u => { const g = byName[geoNorm(u.full)]; if (g) drawn.push({ u, g }); });
-      drawn.sort((a, b) => b.g.a - a.g.a);
-      svg.setAttribute("viewBox", `0 0 ${TV_VIEW.w} ${TV_VIEW.h}`);
-      svg.classList.add("mapsvg--geo");
-      svg.innerHTML = drawn.map(({ u, g }, i) => {
-        const fill = kxiColor(u.score); const dark = u.score >= 51;
-        const nameFill = dark ? "#fff" : "#7a2030", valFill = dark ? "rgba(255,255,255,.88)" : "rgba(122,32,48,.85)";
-        let label = "";
-        if (g.a >= 6000) label = `<text x="${g.cx}" y="${g.cy - 5}" class="mcell__name" fill="${nameFill}">${u.disp || u.name}</text><text x="${g.cx}" y="${g.cy + 15}" class="mcell__val" fill="${valFill}">${u.score}</text>`;
-        else if (g.a >= 2500) label = `<text x="${g.cx}" y="${g.cy - 3}" class="mcell__name mcell__name--sm" fill="${nameFill}">${u.disp || u.name}</text><text x="${g.cx}" y="${g.cy + 12}" class="mcell__val mcell__val--sm" fill="${valFill}">${u.score}</text>`;
-        else label = `<circle cx="${g.cx}" cy="${g.cy}" r="5" class="mcell__mark"/>`;
-        const you = u.own ? `<text x="${g.cx}" y="${g.cy - 24}" class="mcell__you mcell__you--geo">SIZ</text>` : "";
-        return `<g class="mcell${g.a < 2500 ? " mcell--tiny" : ""}" data-cell="${i}"><path d="${g.d}" fill="${fill}" fill-rule="evenodd" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>${label}${you}</g>`;
-      }).join("");
-      renderMap._units = drawn.map(x => x.u);
-      svg.querySelectorAll(".mcell").forEach(gEl => {
-        const u = drawn[+gEl.dataset.cell].u;
-        wireCell(gEl, u, () => { mapDrill = u.ref; renderMap(); }); // DRILL: real tuman xaritasi
-      });
-    } else if (svg) {
-      // district yoki mahallaScope — real tuman konturi + Voronoi uchastkalar
-      const geo = districtGeo(distRef);
-      svg.classList.add("mapsvg--geo");
-      if (geo) {
-        svg.setAttribute("viewBox", `0 0 ${geo.w} ${geo.h}`);
-        const dense = units.length > 30;
-        const locked = mode === "mahallaScope";
-        svg.innerHTML =
-          `<path class="dist-under" d="${geo.o}"/>` +
-          units.map((u, i) => {
-            const cell = geo.c[i]; if (!cell) return "";
-            const isOwn = locked && i === ownIdx;
-            const fill = locked && !isOwn ? "url(#lockhatch)" : kxiColor(u.score);
-            const dark = u.score >= 51;
-            let label = "";
-            if (!locked || isOwn) {
-              label = dense && !isOwn
-                ? `<text x="${cell.cx}" y="${cell.cy + 4}" class="mcell__val mcell__val--sm" fill="${dark ? "rgba(255,255,255,.92)" : "rgba(122,32,48,.85)"}">${u.score}</text>`
-                : `<text x="${cell.cx}" y="${cell.cy - 2}" class="mcell__name mcell__name--sm" fill="${dark ? "#fff" : "#7a2030"}">${u.name.replace(" MFY", "")}</text><text x="${cell.cx}" y="${cell.cy + 13}" class="mcell__val mcell__val--sm" fill="${dark ? "rgba(255,255,255,.88)" : "rgba(122,32,48,.85)"}">${u.score}</text>`;
-            }
-            const you = isOwn ? `<text x="${cell.cx}" y="${cell.cy - 18}" class="mcell__you mcell__you--geo">SIZ</text>` : "";
-            return `<g class="mcell${locked && !isOwn ? " is-locked" : ""}" data-cell="${i}"><path d="${cell.d}" fill="${locked && !isOwn ? "#d7dcea" : fill}" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>${label}${you}</g>`;
-          }).join("") +
-          `<path class="dist-outline" d="${geo.o}"/>`;
-        renderMap._units = units;
-        svg.querySelectorAll(".mcell").forEach(gEl => {
-          const u = units[+gEl.dataset.cell];
-          const lockedCell = gEl.classList.contains("is-locked");
-          wireCell(gEl, u, lockedCell ? null : () => selectMapUnit(gEl, u));
-        });
-        // raisi: o'z mahallasini avtomatik tanlash
-        if (locked) {
-          const ownEl = svg.querySelector(`.mcell[data-cell="${ownIdx}"]`);
-          selectMapUnit(ownEl, units[ownIdx]);
-        }
-      }
+      call.addEventListener("mouseleave", () => tip.classList.remove("is-on"));
     }
 
-    // --- donut yoki ko'rsatkichlar ---
     const donut = $("#mapDonut");
     if (donut) {
-      if (mode === "mahallaScope") {
-        const st = mahallaStats(distRef, units[ownIdx].mhz, ownIdx);
-        donut.innerHTML = `<div style="width:100%">${st.sub.map((v, k) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${KXI_WEIGHTS[k].k}</span><span class="kxi-ind__w">${v}/100</span></div><div class="kxi-ind__bar"><i style="width:${v}%;background:${v >= 81 ? "var(--teal)" : v >= 51 ? "var(--gold)" : "var(--red)"}"></i></div></div>`).join("")}</div>`;
-      } else {
-        const counts = { green: 0, yellow: 0, red: 0 };
-        units.forEach(u => counts[u.lvl.key]++);
-        const tot = units.length, gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
-        donut.innerHTML = `
-          <div class="donut" style="background:conic-gradient(var(--teal) 0 ${gp}%, var(--gold) ${gp}% ${gp + yp}%, var(--red) ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">${mode === "region" ? "hudud" : "mahalla"}</div></div></div>
-          <div class="donut__legend">
-            <div><span class="dleg" style="background:var(--teal)"></span>Xavfsiz 🟢 <b>${counts.green}</b></div>
-            <div><span class="dleg" style="background:var(--gold)"></span>Ogohlantirish 🟡 <b>${counts.yellow}</b></div>
-            <div><span class="dleg" style="background:var(--red)"></span>Yuqori xavf 🔴 <b>${counts.red}</b></div>
-          </div>`;
-      }
+      const tot = units.length, gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
+      donut.innerHTML = `
+        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #f5a623 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">hudud</div></div></div>
+        <div class="donut__legend">
+          <div><span class="dleg" style="background:#40af6e"></span>Xavfsiz <b>${counts.green}</b></div>
+          <div><span class="dleg" style="background:#f5a623"></span>Ogohlantirish <b>${counts.yellow}</b></div>
+          <div><span class="dleg" style="background:#e5484d"></span>Yuqori xavf <b>${counts.red}</b></div>
+        </div>`;
     }
 
-    // --- reyting bars ---
     const bars = $("#mapBars");
     if (bars) {
-      if (mode === "mahallaScope") {
-        const m = units[ownIdx];
-        const distAvg = Math.round(units.reduce((s, u) => s + u.score, 0) / units.length);
-        bars.innerHTML = `
-          <p style="font-size:13px;color:var(--muted);margin:0 0 12px">Mahallangiz tuman o'rtachasi bilan taqqoslanadi. Boshqa mahallalarning alohida ko'rsatkichlari yopiq.</p>
-          <div class="mbar is-you"><div class="mbar__name"><span class="kxi-you">SIZ</span> ${m.name.replace(" MFY", "")}</div><div class="mbar__track"><i style="width:${m.score}%;background:${kxiColor(m.score)}"></i></div><div class="mbar__val">${m.score}</div></div>
-          <div class="mbar"><div class="mbar__name">${tumFull(distRef)} o'rtachasi</div><div class="mbar__track"><i style="width:${distAvg}%;background:${kxiColor(distAvg)}"></i></div><div class="mbar__val">${distAvg}</div></div>`;
-      } else {
-        const modeBar = renderMap._barMode || "kxi";
-        const covMax = Math.max(...units.map(x => x.cov || 0), 1);
-        const rowHtml = u => {
-          const w = modeBar === "cov" ? (u.cov / covMax * 100) : u.score;
-          const col = modeBar === "cov" ? "var(--blue)" : kxiColor(u.score);
-          const vtxt = modeBar === "cov" ? (u.cov || 0).toFixed(1) + "%" : u.score;
-          return `<div class="mbar mbar--click${u.own ? " is-you" : ""}" data-bar="${u.name}" title="Xaritada ko'rsatish"><div class="mbar__name">${u.own ? '<span class="kxi-you">SIZ</span> ' : ""}${(u.disp || u.name).replace(" MFY", "")}</div><div class="mbar__track"><i style="width:${w}%;background:${col}"></i></div><div class="mbar__val mbar__val--w">${vtxt}</div></div>`;
-        };
-        const sorted = [...units].sort((a, b) => (modeBar === "cov" ? (b.cov || 0) - (a.cov || 0) : b.score - a.score));
-        const toggle = mode === "region"
-          ? `<div class="map-toggle"><button class="map-toggle__b${modeBar === "kxi" ? " is-on" : ""}" data-mode="kxi">KXI reytingi</button><button class="map-toggle__b${modeBar === "cov" ? " is-on" : ""}" data-mode="cov">Qamrov reytingi %</button></div>`
-          : `<p style="font-size:12.5px;color:var(--faint);margin:0 0 10px">${units.length} ta mahalla · KXI bo'yicha tartiblangan</p>`;
-        bars.innerHTML = toggle + sorted.map(rowHtml).join("");
-        bars.querySelectorAll(".map-toggle__b").forEach(b => b.addEventListener("click", () => { renderMap._barMode = b.dataset.mode; renderMap(); }));
+      const sorted = [...units].sort((a, b) => b.score - a.score);
+      bars.innerHTML = `<p style="font-size:12.5px;color:var(--faint);margin:0 0 10px">22 hudud · KXI bo'yicha tartiblangan · qatorni bosib hududni oching</p>` +
+        sorted.map(u => `<div class="mbar mbar--click${u.own ? " is-you" : ""}" data-full="${u.full}"><div class="mbar__name">${u.own ? '<span class="kxi-you">REAL</span> ' : ""}${u.disp}</div><div class="mbar__track"><i style="width:${u.score}%;background:${kxiColor(u.score)}"></i></div><div class="mbar__val">${u.score}</div></div>`).join("");
+      bars.querySelectorAll(".mbar").forEach(b => b.addEventListener("click", () => {
+        const u = units.find(x => x.full === b.dataset.full); if (u) { mapDrill = u.t; renderMap(); }
+      }));
+    }
+
+    const det = $("#mapDetail");
+    if (det) det.innerHTML = `<div class="map-detail-empty">${ICON.map}<p>Hudud ustiga bosing. <b>Nurafshon shahri</b> — real murojaatlar tahlili, qolganlari demo.</p></div>`;
+
+    setMapChrome("Toshkent viloyati — 22 hudud", "Yuqori xavf", "Xavfsiz", "KXI 0–100");
+    $("#mapHint") && ($("#mapHint").textContent = "real ma'muriy chegaralar · rang — KXI darajasi");
+    $("#kxiTableHint") && ($("#kxiTableHint").textContent = "Nurafshon shahrining 16 real mahallasi · qatorni bosib batafsil ko'ring");
+  }
+
+  /* ---- 2-bosqich (Nurafshon) — to'liq murojaatlar tahlili ---- */
+  function renderNurafshonMap(svg, tip) {
+    const geo = TV_DIST["Nurafshon shahri"]; if (!geo) { mapDrill = null; return renderMap(); }
+    const rows = NUR_APPEALS.map((m, i) => {
+      const rate = nurRate(m), safety = nurSafety(m);
+      return { ...m, i, rate, safety, lvl: kxiLevel(safety), short: m.name.replace(" MFY", "") };
+    });
+    const totMur = rows.reduce((s, r) => s + r.murojaat, 0);
+    const per1000 = NUR_SUMMARY.aholi ? totMur / NUR_SUMMARY.aholi * 1000 : 0;
+    const counts = { green: 0, yellow: 0, red: 0 }; rows.forEach(r => counts[r.lvl.key]++);
+    const riskiest = [...rows].sort((a, b) => b.rate - a.rate);
+    const safest = [...rows].sort((a, b) => a.rate - b.rate);
+
+    $("#mapTitle") && ($("#mapTitle").textContent = "Nurafshon shahri — murojaatlar xaritasi");
+    $("#mapLead") && ($("#mapLead").textContent = "16 mahalla · rang — 1000 aholiga to'g'ri keladigan murojaatlar (kam = xavfsiz). Mahalla ustiga bosing.");
+    const scope = $("#mapScope");
+    if (scope) { scope.className = "scope-banner scope-banner--admin";
+      scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Nurafshon shahri · rasmiy ma'lumot</h3><p><b>${rows.length} mahalla</b> · jami <b>${totMur} murojaat</b> · qamrab olingan aholi <b>${fmtN(NUR_SUMMARY.aholi)}</b> · 1000 aholiga <b>${per1000.toFixed(2)}</b>.</p></div>`; }
+    const crumb = $("#mapCrumb");
+    if (crumb) crumb.innerHTML = `<button class="crumb__seg crumb__back" id="crumbBack">${ICON.map} ${REGION_NAME}</button><span class="crumb__sep">›</span><span class="crumb__seg is-cur">Nurafshon shahri</span><button class="crumb__return" id="crumbReturn">← Viloyatga qaytish</button>`;
+
+    mapCards([
+      { num: totMur, lab: "Jami murojaat", cls: "i-blue", ico: ICON.sms },
+      { num: fmtN(NUR_SUMMARY.aholi), lab: "Qamrab olingan aholi", cls: "i-purple", ico: ICON.users },
+      { num: per1000.toFixed(2), lab: "1000 aholiga murojaat", cls: "i-gold", ico: ICON.spark },
+      { num: NUR_SUMMARY.topRiskIsh, lab: `Jinoyat ishi · ${riskiest[0].short} (${NUR_SUMMARY.topRiskIsh2025} tasi 2025)`, cls: "i-red", ico: ICON.alert },
+      { num: `${counts.red} / ${counts.yellow} / ${counts.green}`, lab: "Yuqori · o'rta · past xavf mahalla", cls: "i-amber", ico: ICON.shieldCheck }
+    ]);
+
+    svg.classList.add("mapsvg--geo"); svg.classList.add("mapsvg--mhz"); svg.classList.remove("mapsvg--region");
+    svg.setAttribute("viewBox", `0 0 ${geo.w} ${geo.h}`);
+    svg.innerHTML =
+      `<path class="dist-under" d="${geo.o}"/>` +
+      rows.map((r, i) => {
+        const cell = geo.c[i]; if (!cell) return "";
+        const fill = kxiColor(r.safety);
+        const label = `<text x="${cell.cx}" y="${cell.cy - 5}" class="mcell__name mcell__name--sm">${r.short}</text><text x="${cell.cx}" y="${cell.cy + 15}" class="mcell__val mcell__val--sm">${r.murojaat}</text>`;
+        return `<g class="mcell" data-cell="${i}"><path d="${cell.d}" fill="${fill}" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>${label}</g>`;
+      }).join("") +
+      `<g class="mhi"></g><path class="dist-outline" d="${geo.o}"/>`;
+
+    function selectCell(gEl, r) {
+      svg.querySelectorAll(".mcell").forEach(x => x.classList.remove("is-sel"));
+      if (gEl) gEl.classList.add("is-sel");
+      renderNurDetail(r);
+      $$("#mapBars .mbar").forEach(b => b.classList.toggle("is-sel", b.dataset.bar === r.name));
+    }
+    svg.querySelectorAll(".mcell").forEach(gEl => {
+      const r = rows[+gEl.dataset.cell];
+      wireHover(svg, tip, gEl,
+        () => `<div class="mtip__t">${r.short}</div>
+          <div class="mtip__row"><span>Murojaat</span><b>${r.murojaat}</b></div>
+          <div class="mtip__row"><span>1000 aholiga</span><b>${r.rate.toFixed(2)}</b></div>
+          <div class="mtip__row"><span>Holat</span><b>${r.lvl.dot} ${r.lvl.label}</b></div>
+          <div class="mtip__row"><span>Asosiy usul</span><b>${r.usul}</b></div>`,
+        () => selectCell(gEl, r));
+    });
+
+    const donut = $("#mapDonut");
+    if (donut) {
+      let acc = 0;
+      const stops = NUR_METHODS.map(m => { const a = acc; acc += m.pct; return `${m.c} ${a}% ${Math.min(100, acc)}%`; }).join(", ");
+      donut.innerHTML = `
+        <div class="donut" style="background:conic-gradient(${stops})"><div class="donut__hole"><div class="donut__num">${NUR_METHODS.reduce((s, m) => s + m.mfy, 0)}</div><div class="donut__lab">mahalla</div></div></div>
+        <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${m.pct}%</b></div>`).join("")}</div>`;
+    }
+
+    const bars = $("#mapBars");
+    if (bars) {
+      const bmode = renderMap._barMode || "count";
+      const maxRate = Math.max(...rows.map(r => r.rate), 0.001);
+      const maxMur = Math.max(...rows.map(r => r.murojaat), 1);
+      const sorted = [...rows].sort((a, b) => bmode === "rate" ? b.rate - a.rate : b.murojaat - a.murojaat);
+      bars.innerHTML =
+        `<div class="map-toggle"><button class="map-toggle__b${bmode === "count" ? " is-on" : ""}" data-mode="count">Murojaat soni</button><button class="map-toggle__b${bmode === "rate" ? " is-on" : ""}" data-mode="rate">1000 aholiga</button></div>` +
+        sorted.map(r => {
+          const w = bmode === "rate" ? r.rate / maxRate * 100 : r.murojaat / maxMur * 100;
+          const v = bmode === "rate" ? r.rate.toFixed(2) : r.murojaat;
+          return `<div class="mbar mbar--click" data-bar="${r.name}" title="Xaritada ko'rsatish"><div class="mbar__name">${r.short}</div><div class="mbar__track"><i style="width:${w}%;background:${kxiColor(r.safety)}"></i></div><div class="mbar__val">${v}</div></div>`;
+        }).join("");
+      bars.querySelectorAll(".map-toggle__b").forEach(b => b.addEventListener("click", () => { renderMap._barMode = b.dataset.mode; renderMap(); }));
+      bars.querySelectorAll(".mbar").forEach(b => b.addEventListener("click", () => {
+        const r = rows.find(x => x.name === b.dataset.bar); if (!r) return;
+        selectCell(svg.querySelector(`.mcell[data-cell="${r.i}"]`), r);
+      }));
+    }
+
+    const det = $("#mapDetail");
+    if (det) {
+      const mini = (r, base) => `<div class="mbar"><div class="mbar__name">${r.short}</div><div class="mbar__track"><i style="width:${Math.max(4, r.rate / base * 100)}%;background:${kxiColor(r.safety)}"></i></div><div class="mbar__val">${r.murojaat}</div></div>`;
+      const base = riskiest[0].rate || 1;
+      det.innerHTML = `
+        <div class="md-head"><div><h3>Shahar kesimi</h3><span class="kxi-badge kxi-yellow">● O'rtacha ${per1000.toFixed(2)} / 1000</span></div></div>
+        <div class="md-sub md-sub--low">Eng yuqori xavf</div>
+        <div class="md-mhz">${riskiest.slice(0, 3).map(r => mini(r, base)).join("")}</div>
+        <div class="kxi-rec kxi-red" style="margin:12px 0 14px">${ICON.alert}<span><b>${riskiest[0].short}:</b> ${NUR_SUMMARY.topRiskMurojaat} murojaat, ${NUR_SUMMARY.topRiskIsh} ta jinoyat ishi (${NUR_SUMMARY.topRiskIsh2025} tasi 2025). Aholi zichligi va onlayn xarid yuqori — alohida nazorat.</span></div>
+        <div class="md-sub">Nisbatan xavfsiz</div>
+        <div class="md-mhz">${safest.slice(0, 3).map(r => mini(r, base)).join("")}</div>
+        <p style="font-size:12px;color:var(--faint);margin-top:12px">Jabrlanuvchilar o'rtacha yoshi ${NUR_SUMMARY.yoshAsosiy} · ${NUR_SUMMARY.yoshNote}</p>`;
+    }
+
+    setMapChrome("Nurafshon shahri — 16 mahalla", "Ko'p murojaat", "Kam murojaat", "1000 aholiga nisbatan");
+    $("#mapHint") && ($("#mapHint").textContent = "real ma'muriy kontur · rang — 1000 aholiga murojaatlar zichligi");
+    $("#kxiTableHint") && ($("#kxiTableHint").textContent = "Nurafshon shahrining 16 real mahallasi · qatorni bosib batafsil ko'ring");
+
+    wireMapBack();
+    const topEl = svg.querySelector(`.mcell[data-cell="${riskiest[0].i}"]`);
+    if (topEl) selectCell(topEl, riskiest[0]);
+  }
+
+  /* ---- 2-bosqich (boshqa hudud) — DEMO ---- */
+  function renderDemoDistrictMap(svg, tip, d) {
+    const geo = TV_DIST[tumFull(d)];
+    const full = tumFull(d);
+    const mhz = tumanMahallas(d).map((m, i) => ({ ...m, i, lvl: kxiLevel(m.score), short: m.name.replace(" MFY", "") }));
+    const cellCount = geo ? Math.min(geo.c.length, mhz.length) : 0;
+    const shown = mhz.slice(0, cellCount);
+    const avg = Math.round(mhz.reduce((s, m) => s + m.score, 0) / mhz.length);
+    const counts = { green: 0, yellow: 0, red: 0 }; mhz.forEach(m => counts[m.lvl.key]++);
+
+    $("#mapTitle") && ($("#mapTitle").textContent = `${full} — demo ko'rinish`);
+    $("#mapLead") && ($("#mapLead").textContent = "Bu hudud uchun ma'lumotlar namunaviy (demo). To'liq real tahlil faqat Nurafshon shahrida.");
+    const scope = $("#mapScope");
+    if (scope) { scope.className = "scope-banner scope-banner--tuman";
+      scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>${full} · DEMO</h3><p>Namunaviy ko'rsatkichlar — <b>${mhz.length} mahalla</b>, o'rtacha KXI <b>${avg}</b>. Real murojaatlar tahlili uchun Nurafshon shahrini tanlang.</p></div>`; }
+    const crumb = $("#mapCrumb");
+    if (crumb) crumb.innerHTML = `<button class="crumb__seg crumb__back" id="crumbBack">${ICON.map} ${REGION_NAME}</button><span class="crumb__sep">›</span><span class="crumb__seg is-cur">${full} · demo</span><button class="crumb__return" id="crumbReturn">← Viloyatga qaytish</button>`;
+
+    mapCards([
+      { num: mhz.length, lab: "Mahalla (demo)", cls: "i-blue", ico: ICON.map },
+      { num: avg, lab: "O'rtacha KXI (demo)", cls: "i-gold", ico: ICON.spark },
+      { num: fmtN(d.aholi), lab: "Aholi soni", cls: "i-purple", ico: ICON.building },
+      { num: fmtN(d.users), lab: "Foydalanuvchilar", cls: "i-teal", ico: ICON.users },
+      { num: (d.users / d.aholi * 100).toFixed(1) + "%", lab: "Qamrov (aholidan)", cls: "i-amber", ico: ICON.target }
+    ]);
+
+    svg.classList.add("mapsvg--geo"); svg.classList.add("mapsvg--mhz"); svg.classList.remove("mapsvg--region");
+    if (geo) {
+      svg.setAttribute("viewBox", `0 0 ${geo.w} ${geo.h}`);
+      const dense = shown.length > 34;
+      svg.innerHTML =
+        `<path class="dist-under" d="${geo.o}"/>` +
+        shown.map((m, i) => {
+          const cell = geo.c[i]; if (!cell) return "";
+          const fill = kxiColor(m.score);
+          const label = dense
+            ? `<text x="${cell.cx}" y="${cell.cy + 4}" class="mcell__val mcell__val--sm">${m.score}</text>`
+            : `<text x="${cell.cx}" y="${cell.cy - 4}" class="mcell__name mcell__name--sm">${m.short}</text><text x="${cell.cx}" y="${cell.cy + 16}" class="mcell__val mcell__val--sm">${m.score}</text>`;
+          return `<g class="mcell" data-cell="${i}"><path d="${cell.d}" fill="${fill}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>${label}</g>`;
+        }).join("") +
+        `<g class="mhi"></g><path class="dist-outline" d="${geo.o}"/>`;
+
+      function selDemo(gEl, m) {
+        svg.querySelectorAll(".mcell").forEach(x => x.classList.remove("is-sel"));
+        if (gEl) gEl.classList.add("is-sel");
+        demoDetail(m);
+        $$("#mapBars .mbar").forEach(b => b.classList.toggle("is-sel", b.dataset.bar === m.name));
+      }
+      svg.querySelectorAll(".mcell").forEach(gEl => {
+        const m = shown[+gEl.dataset.cell];
+        wireHover(svg, tip, gEl,
+          () => `<div class="mtip__t">${m.short} · demo</div>
+            <div class="mtip__row"><span>KXI</span><b>${m.score}</b></div>
+            <div class="mtip__row"><span>Holat</span><b>${m.lvl.dot} ${m.lvl.label}</b></div>
+            <div class="mtip__cta">namunaviy ma'lumot</div>`,
+          () => selDemo(gEl, m));
+      });
+
+      const bars = $("#mapBars");
+      if (bars) {
+        const sorted = [...mhz].sort((a, b) => b.score - a.score);
+        bars.innerHTML = `<p style="font-size:12.5px;color:var(--faint);margin:0 0 10px">${mhz.length} mahalla · demo KXI bo'yicha</p>` +
+          sorted.map(m => `<div class="mbar mbar--click" data-bar="${m.name}"><div class="mbar__name">${m.short}</div><div class="mbar__track"><i style="width:${m.score}%;background:${kxiColor(m.score)}"></i></div><div class="mbar__val">${m.score}</div></div>`).join("");
         bars.querySelectorAll(".mbar").forEach(b => b.addEventListener("click", () => {
-          const u = units.find(x => x.name === b.dataset.bar); if (!u) return;
-          const cellEl = [...svg.querySelectorAll(".mcell")].find(g => (renderMap._units || [])[+g.dataset.cell] === u);
-          if (mode === "region") { mapDrill = u.ref; renderMap(); }
-          else selectMapUnit(cellEl, u);
+          const idx = shown.findIndex(x => x.name === b.dataset.bar);
+          if (idx >= 0) selDemo(svg.querySelector(`.mcell[data-cell="${idx}"]`), shown[idx]);
         }));
       }
+      function demoDetail(m) {
+        const det = $("#mapDetail"); if (!det) return;
+        det.innerHTML = `
+          <div class="md-head"><div><h3>${m.short}</h3><span class="kxi-badge ${m.lvl.cls}">${m.lvl.dot} ${m.lvl.label}</span></div><div class="md-score" style="color:${kxiColor(m.score)}">${m.score}<span>/100</span></div></div>
+          <div class="kxi-rec ${m.lvl.cls}" style="margin:12px 0 0">${ICON.alert}<span><b>Demo:</b> ${KXI_REC[m.lvl.key]}</span></div>
+          <p style="font-size:12px;color:var(--faint);margin-top:12px">Bu ko'rsatkichlar namunaviy. Real murojaatlar tahlili — Nurafshon shahrida.</p>`;
+      }
+      demoDetail(shown[0]);
+      svg.querySelector('.mcell[data-cell="0"]') && svg.querySelector('.mcell[data-cell="0"]').classList.add("is-sel");
+    } else {
+      svg.removeAttribute("viewBox");
+      svg.innerHTML = "";
     }
 
-    // --- detal boshlang'ich holati ---
-    mapSel = null;
-    const det = $("#mapDetail");
-    if (det && mode !== "mahallaScope") det.innerHTML = `<div class="map-detail-empty">${ICON.map}<p>${mode === "region" ? "Hudud ustiga bosing — o'sha tumanning real xaritasi ochiladi." : "Mahalla ustiga bosing — statistikasi shu yerda chiqadi."}</p></div>`;
-
-    // --- crumb tugmalari ---
-    const back1 = $("#crumbBack"), back2 = $("#crumbReturn");
-    [back1, back2].forEach(b => b && b.addEventListener("click", () => { mapDrill = null; renderMap(); }));
-
-    // diqqat markazida — Nurafshon (SIZ): region rejimida avtomatik tanlangan
-    if (mode === "region") {
-      const arr = renderMap._units || [];
-      const ownCell = [...svg.querySelectorAll(".mcell")].find(g => arr[+g.dataset.cell] && arr[+g.dataset.cell].own);
-      if (ownCell) selectMapUnit(ownCell, arr[+ownCell.dataset.cell]);
+    const donut = $("#mapDonut");
+    if (donut) {
+      const tot = mhz.length, gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
+      donut.innerHTML = `
+        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #f5a623 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">mahalla</div></div></div>
+        <div class="donut__legend">
+          <div><span class="dleg" style="background:#40af6e"></span>Xavfsiz <b>${counts.green}</b></div>
+          <div><span class="dleg" style="background:#f5a623"></span>Ogohlantirish <b>${counts.yellow}</b></div>
+          <div><span class="dleg" style="background:#e5484d"></span>Yuqori xavf <b>${counts.red}</b></div>
+        </div>`;
     }
 
-    // --- izohlar ---
-    const th = $("#kxiTableHint");
-    const ownMhz = own.mahallas;
-    if (th) th.textContent = mode === "district" && role === "tuman"
-      ? `${MY_TUMAN}: ${ownMhz} ta rasmiy mahalla — real ro'yxat va aholi soni · qatorni bosib batafsil ko'ring`
-      : mode === "mahallaScope"
-        ? `${MY_TUMAN}ning ${ownMhz} real mahallasi — sizniki birinchi qatorda`
-        : `Mahalla kesimi: ${MY_TUMAN} (${ownMhz} ta real mahalla) · qatorni bosib batafsil ko'ring`;
-    const mh = $("#mapHint");
-    if (mh) mh.textContent = mode === "region"
-      ? "real ma'muriy chegaralar · rang — KXI darajasi"
-      : mode === "district"
-        ? "real tuman konturi · mahalla uchastkalari (demo bo'linma)"
-        : "faqat o'z mahallangiz ochiq";
+    setMapChrome(tumFull(d) + " — demo bo'linma", "Past KXI", "Yuqori KXI", "demo 0–100");
+    $("#mapHint") && ($("#mapHint").textContent = "namunaviy bo'linma · rang — demo KXI");
+    $("#kxiTableHint") && ($("#kxiTableHint").textContent = "Nurafshon shahrining 16 real mahallasi · qatorni bosib batafsil ko'ring");
+    wireMapBack();
+  }
+
+  function wireMapBack() {
+    const back = $("#crumbBack"), ret = $("#crumbReturn");
+    [back, ret].forEach(b => b && b.addEventListener("click", () => { mapDrill = null; renderMap(); }));
+  }
+
+  function renderNurDetail(r) {
+    const det = $("#mapDetail"); if (!det) return;
+    const soc = [
+      { k: "Ish bilan band", v: r.band, c: "#12A594" },
+      { k: "Ishsiz", v: r.ishsiz, c: "#F5A623" },
+      { k: "Nafaqada", v: r.nafaqa, c: "#3E7BFA" }
+    ];
+    det.innerHTML = `
+      <div class="md-head"><div><h3>${r.short}</h3><span class="kxi-badge ${r.lvl.cls}">${r.lvl.dot} ${r.lvl.label}</span></div><div class="md-score" style="color:${kxiColor(r.safety)}">${r.murojaat}<span> murojaat</span></div></div>
+      <div class="md-stats md-stats--4">
+        <div><span class="k">Aholi</span><span class="v">${fmtN(r.aholi)}</span></div>
+        <div><span class="k">1000 aholiga</span><span class="v">${r.rate.toFixed(2)}</span></div>
+        <div><span class="k">O'rtacha yosh</span><span class="v">${r.yosh}</span></div>
+        <div><span class="k">Asosiy usul</span><span class="v" style="font-size:12.5px">${r.usul}</span></div>
+      </div>
+      <div class="md-sub">Jabrlanuvchilar — ijtimoiy tarkib</div>
+      <div class="kxi-breakdown" style="padding:0">
+        ${soc.map(s => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${s.k}</span><span class="kxi-ind__w">${s.v}%</span></div><div class="kxi-ind__bar"><i style="width:${Math.min(100, s.v)}%;background:${s.c}"></i></div></div>`).join("")}
+      </div>
+      ${r.ish
+        ? `<div class="kxi-rec kxi-red" style="margin:12px 0 0">${ICON.alert}<span><b>${r.ish} ta jinoyat ishi</b> qo'zg'atilgan${r.ish2025 ? `, shundan ${r.ish2025} tasi 2025-yilda sodir etilgan` : ""}.</span></div>`
+        : `<div class="kxi-rec ${r.lvl.cls}" style="margin:12px 0 0">${ICON.alert}<span><b>Tavsiya:</b> ${KXI_REC[r.lvl.key]}</span></div>`}`;
   }
 
   function renderMapDetail(u) {
@@ -2882,6 +3147,7 @@ ${rowsHtml}
     // foydalanuvchi paneli (odat yondashuvi)
     renderDashHero();
     renderSecLevel();
+    renderDashAppeals();
     renderDayTip();
     renderLifehacks();
     renderCertGoal();

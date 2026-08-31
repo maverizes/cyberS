@@ -19,7 +19,7 @@
     <a class="brand" href="#dash" data-view="dash">
       <span class="brand__logo">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M12 2 4 5v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V5l-8-3Z" fill="#161F3D" />
+          <path d="M12 2 4 5v6c0 4.5 3.2 8.3 8 9.7 4.8-1.4 8-5.2 8-9.7V5l-8-3Z" fill="#022A5B" />
           <path d="m8.5 12 2.3 2.4L15.8 9" stroke="#fff" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round" />
         </svg>
@@ -200,7 +200,7 @@
       <section class="view is-active" id="view-dash">
         <div id="dashSpotlight"></div>
         <div class="dash-hello">
-          <h1>Salom, <span id="helloName">Azizbek</span> <span class="wave">👋</span></h1>
+          <h1>Salom, <span id="helloName">Azizbek</span></h1>
           <p class="lead">Bugun ham kiberxavfsizlik sari bir qadam. Quyidagi vazifalarni bajaring, ball to'plang va
             himoyangizni oshiring.</p>
         </div>
@@ -210,6 +210,24 @@
         <div class="card certgoal" id="dashCert"></div>
 
         <div class="card seclevel" id="dashSec"></div>
+
+        <!-- ===== MUROJAATLAR — Nurafshon shahri (rasmiy ma'lumot) ===== -->
+        <div class="gov-block">
+          <div class="gov-head">
+            <div>
+              <span class="eyebrow">Rasmiy tahlil</span>
+              <h2>Murojaatlar — Nurafshon shahri</h2>
+            </div>
+            <span class="gov-head__meta">16 mahalla · 2025</span>
+          </div>
+          <div class="grid stat-grid" id="dashAppealsStats"></div>
+          <div class="appeals-2col">
+            <div class="card card--pad" id="dashAppealsMethods"></div>
+            <div class="card card--pad" id="dashAppealsDemo"></div>
+          </div>
+          <div class="card card--pad" id="dashAppealsBars" style="margin-top:16px"></div>
+          <div class="card card--pad" id="dashAppealsRisk" style="margin-top:16px"></div>
+        </div>
 
         <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px" id="dashMidRow">
           <div class="card card--pad" id="dashCourse"></div>
@@ -228,13 +246,13 @@
         </button>
 
         <div class="section-title">
-          <h2>🎥 Kiber Layfxak</h2><span class="hint">qisqa amaliy maslahatlar</span><button class="section-link"
+          <h2>Kiber Layfxak</h2><span class="hint">qisqa amaliy maslahatlar</span><button class="section-link"
             data-view="life">Barchasi →</button>
         </div>
         <div class="grid lifehack-grid" id="dashLife"></div>
 
         <div class="section-title">
-          <h2>🚨 So'nggi ogohlantirishlar</h2><button class="section-link" data-view="feed">Barchasi →</button>
+          <h2>So'nggi ogohlantirishlar</h2><button class="section-link" data-view="feed">Barchasi →</button>
         </div>
         <div class="feed" id="dashFeed"></div>
       </section>
@@ -624,9 +642,10 @@
       <section class="view" id="view-kxi">
         <div class="page-head">
           <span class="eyebrow">KiberXavfsizlik Indeksi</span>
-          <h1>Har hududga — bitta ball, bitta holat</h1>
-          <p class="lead">KXI har bir hudud va mahallaning kiberxavfsizlik holatini 0–100 ball bilan baholaydi. Tizim
-            ko'rsatkichlarni avtomatik hisoblab, qaysi hududga e'tibor kerakligini xaritada bir qarashda ko'rsatadi.</p>
+          <h1>Har mahallaga — bitta holat, bitta xarita</h1>
+          <p class="lead">KXI har bir mahallaning kiberxavfsizlik holatini 0–100 ball bilan baholaydi. Nurafshon shahri
+            bo'yicha xarita esa kelib tushgan murojaatlarni aholi soniga nisbatan ko'rsatadi — qaysi mahallaga
+            e'tibor kerakligi bir qarashda bilinadi.</p>
         </div>
         <div class="scope-banner" id="mapScope"></div>
         <div class="grid stat-grid" id="mapSummary"></div>
@@ -637,23 +656,23 @@
         <div class="map-layout">
           <div class="card map-card">
             <div class="map-card__head">
-              <h3>Choropleth xarita</h3><span class="hint" id="mapHint">real ma'muriy chegaralar · rang — KXI
-                darajasi</span>
+              <h3 id="mapCardTitle">Toshkent viloyati — hududlar</h3><span class="hint" id="mapHint">real ma'muriy
+                chegaralar · rang — KXI darajasi</span>
             </div>
             <div class="map-crumb" id="mapCrumb"></div>
             <div class="map-stage">
               <svg id="mapSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
               <div class="mtip" id="mapTip"></div>
             </div>
-            <div class="map-scale"><span>0</span>
-              <div class="map-scale__bar"></div><span>100</span><span class="map-scale__lab">Yuqori xavf →
-                Xavfsiz</span>
+            <div class="map-scale"><span id="mapScaleLo">Yuqori xavf</span>
+              <div class="map-scale__bar"></div><span id="mapScaleHi">Xavfsiz</span><span class="map-scale__lab"
+                id="mapScaleLab">KXI 0–100</span>
             </div>
           </div>
           <div class="map-aside">
             <div class="card card--pad">
               <div class="map-card__head" style="margin-bottom:14px">
-                <h3 style="font-size:16px">Daraja taqsimoti</h3>
+                <h3 style="font-size:16px">Jinoyat sodir etish usullari</h3>
               </div>
               <div class="donut-wrap" id="mapDonut"></div>
             </div>
@@ -662,7 +681,7 @@
         </div>
 
         <div class="section-title">
-          <h2>Reyting — KXI bo'yicha</h2><span class="hint">diagramma</span>
+          <h2>Reyting — murojaatlar bo'yicha</h2><span class="hint">mahallalar kesimida</span>
         </div>
         <div class="card card--pad">
           <div id="mapBars"></div>
