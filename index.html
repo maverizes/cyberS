@@ -798,22 +798,158 @@
         <p class="chat__note">AI Hamroh — namunaviy demo. Suhbat va xavf aniqlash avtomatik tahlil asosida ishlaydi;
           real platformada AI model (masalan, Claude) bilan ishlaydi. Shaxsiy yozishmalar saqlanmaydi.</p>
       </section>
-      <footer class="foot">
-        <div class="foot__row">
-          <div>
-            <span class="brand__name" style="color:var(--navy);font-size:16px">Kiber<b
-                style="color:var(--gold-700)">Ogoh</b> UZ</span>
-            <div style="margin-top:4px">Mahalla darajasidagi milliy kiber qalqon platformasi · #KiberXavfsizlik</div>
+      <!-- ============================================================
+           UMUMIY FOOTER — barcha ko'rinishlarda ko'rinadi
+           Class prefiksi: .ko-ft-  ·  CSS o'zgaruvchilari: --ft-
+           Bo'limlar: 1) Shoshilinch yordam  2) Brend va havolalar
+                      3) Sertifikat tekshirish  4) Ishonch qatori  5) Pastki qator
+           ============================================================ -->
+      <footer class="ko-ft" role="contentinfo">
+
+        <!-- 1. SHOSHILINCH YORDAM — eng tepada: jabrlanuvchi menyuni o'qimaydi -->
+        <section class="ko-ft-sos" aria-labelledby="ftSosH">
+          <div class="ko-ft-sos__head">
+            <span class="ko-ft-sos__ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3.8 2.6 20h18.8L12 3.8Z" stroke-linejoin="round" />
+                <path d="M12 10v4.2" stroke-linecap="round" />
+                <circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
+            <div>
+              <h3 id="ftSosH">Pulingiz aldab olindimi? Shu uch qadamni hoziroq bajaring</h3>
+              <p>Qanchalik tez harakat qilsangiz, mablag'ni to'xtatib qolish ehtimoli shuncha yuqori. Uyalmang va
+                kechiktirmang — murojaatlarning katta qismi kech qilingani uchun natijasiz qolgan.</p>
+            </div>
           </div>
-          <span class="foot__demo">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 8v5" stroke-linecap="round" />
-              <circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none" />
-            </svg>
-            Konseptual demo · 2026
-          </span>
-        </div>
+          <ol class="ko-ft-sos__grid">
+            <li class="ko-ft-sos__c">
+              <span class="ko-ft-sos__n">1</span>
+              <h4>Kartani bloklang</h4>
+              <p>Bank ilovasi orqali yoki bankingiz qo'ng'iroq markaziga qo'ng'iroq qilib. Avval karta — keyin
+                qolgani.</p>
+            </li>
+            <li class="ko-ft-sos__c">
+              <span class="ko-ft-sos__n">2</span>
+              <h4>102 ga qo'ng'iroq qiling</h4>
+              <p>Ichki ishlar organlarining shoshilinch raqami: <a class="ko-ft-tel" href="tel:102">102</a> —
+                qo'ng'iroq bepul.</p>
+            </li>
+            <li class="ko-ft-sos__c">
+              <span class="ko-ft-sos__n">3</span>
+              <h4>Dalillarni saqlab, ariza bering</h4>
+              <p>SMS, chek, suhbat tarixi va raqamlarni o'chirmang.</p>
+              <a class="ko-ft-sos__lnk" href="/xabar" data-ko-link>Onlayn murojaat shakli →</a>
+            </li>
+          </ol>
+        </section>
+
+        <!-- 2. BREND VA HAVOLALAR -->
+        <section class="ko-ft-main">
+          <div class="ko-ft-brand">
+            <div class="ko-ft-brand__row">
+              <span class="ko-ft-brand__ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.8 4 5.8v6c0 4.5 3.2 8.3 8 9.6 4.8-1.3 8-5.1 8-9.6v-6l-8-3Z" stroke-linejoin="round" />
+                  <path d="m8.6 12 2.3 2.4 4.6-5.3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <b class="ko-ft-brand__n">KiberOgoh UZ</b>
+            </div>
+            <span class="ko-ft-brand__org">Toshkent viloyati IIBB bilan hamkorlikda</span>
+            <p class="ko-ft-brand__p">Kiber firibgarlikdan himoyalanishni o'rgatuvchi ochiq platforma. Barcha modullar
+              Nurafshon shahri bo'yicha qayd etilgan real murojaatlar tahliliga asoslangan — to'qib chiqarilgan
+              misollar emas.</p>
+            <ul class="ko-ft-soc" aria-label="Ijtimoiy tarmoqlar">
+              <!-- TODO: haqiqiy hisob havolalari bilan almashtiring -->
+              <li><a href="#" aria-label="Telegram" data-ft-soc>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21.5 4.3 2.9 11.4l5.2 1.7 1.9 5.6 2.8-3.3 4.4 3.3 4.3-14.4Z" stroke-linejoin="round"/><path d="m8.1 13.1 9.6-6.6-6.3 8" stroke-linejoin="round"/></svg></a></li>
+              <li><a href="#" aria-label="Instagram" data-ft-soc>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.1" cy="6.9" r="1.1" fill="currentColor" stroke="none"/></svg></a></li>
+              <li><a href="#" aria-label="YouTube" data-ft-soc>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2.4" y="5.4" width="19.2" height="13.2" rx="4"/><path d="m10.3 9.4 5 2.6-5 2.6V9.4Z" stroke-linejoin="round"/></svg></a></li>
+              <li><a href="mailto:info@kiberogoh.uz" aria-label="Elektron pochta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2.6" y="5" width="18.8" height="14" rx="3"/><path d="m3.4 7 8.6 6 8.6-6" stroke-linejoin="round"/></svg></a></li>
+            </ul>
+          </div>
+
+          <nav class="ko-ft-col" aria-label="Platforma havolalari">
+            <h3>Platforma</h3>
+            <ul>
+              <li><a href="/#yosh-yollar" data-ko-link>Xavf yo'llari</a></li>
+              <li><a href="/kitobxonlik" data-ko-link>Kitobxonlik</a></li>
+              <li><a href="/elchi" data-ko-link>Kiber Elchi <span class="ko-ft-pill">Yangi</span></a></li>
+              <li><a href="/statistika" data-ko-link>Murojaatlar statistikasi</a></li>
+              <li><a href="/mahalla" data-ko-link>Mahalla kesimida</a></li>
+              <li><a href="/materiallar" data-ko-link>Yuklab olish materiallari</a></li>
+            </ul>
+          </nav>
+
+          <nav class="ko-ft-col" aria-label="Ma'lumot havolalari">
+            <h3>Ma'lumot</h3>
+            <ul>
+              <li><a href="/haqida" data-ko-link>Loyiha haqida</a></li>
+              <li><a href="/yangiliklar" data-ko-link>Yangiliklar</a></li>
+              <li><a href="/savol-javob" data-ko-link>Savol-javob</a></li>
+              <li><a href="/hamkorlar" data-ko-link>Hamkorlar</a></li>
+              <li><a href="/maktablar" data-ko-link>Maktab va tashkilotlar uchun</a></li>
+              <li><a href="/aloqa" data-ko-link>Biz bilan aloqa</a></li>
+            </ul>
+          </nav>
+
+          <nav class="ko-ft-col" aria-label="Xavfsizlik havolalari">
+            <h3>Xavfsizlik</h3>
+            <ul>
+              <li><a href="/xabar" data-ko-link>Firibgarlik haqida xabar berish</a></li>
+              <li><a href="/sert" data-ko-link>Sertifikatni tekshirish</a></li>
+              <li><a href="/qoidalar" data-ko-link>Foydalanish shartlari</a></li>
+              <li><a href="/maxfiylik" data-ko-link>Maxfiylik siyosati</a></li>
+              <li><a href="/manba" data-ko-link>Ma'lumotlar manbai</a></li>
+            </ul>
+          </nav>
+        </section>
+
+        <!-- 3. SERTIFIKAT TEKSHIRISH -->
+        <section class="ko-ft-cert" aria-labelledby="ftCertH">
+          <div class="ko-ft-cert__txt">
+            <h3 id="ftCertH">Sertifikat haqiqiyligini tekshirish</h3>
+            <p>Qo'lingizdagi sertifikat raqamini kiriting — egasi, berilgan sanasi va amal qilish holati ko'rsatiladi.
+              Bekor qilingan sertifikat darhol «haqiqiy emas» deb belgilanadi.</p>
+          </div>
+          <form class="ko-ft-cert__form" id="ftCertForm" novalidate>
+            <div class="ko-ft-cert__row">
+              <label class="sr-only" for="ftCertInput">Sertifikat raqami</label>
+              <input type="text" id="ftCertInput" name="sert" placeholder="KO-2026-000482"
+                autocomplete="off" spellcheck="false" aria-describedby="ftCertErr">
+              <button type="submit" class="ko-ft-cert__btn">Tekshirish</button>
+            </div>
+            <p class="ko-ft-cert__err" id="ftCertErr" role="alert"></p>
+            <div class="ko-ft-cert__res" id="ftCertRes" role="status" aria-live="polite" hidden></div>
+          </form>
+        </section>
+
+        <!-- 4. ISHONCH QATORI -->
+        <section class="ko-ft-trust" id="ftTrust" aria-label="Platforma ko'rsatkichlari"></section>
+
+        <!-- 5. PASTKI QATOR -->
+        <section class="ko-ft-bot">
+          <p class="ko-ft-cp">© <span id="ftYear"></span> KiberOgoh UZ. Nodavlat ta'lim tashabbusi, Toshkent viloyati
+            IIBB ko'magida amalga oshirilmoqda.</p>
+          <div class="ko-ft-bot__r">
+            <span class="ko-ft-demo">Konseptual demo</span>
+            <nav class="ko-ft-micro" aria-label="Huquqiy havolalar">
+              <a href="/qoidalar" data-ko-link>Shartlar</a>
+              <a href="/maxfiylik" data-ko-link>Maxfiylik</a>
+              <a href="/cookie" data-ko-link>Cookie</a>
+            </nav>
+            <div class="ko-ft-lang" role="group" aria-label="Til tanlash">
+              <button type="button" class="is-on" aria-current="true" data-ft-lang="uz">UZ</button>
+              <button type="button" data-ft-lang="ru">РУ</button>
+              <button type="button" data-ft-lang="en">EN</button>
+            </div>
+          </div>
+        </section>
+
       </footer>
 
     </main>

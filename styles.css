@@ -2106,3 +2106,131 @@ a.ko-book:hover{ border-color:var(--blue); transform:translateX(2px); }
   .ko-book{ flex-wrap:wrap; }
   .ko-cert__ttl{ font-size:20px; letter-spacing:.16em; }
 }
+
+/* =========================================================
+   UMUMIY FOOTER — prefiks .ko-ft- , o'zgaruvchilar --ft-
+   Ranglar sayt tokenlariga bog'langan (izolyatsiya + vizual birlik).
+   Qorong'i rejim — FAQAT ixtiyoriy: [data-theme="dark"] yoki .ko-ft--dark.
+   Avtomatik prefers-color-scheme ataylab yoqilmagan: saytning qolgan qismi
+   yorug' rejimda, faqat footer qorayishi nuqson bo'lardi.
+   ========================================================= */
+.ko-ft{
+  --ft-surface:var(--surface); --ft-plane:var(--canvas);
+  --ft-ink:var(--ink); --ft-ink-2:var(--muted); --ft-muted:var(--faint);
+  --ft-grid:var(--line); --ft-ring:rgba(2,42,91,.10); --ft-track:rgba(2,42,91,.05);
+  --ft-accent:var(--navy); --ft-accent-soft:var(--blue-soft);
+  --ft-critical:var(--red); --ft-critical-soft:var(--red-soft);
+  --ft-good:var(--teal);
+  margin-top:50px; background:var(--ft-surface); color:var(--ft-ink-2);
+  border:1px solid var(--ft-grid); border-radius:16px; overflow:hidden;
+  font-size:13.5px; line-height:1.6;
+}
+:root[data-theme="dark"] .ko-ft, .ko-ft--dark{
+  --ft-surface:#1a1a19; --ft-plane:#0d0d0d;
+  --ft-ink:#fff; --ft-ink-2:#c3c2b7; --ft-muted:#8d8c83;
+  --ft-grid:#2c2c2a; --ft-ring:rgba(255,255,255,.10); --ft-track:rgba(255,255,255,.06);
+  --ft-accent:#3987e5; --ft-accent-soft:rgba(57,135,229,.14);
+  --ft-critical:#e56464; --ft-critical-soft:rgba(229,100,100,.12);
+}
+.ko-ft h3, .ko-ft h4{ color:var(--ft-ink); font-family:var(--ui); }
+.ko-ft a{ color:inherit; text-decoration:none; }
+.ko-ft a:focus-visible, .ko-ft button:focus-visible, .ko-ft input:focus-visible{
+  outline:2px solid var(--ft-accent); outline-offset:2px; border-radius:5px;
+}
+
+/* --- 1. shoshilinch yordam --- */
+.ko-ft-sos{ background:var(--ft-critical-soft); border-left:4px solid var(--ft-critical); padding:22px 26px 24px; }
+.ko-ft-sos__head{ display:flex; gap:13px; align-items:flex-start; margin-bottom:18px; }
+.ko-ft-sos__ico{ flex:0 0 26px; color:var(--ft-critical); margin-top:1px; }
+.ko-ft-sos__ico svg{ width:26px; height:26px; }
+.ko-ft-sos h3{ font-size:17px; font-weight:700; line-height:1.35; }
+.ko-ft-sos__head p{ font-size:13px; color:var(--ft-ink-2); margin-top:6px; max-width:82ch; }
+.ko-ft-sos__grid{ list-style:none; margin:0; padding:0;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:13px; }
+.ko-ft-sos__c{ background:var(--ft-surface); border:1px solid var(--ft-grid); border-radius:11px; padding:15px 16px; }
+.ko-ft-sos__n{ display:grid; place-items:center; width:25px; height:25px; border-radius:50%;
+  background:var(--ft-critical); color:#fff; font-size:12.5px; font-weight:800; margin-bottom:10px; }
+.ko-ft-sos__c h4{ font-size:14px; font-weight:700; margin-bottom:5px; }
+.ko-ft-sos__c p{ font-size:12.5px; color:var(--ft-ink-2); }
+.ko-ft-tel{ font-weight:800; color:var(--ft-critical); border-bottom:2px solid currentColor; padding-bottom:1px; }
+.ko-ft-sos__lnk{ display:inline-block; margin-top:9px; font-size:12.5px; font-weight:700; color:var(--ft-accent); }
+.ko-ft-sos__lnk:hover{ text-decoration:underline; }
+
+/* --- 2. brend va havolalar --- */
+.ko-ft-main{ border-top:1px solid var(--ft-grid); padding:26px; display:grid; gap:26px; grid-template-columns:1fr; }
+@media (min-width:760px){ .ko-ft-main{ grid-template-columns:1.4fr 1fr 1fr 1fr; gap:30px; } }
+.ko-ft-brand__row{ display:flex; align-items:center; gap:10px; }
+.ko-ft-brand__ico{ color:var(--ft-accent); flex:0 0 26px; }
+.ko-ft-brand__ico svg{ width:26px; height:26px; }
+.ko-ft-brand__n{ font-family:var(--display); font-size:17px; font-weight:700; color:var(--ft-ink); }
+.ko-ft-brand__org{ display:block; margin:8px 0 10px; font-size:10.5px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ft-muted); }
+.ko-ft-brand__p{ font-size:12.5px; color:var(--ft-ink-2); max-width:46ch; }
+.ko-ft-soc{ list-style:none; display:flex; gap:8px; margin:16px 0 0; padding:0; }
+.ko-ft-soc a{ display:grid; place-items:center; width:34px; height:34px; border-radius:9px;
+  border:1px solid var(--ft-grid); color:var(--ft-ink-2); transition:all .18s ease; }
+.ko-ft-soc svg{ width:17px; height:17px; }
+.ko-ft-soc a:hover{ border-color:var(--ft-accent); color:var(--ft-accent); background:var(--ft-accent-soft); }
+.ko-ft-col h3{ font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ft-muted); margin-bottom:12px; }
+.ko-ft-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+.ko-ft-col a{ font-size:13px; color:var(--ft-ink-2); display:inline-flex; align-items:center; gap:7px; }
+.ko-ft-col a:hover{ color:var(--ft-accent); }
+.ko-ft-pill{ font-size:9.5px; font-weight:800; letter-spacing:.04em; padding:2px 7px; border-radius:999px;
+  background:var(--ft-accent-soft); color:var(--ft-accent); }
+
+/* --- 3. sertifikat tekshirish --- */
+.ko-ft-cert{ border-top:1px solid var(--ft-grid); background:var(--ft-plane); padding:22px 26px;
+  display:grid; gap:16px; grid-template-columns:1fr; align-items:center; }
+@media (min-width:860px){ .ko-ft-cert{ grid-template-columns:1fr auto; gap:30px; } }
+.ko-ft-cert h3{ font-size:15px; font-weight:700; margin-bottom:5px; }
+.ko-ft-cert__txt p{ font-size:12.5px; color:var(--ft-ink-2); max-width:60ch; }
+.ko-ft-cert__row{ display:flex; gap:8px; flex-wrap:wrap; }
+.ko-ft-cert__form input{ flex:1 1 190px; min-width:0; font-family:var(--mono); font-size:13px;
+  padding:10px 13px; border-radius:9px; border:1.5px solid var(--ft-grid);
+  background:var(--ft-surface); color:var(--ft-ink); transition:border-color .18s ease; }
+.ko-ft-cert__form input::placeholder{ color:var(--ft-muted); }
+.ko-ft-cert__form input:focus{ outline:none; border-color:var(--ft-accent); }
+.ko-ft-cert__form input[aria-invalid="true"]{ border-color:var(--ft-critical); }
+.ko-ft-cert__btn{ border:0; border-radius:9px; padding:10px 20px; font-weight:700; font-size:13px;
+  background:var(--ft-accent); color:#fff; white-space:nowrap; }
+.ko-ft-cert__btn:hover{ filter:brightness(1.1); }
+.ko-ft-cert__err{ font-size:12px; color:var(--ft-critical); margin-top:7px; min-height:1px; }
+.ko-ft-cert__res{ margin-top:10px; font-size:12.5px; border-radius:9px; padding:11px 13px;
+  border:1px solid var(--ft-grid); background:var(--ft-surface); }
+.ko-ft-cert__res b{ color:var(--ft-ink); }
+.ko-ft-cert__res.is-ok{ border-color:var(--ft-good); }
+.ko-ft-cert__res.is-no{ border-color:var(--ft-critical); }
+.ko-ft-cert__res .ko-ft-cert__st{ font-weight:800; }
+.ko-ft-cert__res.is-ok .ko-ft-cert__st{ color:var(--ft-good); }
+.ko-ft-cert__res.is-no .ko-ft-cert__st{ color:var(--ft-critical); }
+
+/* --- 4. ishonch qatori --- */
+.ko-ft-trust{ border-top:1px solid var(--ft-grid); padding:18px 26px;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; }
+.ko-ft-trust__i b{ display:block; font-family:var(--display); font-size:22px; font-weight:700; color:var(--ft-ink); line-height:1.1; }
+.ko-ft-trust__i span{ display:block; font-size:11.5px; color:var(--ft-muted); margin-top:3px; }
+
+/* --- 5. pastki qator --- */
+.ko-ft-bot{ border-top:1px solid var(--ft-grid); background:var(--ft-plane); padding:15px 26px;
+  display:flex; flex-wrap:wrap; gap:12px 18px; align-items:center; justify-content:space-between; }
+.ko-ft-cp{ font-size:12px; color:var(--ft-muted); max-width:70ch; }
+.ko-ft-bot__r{ display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; }
+.ko-ft-demo{ font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px;
+  background:var(--ft-track); color:var(--ft-muted); }
+.ko-ft-micro{ display:flex; gap:12px; }
+.ko-ft-micro a{ font-size:12px; color:var(--ft-muted); }
+.ko-ft-micro a:hover{ color:var(--ft-accent); }
+.ko-ft-lang{ display:inline-flex; gap:3px; border:1px solid var(--ft-grid); border-radius:8px; padding:2px; }
+.ko-ft-lang button{ border:0; background:transparent; font-size:11.5px; font-weight:700;
+  color:var(--ft-muted); padding:4px 9px; border-radius:6px; }
+.ko-ft-lang button:hover{ color:var(--ft-ink); }
+.ko-ft-lang button.is-on{ background:var(--ft-accent-soft); color:var(--ft-accent);
+  box-shadow:inset 0 0 0 1px var(--ft-accent); }
+
+@media (max-width:560px){
+  .ko-ft-sos{ padding:18px 16px 20px; }
+  .ko-ft-main, .ko-ft-cert, .ko-ft-trust, .ko-ft-bot{ padding-left:16px; padding-right:16px; }
+  .ko-ft-cert__btn{ width:100%; }
+  .ko-ft-bot{ justify-content:flex-start; }
+}

@@ -3474,8 +3474,25 @@ ${rowsHtml}
       const url = new URL(a.getAttribute("href"), location.origin);
       const p = url.pathname, q = url.searchParams.get("yosh");
       if (q && AGE_NAMES[q]) koAge = q;
-      if (p === "/kitobxonlik") { showView("kitobxonlik"); return; }
-      if (p === "/elchi") { showView("cert"); return; }
+      // footer va bo'limlar marshrutlari — mavjud ko'rinishlarga moslanadi
+      const KO_ROUTES = {
+        "/": "yollar", "/kitobxonlik": "kitobxonlik", "/elchi": "cert",
+        "/yangiliklar": "feed", "/savol-javob": "help", "/materiallar": "life",
+        "/qoidalar": "legal", "/maxfiylik": "legal", "/haqida": "legal"
+      };
+      if (url.hash === "#yosh-yollar" || p === "/") { showView("yollar"); return; }
+      if (KO_ROUTES[p]) { showView(KO_ROUTES[p]); return; }
+      if (p === "/statistika" || p === "/mahalla" || p === "/manba") {
+        showView("dash");
+        setTimeout(() => { const g = $(".gov-block"); if (g) g.scrollIntoView({ behavior: "smooth", block: "start" }); }, 120);
+        return;
+      }
+      if (p === "/xabar") { koToast("Murojaat shakli konseptual demoda hali ochilmagan. Shoshilinch holatda 102 ga qo'ng'iroq qiling."); return; }
+      if (p === "/sert" || p.startsWith("/sert/")) {
+        const inp = $("#ftCertInput");
+        if (inp) { inp.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => inp.focus(), 400); }
+        return;
+      }
       if (p.startsWith(KO_BASE)) {
         const slug = p.slice(KO_BASE.length).split("/")[0];
         if (PATH_NAMES[slug]) { koPath = slug; renderKitobxonlik(); koToast(`«${PATH_NAMES[slug]}» yo'li tanlandi — kitobxonlikda birinchi o'ringa chiqadi.`); }
@@ -3484,6 +3501,74 @@ ${rowsHtml}
       if (p.startsWith("/kitob/")) { koToast("Kitob sahifasi konseptual demoda hali ochilmagan."); return; }
       koToast("Bu sahifa konseptual demoda hali ochilmagan.");
     });
+  }
+
+
+  /* =========================================================
+     FOOTER — yil, ishonch qatori, sertifikat tekshirish, til
+     ========================================================= */
+  const FT_SERT_RE = /^KO-\d{4}-\d{6}$/;
+  // demo bazasi — real tizimda bu server so'rovi bo'ladi
+  const FT_SERTS = {
+    "KO-2026-000482": { ega:"A. Toshmatov", sana:"14.03.2026", holat:"ok",   izoh:"Amal qiladi" },
+    "KO-2026-000117": { ega:"D. Yo'ldosheva", sana:"02.02.2026", holat:"no", izoh:"Bekor qilingan — haqiqiy emas" }
+  };
+
+  function renderFooter() {
+    const y = $("#ftYear"); if (y) y.textContent = new Date().getFullYear();
+
+    // ishonch qatori — raqamlar mavjud ma'lumotdan hisoblanadi, hardcode qilinmaydi
+    const tr = $("#ftTrust");
+    if (tr) {
+      const items = [
+        [NUR_APPEALS.length, "mahalla qamrab olingan"],
+        [NUR_SUMMARY.murojaat, "real murojaat tahlili"],
+        [PATHS.length, "xavf yo'li"],
+        [KO_BOOKS.length, "kitob kutubxonada"]
+      ];
+      tr.innerHTML = items.map(i => `<div class="ko-ft-trust__i"><b>${i[0]}</b><span>${i[1]}</span></div>`).join("");
+    }
+  }
+
+  function setupFooter() {
+    const form = $("#ftCertForm"); if (!form) return;
+    const inp = $("#ftCertInput"), err = $("#ftCertErr"), res = $("#ftCertRes");
+
+    function clearErr() {
+      err.textContent = ""; inp.removeAttribute("aria-invalid");
+    }
+    function fail(msg) {
+      err.textContent = msg; inp.setAttribute("aria-invalid", "true");
+      res.hidden = true; inp.focus();
+    }
+    inp.addEventListener("input", clearErr);   // yozishni boshlaganda xato o'zi tozalanadi
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const v = inp.value.trim().toUpperCase().replace(/\s+/g, "");
+      if (!v) return fail("Sertifikat raqamini kiriting.");
+      if (!FT_SERT_RE.test(v)) return fail("Format noto'g'ri. Namuna: KO-2026-000482");
+      clearErr();
+      inp.value = v;
+      const rec = FT_SERTS[v];
+      res.hidden = false;
+      res.className = "ko-ft-cert__res " + (rec ? (rec.holat === "ok" ? "is-ok" : "is-no") : "is-no");
+      res.innerHTML = rec
+        ? `<span class="ko-ft-cert__st">${rec.holat === "ok" ? "✓ Haqiqiy" : "✕ Haqiqiy emas"}</span> · <b>${v}</b><br>
+           Egasi: <b>${rec.ega}</b> · Berilgan sana: <b>${rec.sana}</b> · Holat: ${rec.izoh}`
+        : `<span class="ko-ft-cert__st">✕ Topilmadi</span> · <b>${v}</b><br>
+           Bu raqam bo'yicha sertifikat ro'yxatda yo'q. Namuna uchun: KO-2026-000482`;
+    });
+
+    // til almashtirgichi — demo
+    $$("[data-ft-lang]").forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.ftLang === "uz") return;
+      koToast("Platforma hozircha faqat o'zbek tilida. Rus va ingliz tillari tayyorlanmoqda.");
+    }));
+    // ijtimoiy tarmoq havolalari hali ulanmagan
+    $$("[data-ft-soc]").forEach(a => a.addEventListener("click", e => {
+      e.preventDefault(); koToast("Rasmiy ijtimoiy tarmoq hisoblari hali ulanmagan.");
+    }));
   }
 
   /* =========================================================
@@ -3524,6 +3609,8 @@ ${rowsHtml}
     renderYollar();
     renderKitobxonlik();
     setupKoLinks();
+    renderFooter();
+    setupFooter();
     setupLogin();
     bindRoleSwitch();
     applyRole("user");           // boshlang'ich — oddiy fuqaro; imtiyozli rollar login talab qiladi
