@@ -463,7 +463,7 @@
   const NUR_METHODS = [
     { k:"Kartadan pul yechish",              mfy:5, pct:38.2, c:"#C62828" },
     { k:"Firibgarlik (ijtimoiy muhandislik)", mfy:3, pct:32.5, c:"#E5484D" },
-    { k:"Pul yechish + zararli ilova",       mfy:2, pct:18.8, c:"#EF7A6D" },
+    { k:"Pul yechish + zararli ilova",       mfy:2, pct:25.0, c:"#EF7A6D" },
     { k:"Zararli ilovalar",                  mfy:1, pct:6.2,  c:"#F3A99F" },
     { k:"Onlayn do'kon",                     mfy:1, pct:6.2,  c:"#F7CFC9" }
   ];
@@ -617,7 +617,8 @@
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
     assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
-    admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi"
+    admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
+    yollar:"Xavf yo'llari", kitobxonlik:"Kitobxonlik va sertifikat"
   };
   let dashAnimated = false, quizBuilt = false;
 
@@ -635,6 +636,8 @@
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
     if (v === "appeals") renderAppeals();
+    if (v === "yollar") renderYollar();
+    if (v === "kitobxonlik") renderKitobxonlik();
     if (v === "quiz") {
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
       else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
@@ -1132,7 +1135,7 @@
         <div class="appeals-card__sub">Mahallalar kesimidagi ulush · jami ${tot} holat</div>
         <div class="donut-wrap">
           <div class="donut" style="background:conic-gradient(${stops})"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">holat</div></div></div>
-          <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${m.pct}%</b></div>`).join("")}</div>
+          <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${koPct(m.pct)}%</b></div>`).join("")}</div>
         </div>`;
     }
 
@@ -2783,7 +2786,7 @@ ${rowsHtml}
       const stops = NUR_METHODS.map(m => { const a = acc; acc += m.pct; return `${m.c} ${a}% ${Math.min(100, acc)}%`; }).join(", ");
       donut.innerHTML = `
         <div class="donut" style="background:conic-gradient(${stops})"><div class="donut__hole"><div class="donut__num">${NUR_METHODS.reduce((s, m) => s + m.mfy, 0)}</div><div class="donut__lab">mahalla</div></div></div>
-        <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${m.pct}%</b></div>`).join("")}</div>`;
+        <div class="donut__legend">${NUR_METHODS.map(m => `<div><span class="dleg" style="background:${m.c}"></span>${m.k} <b>${koPct(m.pct)}%</b></div>`).join("")}</div>`;
     }
 
     const bars = $("#mapBars");
@@ -3128,6 +3131,361 @@ ${rowsHtml}
     }
   }
 
+
+  /* =========================================================
+     O'QUV YO'LI: 2-qadam (Xavf yo'llari) + 3-qadam (Kitobxonlik)
+     Barcha rollarga ochiq. Yagona identifikatorlar:
+       yosh: a1=10–14, a2=15–19, a3=20–30, a4=31–45, a5=46+
+       yo'l slug: kartadan-pul-yechish, ijtimoiy-muhandislik,
+                  zararli-ilovalar-apk, onlayn-savdo-firibgarligi, telegram-akkaunt
+     ========================================================= */
+  const KO_BASE = "/yol/";          // barcha yo'l marshrutlarining bazaviy manzili
+  const PATH_BALL = 30;             // yo'l testi uchun ball
+  const BOOK_BALL = 20, CERT_BALL = 60, BOOKS_NEEDED = 4;
+
+  const KO_ICO = {
+    card:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6 15h4"/></svg>',
+    mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6" stroke-linecap="round"/></svg>',
+    apk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v7m0 0 2.5-2.5M12 14l-2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 3.5h2.2l2.2 11h10.4l2.2-8H6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>',
+    kid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M5 21a7 7 0 0 1 14 0" stroke-linecap="round"/></svg>',
+    teen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3" stroke-linecap="round"/></svg>',
+    adult:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20a8 8 0 0 1 16 0" stroke-linecap="round"/><circle cx="12" cy="7.5" r="3.8"/><path d="M12 11.5v4" stroke-linecap="round"/></svg>',
+    family:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M14 20a4.5 4.5 0 0 1 7.5-2.4" stroke-linecap="round"/></svg>',
+    elder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="7" r="3.4"/><path d="M6 20v-4a5 5 0 0 1 10 0v4M18.5 11v9" stroke-linecap="round"/></svg>',
+    info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="7.8" r=".7" fill="currentColor" stroke="none"/></svg>',
+    book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4.5h6a3 3 0 0 1 2 2.8V20a2.4 2.4 0 0 0-2-1.6H4Z" stroke-linejoin="round"/><path d="M20 4.5h-6a3 3 0 0 0-2 2.8V20a2.4 2.4 0 0 1 2-1.6h6Z" stroke-linejoin="round"/></svg>'
+  };
+
+  const AGE_NAMES = { a1:"10–14 yosh", a2:"15–19 yosh", a3:"20–30 yosh", a4:"31–45 yosh", a5:"46+ yosh" };
+  const AGES = [
+    { id:"a1", label:"10–14", ico:KO_ICO.kid,    high:false,
+      ctx:"Moliyaviy zarar kam, ammo bu toifa — <b>oilaga xabar yetkazuvchi asosiy bo'g'in</b>. Shuning uchun o'yin shaklidagi qisqa modullar va uyga topshiriq beriladi." },
+    { id:"a2", label:"15–19", ico:KO_ICO.teen,   high:false,
+      ctx:"Aynan shu toifadan <b>Kiber Elchi</b> tayyorlanadi. Bilimdan tashqari <b>boshqalarga tushuntira olish</b> ko'nikmasi baholanadi — offline testda shu jihat ajratib ko'rsatiladi." },
+    { id:"a3", label:"20–30", ico:KO_ICO.adult,  high:true,
+      ctx:"Raqamli xizmatlardan eng faol foydalanuvchi toifa. <b>Kartadan pul yechish</b> holatlari ko'proq shu yoshda qayd etilgan (Nurafshon, Qumariq, Oppoq mahallalari)." },
+    { id:"a4", label:"31–45", ico:KO_ICO.family, high:true,
+      ctx:"<b>Murojaatlarning asosiy qismi shu toifada.</b> Yangi obod mahallasida qayd etilgan 13 ta murojaatning aksariyati 35–45 yosh oralig'iga to'g'ri keladi." },
+    { id:"a5", label:"46+",   ico:KO_ICO.elder,  high:false,
+      ctx:"Dehqonobod (30–55) va Mukumiy (35–50) ko'rsatkichlari shu toifaga tegishli. Sekin sur'at, yirik matn va <b>ovozli format</b> ustuvor qilingan." }
+  ];
+
+  /* PATHS — MAJBURIY SHART: har bir yosh id (a1…a5) kamida bitta yo'lning
+     ages ro'yxatida bo'lishi kerak, aks holda o'sha toifa bo'sh natija beradi.
+     Shu sababli a1 va a2 ikkitadan yo'lga biriktirilgan (zararli-ilovalar-apk +
+     telegram-akkaunt). Qo'shimcha himoya sifatida renderYollar() avval recCount
+     hisoblaydi va xiralashtirishni FAQAT recCount > 0 bo'lganda qo'llaydi.
+     Foizlar yig'indisi 100% emas (108,1%) — bu ataylab: bitta murojaatda bir
+     nechta usul qayd etilishi mumkin. Raqamlar o'zgartirilmaydi. */
+  const PATHS = [
+    { slug:"kartadan-pul-yechish", title:"Kartadan pul yechish", sub:"Eng ko'p uchraydigan usul",
+      pct:38.2, ico:KO_ICO.card, ages:["a3","a4"], modules:4, minutes:25,
+      desc:"Firibgar bank xodimi niqobida qo'ng'iroq qilib, karta ma'lumotlari va SMS-kodni qo'lga kiritadi.",
+      steps:[["Qanday ishlaydi","Real qo'ng'iroq yozuvi asosidagi 3 daqiqalik video tahlil"],
+             ["Hayotiy vaziyat","«Bank xodimi» qo'ng'irog'i — bosqichma-bosqich ajratib ko'rsatiladi"],
+             ["Amaliy ko'nikma","Kartani zudlik bilan bloklash tartibi"],
+             ["Onlayn test","10 savol · o'tish balli 70%"]] },
+    { slug:"ijtimoiy-muhandislik", title:"Ijtimoiy muhandislik (firibgarlik)", sub:"Ishonchga kirib olish orqali",
+      pct:32.5, ico:KO_ICO.mic, ages:["a3","a4","a5"], modules:4, minutes:30,
+      desc:"Texnik hujum emas — insonning ishonchi, shoshilinchi va qo'rquvi orqali ma'lumot olinadi.",
+      steps:[["Firibgar tili","Shoshiltirish, qo'rqitish, maxfiylik — uchta asosiy belgi"],
+             ["Hayotiy vaziyat","«O'g'lingiz muammoga tushdi» sxemasi to'liq tahlil qilinadi"],
+             ["Amaliy ko'nikma","Suhbatni to'xtatish va mustaqil kanal orqali qayta tekshirish"],
+             ["Onlayn test","12 savol · o'tish balli 70%"]] },
+    { slug:"zararli-ilovalar-apk", title:"Zararli ilovalar (APK)", sub:"Eng tez o'sayotgan tahdid",
+      pct:25.0, ico:KO_ICO.apk, ages:["a1","a2","a3","a4"], modules:4, minutes:25,
+      desc:"Rasmiy do'kondan tashqari o'rnatilgan fayl telefondagi SMS va bank ilovasiga kirish huquqini oladi.",
+      steps:[["Qanday ishlaydi","«Qarzdorlik» nomli fayl o'rnatilgach nima sodir bo'ladi"],
+             ["Hayotiy vaziyat","Er-xotin va soxta MIB xabari — real holat tahlili"],
+             ["Amaliy ko'nikma","Ilova ruxsatlarini tekshirish va bekor qilish"],
+             ["Onlayn test","10 savol · o'tish balli 70%"]] },
+    { slug:"onlayn-savdo-firibgarligi", title:"Onlayn savdo firibgarligi", sub:"Soxta do'kon va e'lonlar",
+      pct:6.2, ico:KO_ICO.cart, ages:["a4","a5"], modules:3, minutes:20,
+      desc:"Mavjud bo'lmagan tovar uchun oldindan to'lov olinadi va aloqa uziladi.",
+      steps:[["Soxta do'kon belgilari","Beshta tekshiruv nuqtasi bo'yicha amaliy ro'yxat"],
+             ["Hayotiy vaziyat","Instagram e'loni bo'yicha oldindan to'lov holati"],
+             ["Onlayn test","8 savol · o'tish balli 70%"]] },
+    { slug:"telegram-akkaunt", title:"Telegram akkauntni egallash", sub:"Yoshlar orasida keng tarqalgan",
+      pct:6.2, ico:ICON.tg, ages:["a1","a2","a3"], modules:3, minutes:15,
+      desc:"Kirish kodi qo'lga kiritilgach, akkaunt do'stlardan pul so'rash uchun ishlatiladi.",
+      steps:[["Kod so'raladigan holatlar","Hech kim, hech qachon — qoidaning izohi"],
+             ["Amaliy ko'nikma","Ikki bosqichli tekshiruvni yoqish"],
+             ["Onlayn test","8 savol · o'tish balli 70%"]] }
+  ];
+  const PATH_NAMES = {}; PATHS.forEach(p => PATH_NAMES[p.slug] = p.title);
+
+  const KO_BOOKS = [
+    { slug:"raqamli-xavfsizlik-asoslari", title:"Raqamli xavfsizlik asoslari", path:null,
+      state:"O'qildi · test 90% · +20 ball", badge:"Yakunlandi", bcls:"ko-b--done" },
+    { slug:"onlayn-tolovlar-karta-xavfsizligi", title:"Onlayn to'lovlar va karta xavfsizligi", path:"kartadan-pul-yechish",
+      state:"O'qildi · test 80% · +20 ball", badge:"Yakunlandi", bcls:"ko-b--done" },
+    { slug:"firibgar-psixologiyasi", title:"Firibgar psixologiyasi: ishonchga kirish sxemalari", path:"ijtimoiy-muhandislik",
+      state:"O'qib bo'lindi · test ochiq", badge:"Test topshiring", bcls:"ko-b--test" },
+    { slug:"mobil-qurilma-ruxsatlari", title:"Mobil qurilma va ilova ruxsatlari", path:"zararli-ilovalar-apk",
+      state:"142 sahifadan 38-si", badge:"O'qilmoqda", bcls:"ko-b--read" },
+    { slug:"soxta-dokon-onlayn-savdo", title:"Soxta do'kon va onlayn savdo", path:"onlayn-savdo-firibgarligi",
+      state:"Boshlanmagan · ≈2 soat", badge:"Boshlash", bcls:"ko-b--new" },
+    { slug:"messenjer-akkaunt-himoyasi", title:"Messenjer akkauntini himoyalash", path:"telegram-akkaunt",
+      state:"Boshlanmagan · ≈1,5 soat", badge:"Boshlash", bcls:"ko-b--new" },
+    { slug:"kiber-elchi-qollanmasi", title:"Kiber Elchi qo'llanmasi", path:null,
+      state:"Nomzod darajasidan ochiladi", badge:"Yopiq", bcls:"ko-b--lock", locked:true }
+  ];
+
+  /* --- holat --- */
+  let koAge = "a4";      // boshlang'ich tanlov
+  let koPath = null;     // 2-qadamda tanlangan yo'l (kitobxonlikka uzatiladi)
+
+  const koNum = n => String(n).replace(".", ",");
+  const koPct = n => n.toFixed(1).replace(".", ",");   // 25 -> "25,0" (bitta kasr xona doim ko'rinadi)
+  const koAgeName = id => AGE_NAMES[id] || null;
+  const koPathName = slug => PATH_NAMES[slug] || null;
+  const koQ = () => `?yosh=${koAge}`;
+  // foizlar yig'indisi — runtime'da hisoblanadi, hardcode qilinmaydi
+  const koPctSum = () => Math.round(PATHS.reduce((s, p) => s + p.pct, 0) * 10) / 10;
+  const KO_PCT_TIP = "Bir murojaatda bir nechta usul qayd etilishi mumkin, shuning uchun ulushlar yig'indisi 100% dan oshadi.";
+  const koSrcNote = () => `Manba: Nurafshon shahri bo'yicha qayd etilgan murojaatlar tahlili. Foizlar bitta murojaatda bir nechta usul birgalikda qo'llanilgan bo'lishi mumkinligini hisobga oladi, shuning uchun ularning yig'indisi 100% emas, <b>${koNum(koPctSum())}%</b> ni tashkil etadi.`;
+
+  /* --- yo'nalish zanjiri --- */
+  function koChain(cur) {
+    const steps = [[1, "Yosh toifasi"], [2, "Xavf yo'li"], [3, "Kitobxonlik"], [4, "Attestatsiya"]];
+    return steps.map(([n, t]) => {
+      const cls = n < cur ? "is-done" : n === cur ? "is-cur" : "";
+      return `<span class="ko-chain__i ${cls}"><i class="ko-chain__n">${n < cur ? "✓" : n}</i>${t}</span>`;
+    }).join('<span class="ko-chain__sep">→</span>');
+  }
+  function koStepHead(n, t) {
+    return `<span class="ko-step__n">${n}</span><span class="ko-step__t">${n}-qadam — ${t}</span>`;
+  }
+
+  /* =========================================================
+     2-QADAM — XAVF YO'LLARI
+     ========================================================= */
+  function renderYollar() {
+    const chain = $("#ylChain"); if (chain) chain.innerHTML = koChain(2);
+    const step = $("#ylStep"); if (step) step.innerHTML = koStepHead(2, "Xavf yo'li");
+
+    // yosh toifalari
+    const ag = $("#ylAges");
+    if (ag) {
+      ag.innerHTML = AGES.map(a => `
+        <button type="button" class="ko-age${a.id === koAge ? " is-on" : ""}" data-age="${a.id}" aria-pressed="${a.id === koAge}">
+          <span class="ko-age__ico">${a.ico}</span>
+          <span class="ko-age__lab">${a.label}</span>
+          ${a.high ? '<span class="ko-age__hi"><i></i>YUQORI XAVF</span>' : ""}
+        </button>`).join("");
+      ag.querySelectorAll("[data-age]").forEach(b => b.addEventListener("click", () => {
+        koAge = b.dataset.age; renderYollar();
+      }));
+    }
+
+    // TAVSIYALAR — avval hisoblanadi, xiralashtirish faqat recCount > 0 bo'lsa qo'llaniladi
+    const recCount = PATHS.filter(p => p.ages.includes(koAge)).length;
+    const age = AGES.find(a => a.id === koAge) || AGES[0];
+
+    const ctx = $("#ylCtx");
+    if (ctx) {
+      ctx.innerHTML = `<span class="ko-ctx__ico">${KO_ICO.info}</span><p>${
+        recCount > 0
+          ? `${age.ctx} Ushbu toifa uchun <b>${recCount} ta yo'l</b> tavsiya etiladi.`
+          : "Bu toifa uchun maxsus yo'l tayyorlanmoqda — quyida barcha yo'llar ko'rsatilgan."}</p>`;
+    }
+
+    // yo'l kartalari
+    const wrap = $("#ylPaths");
+    if (wrap) {
+      const maxPct = Math.max(...PATHS.map(p => p.pct));
+      const ramp = ["#0B3E7A", "#12508F", "#2E78C7", "#5B9BE0", "#7FB0E8"];
+      const sorted = [...PATHS].sort((a, b) => {
+        const ra = a.ages.includes(koAge) ? 1 : 0, rb = b.ages.includes(koAge) ? 1 : 0;
+        return rb - ra || b.pct - a.pct;
+      });
+      wrap.innerHTML = sorted.map((p, i) => {
+        const rec = p.ages.includes(koAge);
+        const dim = recCount > 0 && !rec;      // recCount = 0 bo'lsa hech biri xiralashmaydi
+        const col = ramp[Math.min(ramp.length - 1, PATHS.slice().sort((x, y) => y.pct - x.pct).findIndex(x => x.slug === p.slug))];
+        return `
+        <article class="card ko-path${dim ? " is-dim" : ""}" data-path="${p.slug}">
+          <div class="ko-path__top">
+            <span class="ko-path__ico" style="background:${col}">${p.ico}</span>
+            <div class="ko-path__h"><h3>${p.title}</h3><span class="ko-path__sub">${p.sub}</span></div>
+            ${rec ? '<span class="ko-path__rec">TAVSIYA</span>' : ""}
+          </div>
+          <div class="ko-path__pct">
+            <span class="ko-path__pl" title="${KO_PCT_TIP}">Murojaatlarda uchraydi</span>
+            <span class="ko-path__pv">${koPct(p.pct)}%</span>
+          </div>
+          <div class="ko-path__bar"><i style="width:${p.pct / maxPct * 100}%;background:${col}"></i></div>
+          <p class="ko-path__desc">${p.desc}</p>
+          <a class="btn btn--gold btn--block ko-path__go" href="${KO_BASE}${p.slug}${koQ()}" data-ko-link>Yo'lni boshlash →</a>
+          <button type="button" class="ko-path__tog" aria-expanded="false" aria-controls="ylSteps${i}">Yo'l tarkibini ko'rish →</button>
+          <ol class="ko-path__steps" id="ylSteps${i}" hidden>
+            ${p.steps.map((s, k) => `<li><a href="${KO_BASE}${p.slug}/${k + 1}${koQ()}" data-ko-link><b>${s[0]}</b><span>${s[1]}</span></a></li>`).join("")}
+          </ol>
+          <div class="ko-path__meta">${p.modules} ta modul · ≈${p.minutes} daqiqa · Yo'l testi · +${PATH_BALL} ball</div>
+        </article>`;
+      }).join("");
+      wrap.querySelectorAll(".ko-path__tog").forEach(b => b.addEventListener("click", () => {
+        const list = document.getElementById(b.getAttribute("aria-controls"));
+        const open = b.getAttribute("aria-expanded") === "true";
+        b.setAttribute("aria-expanded", String(!open));
+        list.hidden = open;
+        b.textContent = open ? "Yo'l tarkibini ko'rish →" : "Yo'l tarkibini yopish ↑";
+      }));
+    }
+
+    const next = $("#ylNext");
+    if (next) next.innerHTML = `
+      <div class="ko-next__b">
+        <span class="ko-next__k">3-qadam — Kitobxonlik va sertifikat</span>
+        <p>Xavf yo'lini yakunlagach, kitobxonlik dasturi boshlanadi: to'rtta kitob va ularning testlari sertifikatga olib boradi.</p>
+      </div>
+      <a class="btn btn--gold btn--lg" href="/kitobxonlik${koQ()}" data-ko-link>Kitobxonlikni ko'rish →</a>`;
+
+    const src = $("#ylSrc"); if (src) src.innerHTML = koSrcNote();
+  }
+
+  /* =========================================================
+     3-QADAM — KITOBXONLIK VA SERTIFIKAT
+     ========================================================= */
+  function renderKitobxonlik() {
+    const chain = $("#ktChain"); if (chain) chain.innerHTML = koChain(3);
+    const step = $("#ktStep"); if (step) step.innerHTML = koStepHead(3, "Kitobxonlik");
+
+    const aName = koAgeName(koAge), pName = koPathName(koPath);
+    const ctx = $("#ktCtx");
+    if (ctx) {
+      let txt;
+      if (aName && pName) txt = `<b>${pName} yo'li · ${aName}.</b> Shu yo'lga biriktirilgan kitob ro'yxat boshiga chiqarildi. Qolgan uchtasini istalgan kitobdan tanlashingiz mumkin.`;
+      else if (aName) txt = `<b>${aName}.</b> Yo'l tanlanmagan — quyida barcha kitoblar ko'rsatilgan. 2-qadamda xavf yo'lini tanlasangiz, unga mos kitob ro'yxat boshiga chiqariladi.`;
+      else txt = "Kitoblar barcha yo'llar bo'yicha ko'rsatilmoqda. 2-qadamda xavf yo'lini tanlasangiz, unga mos kitob ro'yxat boshiga chiqariladi.";
+      ctx.innerHTML = `<span class="ko-ctx__ico">${KO_ICO.info}</span><p>${txt}</p>`;
+    }
+
+    // progress zanjiri
+    const prog = $("#ktProg");
+    if (prog) {
+      const nodes = [["1-kitob", "done"], ["2-kitob", "done"], ["3-kitob", "cur"], ["4-kitob", ""], ["Sertifikat", ""]];
+      prog.innerHTML = `
+        <div class="ko-prog__h">
+          <div><b>Sertifikatgacha</b><span>Har bir kitob testi kamida 70% ball bilan topshirilishi shart</span></div>
+          <span class="ko-prog__c">2 / ${BOOKS_NEEDED} kitob yakunlandi</span>
+        </div>
+        <div class="ko-prog__chain">${nodes.map((n, i) => `
+          <div class="ko-prog__n ${n[1] ? "is-" + n[1] : ""}">
+            <i>${n[1] === "done" ? "✓" : i + 1 === 5 ? "★" : i + 1}</i><span>${n[0]}</span>
+          </div>${i < nodes.length - 1 ? `<div class="ko-prog__l ${nodes[i + 1][1] === "done" ? "is-done" : ""}"></div>` : ""}`).join("")}
+        </div>`;
+    }
+
+    // kitoblar — mos kelgani ro'yxat boshida
+    const bl = $("#ktBooks");
+    if (bl) {
+      const list = [...KO_BOOKS].sort((a, b) => (b.path === koPath && koPath ? 1 : 0) - (a.path === koPath && koPath ? 1 : 0));
+      bl.innerHTML = list.map(b => {
+        const mine = koPath && b.path === koPath;
+        const chip = mine ? `Sizning yo'lingiz · ${koPathName(b.path)}`
+                          : b.path ? koPathName(b.path) : "Barcha yo'llar uchun";
+        const inner = `
+          <span class="ko-book__ico">${KO_ICO.book}</span>
+          <span class="ko-book__b">
+            <span class="ko-book__t">${b.title}</span>
+            <span class="ko-book__chip${mine ? " is-mine" : ""}">${chip}</span>
+            <span class="ko-book__s">${b.state}</span>
+          </span>
+          <span class="ko-book__badge ${b.bcls}">${b.badge}</span>`;
+        return b.locked
+          ? `<div class="ko-book is-locked" aria-disabled="true">${inner}</div>`
+          : `<a class="ko-book${mine ? " is-mine" : ""}" href="/kitob/${b.slug}${koQ()}" data-ko-link>${inner}</a>`;
+      }).join("");
+    }
+    const bn = $("#ktBooksNote");
+    if (bn) bn.innerHTML = `Dastur uchun istalgan <b>${BOOKS_NEEDED} ta kitob</b> hisobga olinadi — yo'lingizga mos kitoblar ro'yxat boshiga chiqariladi.`;
+
+    // ball narvoni
+    const ld = $("#ktLadder");
+    if (ld) ld.innerHTML = `
+      <h3 class="ko-h3">Ball narvoni</h3>
+      <div class="ko-lad__r"><span>Kitob testi — har biri</span><b>+${BOOK_BALL} ball</b></div>
+      <div class="ko-lad__r"><span>Sertifikat — ${BOOKS_NEEDED}-kitob yopilgach</span><b>+${CERT_BALL} ball</b></div>
+      <div class="ko-lad__r is-sum"><span>Kitobxonlik dasturi jami</span><b>${BOOKS_NEEDED * BOOK_BALL + CERT_BALL} ball</b></div>
+      <div class="ko-lad__r is-extra"><span>Xavf yo'li testi — 2-qadamdan, har biri</span><b>+${PATH_BALL} ball</b></div>`;
+
+    // uch xil test
+    const ts = $("#ktTests");
+    if (ts) {
+      const T = [
+        ["Yo'l testi", "Xavf yo'li modullari oxirida topshiriladi.", `2-qadam · 8–12 savol · 70% · +${PATH_BALL} ball`],
+        ["Kitob testi", "Kitob o'qib bo'lingach topshiriladi. Sertifikat aynan shundan yig'iladi.", `3-qadam · 70% · +${BOOK_BALL} ball`],
+        ["Offline attestatsiya", "Mahallada, jonli o'tkaziladi. Kiber Elchi maqomi faqat shundan keyin beriladi.", "Onlayn ballar bunga qo'yiladigan shart"]
+      ];
+      ts.innerHTML = `<h3 class="ko-h3">«Test» so'zi uch xil ma'noda ishlatiladi</h3>
+        <div class="ko-tests__g">${T.map(t => `<div class="card ko-test"><b>${t[0]}</b><p>${t[1]}</p><span>${t[2]}</span></div>`).join("")}</div>`;
+    }
+
+    // sertifikat namunasi
+    const ct = $("#ktCert");
+    if (ct) ct.innerHTML = `
+      <div class="ko-cert__paper">
+        <span class="ko-cert__ribbon">NAMUNA</span>
+        <div class="ko-cert__brand">${ICON.shieldCheck}<span>KiberOgoh UZ<br><i>Toshkent viloyati IIBB</i></span></div>
+        <div class="ko-cert__ttl">SERTIFIKAT</div>
+        <div class="ko-cert__sub">Kiber savodxonlik bo'yicha kitobxonlik dasturi</div>
+        <div class="ko-cert__name">F.I.SH.<i></i></div>
+        <p class="ko-cert__txt">Kitobxonlik dasturining barcha ${BOOKS_NEEDED} ta kitobini o'qib, testlarini muvaffaqiyatli topshirgani tasdiqlanadi.</p>
+        <div class="ko-cert__meta">
+          <div><span>Sertifikat raqami:</span><b>KO-2026-000482</b></div>
+          <div><span>Yo'nalish:</span><b>${pName || "Umumiy dastur"}</b></div>
+          <div><span>Berilgan sana:</span><b>__.__.2026</b></div>
+          <div><span>Mahalla:</span><b>Nurafshon sh., ______ MFY</b></div>
+        </div>
+        <div class="ko-cert__qr">${fakeQR("KO-2026-000482", 11)}<span>Haqiqiyligini tekshirish</span></div>
+      </div>
+      <p class="ko-cert__note">${ICON.check} QR kod <b>kiberogoh.uz/sert/KO-2026-000482</b> manziliga olib boradi. Bekor qilingan sertifikat u yerda darhol «haqiqiy emas» deb ko'rsatiladi.</p>`;
+
+    const mv = $("#ktMotiv");
+    if (mv) mv.innerHTML = `
+      <h3 class="ko-h3">Sertifikat darajalar tizimiga qanday bog'lanadi</h3>
+      <p>Kitobxonlik dasturi <b>${BOOKS_NEEDED * BOOK_BALL + CERT_BALL} ball</b> beradi (${BOOKS_NEEDED}×${BOOK_BALL} + ${CERT_BALL}). Unga 2-qadamda yakunlangan <b>har bir xavf yo'li +${PATH_BALL} ball</b> qo'shadi. Kiber Elchilar uchun sertifikat qayta attestatsiyada hisobga olinadi.</p>`;
+
+    const nx = $("#ktNext");
+    if (nx) nx.innerHTML = `
+      <div class="ko-next__b">
+        <span class="ko-next__k">4-qadam — Kiber Elchi attestatsiyasi</span>
+        <p>Sertifikat olingach, mahallada jonli attestatsiyaga yoziladi. Onlayn ballar unga qo'yiladigan shart hisoblanadi.</p>
+      </div>
+      <a class="btn btn--gold btn--lg" href="/elchi${koQ()}" data-ko-link>Shartlar bilan tanishish →</a>`;
+
+    const src = $("#ktSrc");
+    if (src) src.innerHTML = "Sertifikat namunasi — yakuniy dizayn IIBB bilan kelishilgandan keyin tasdiqlanadi. Ball miqdorlari namunaviy, pilot natijalariga qarab sozlanadi.";
+  }
+
+  /* --- marshrutlar: demo ichida ushlab qolinadi --- */
+  function koToast(msg) {
+    let t = $("#koToast");
+    if (!t) { t = el("div", "ko-toast"); t.id = "koToast"; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add("is-on");
+    clearTimeout(koToast._t); koToast._t = setTimeout(() => t.classList.remove("is-on"), 3200);
+  }
+  function setupKoLinks() {
+    document.addEventListener("click", e => {
+      const a = e.target.closest("a[data-ko-link]"); if (!a) return;
+      e.preventDefault();
+      const url = new URL(a.getAttribute("href"), location.origin);
+      const p = url.pathname, q = url.searchParams.get("yosh");
+      if (q && AGE_NAMES[q]) koAge = q;
+      if (p === "/kitobxonlik") { showView("kitobxonlik"); return; }
+      if (p === "/elchi") { showView("cert"); return; }
+      if (p.startsWith(KO_BASE)) {
+        const slug = p.slice(KO_BASE.length).split("/")[0];
+        if (PATH_NAMES[slug]) { koPath = slug; renderKitobxonlik(); koToast(`«${PATH_NAMES[slug]}» yo'li tanlandi — kitobxonlikda birinchi o'ringa chiqadi.`); }
+        return;
+      }
+      if (p.startsWith("/kitob/")) { koToast("Kitob sahifasi konseptual demoda hali ochilmagan."); return; }
+      koToast("Bu sahifa konseptual demoda hali ochilmagan.");
+    });
+  }
+
   /* =========================================================
      INIT
      ========================================================= */
@@ -3163,6 +3521,9 @@ ${rowsHtml}
     renderPlatformAnalytics();
     renderMahalla();
     setupPermitModal();
+    renderYollar();
+    renderKitobxonlik();
+    setupKoLinks();
     setupLogin();
     bindRoleSwitch();
     applyRole("user");           // boshlang'ich — oddiy fuqaro; imtiyozli rollar login talab qiladi

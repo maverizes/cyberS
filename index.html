@@ -134,6 +134,23 @@
           </svg>
           Kiber Layfxak
         </button>
+        <button class="nav-item" data-view="yollar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19c4-1 5-6 9-7s6-1 7-3" stroke-linecap="round"/>
+            <circle cx="4.5" cy="19" r="1.8"/><circle cx="19.5" cy="6" r="1.8"/>
+            <path d="M12 3.5 13 6l2.5 1L13 8l-1 2.5L11 8 8.5 7 11 6Z" stroke-linejoin="round"/>
+          </svg>
+          Xavf yo'llari
+          <span class="badge badge--step">2</span>
+        </button>
+        <button class="nav-item" data-view="kitobxonlik">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4.5h5.5A2.5 2.5 0 0 1 12 7v12a2 2 0 0 0-1.7-1H4Z" stroke-linejoin="round"/>
+            <path d="M20 4.5h-5.5A2.5 2.5 0 0 0 12 7v12a2 2 0 0 1 1.7-1H20Z" stroke-linejoin="round"/>
+          </svg>
+          Kitobxonlik
+          <span class="badge badge--step">3</span>
+        </button>
         <button class="nav-item nav-item--goal" data-view="cert">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round" />
@@ -481,6 +498,51 @@
       </section>
 
       <!-- ===== OFFLINE SERTIFIKAT SINOVI ===== -->
+      <!-- ===== 2-QADAM: XAVF YO'LLARI ===== -->
+      <section class="view ko-yl" id="view-yollar">
+        <nav class="ko-chain" id="ylChain" aria-label="Yo'nalish zanjiri"></nav>
+        <div class="page-head">
+          <span class="eyebrow">O'quv yo'li</span>
+          <h1>Yoshingizga mos xavf yo'lini tanlang</h1>
+          <p class="lead">Nurafshon shahri murojaatlari tahlili asosida beshta xavf yo'li ajratildi. Avval yosh
+            toifangizni belgilang — tizim aynan sizga tegishli yo'llarni tepaga chiqaradi.</p>
+        </div>
+        <div class="ko-step" id="ylStep"></div>
+        <div class="ko-ages" id="ylAges"></div>
+        <div class="ko-ctx" id="ylCtx" role="status" aria-live="polite"></div>
+        <div class="ko-paths" id="ylPaths"></div>
+        <div class="ko-next" id="ylNext"></div>
+        <p class="ko-src" id="ylSrc"></p>
+      </section>
+
+      <!-- ===== 3-QADAM: KITOBXONLIK VA SERTIFIKAT ===== -->
+      <section class="view ko-kt" id="view-kitobxonlik">
+        <nav class="ko-chain" id="ktChain" aria-label="Yo'nalish zanjiri"></nav>
+        <div class="page-head">
+          <span class="eyebrow">O'quv yo'li</span>
+          <h1>Kitobxonlik va sertifikat</h1>
+          <p class="lead">To'rtta kitob va ularning testlari sertifikatga olib boradi. Xavf yo'lingizga mos kitob
+            ro'yxat boshiga chiqariladi.</p>
+        </div>
+        <div class="ko-step" id="ktStep"></div>
+        <div class="ko-ctx" id="ktCtx" role="status" aria-live="polite"></div>
+        <div class="ko-kt__grid">
+          <div class="ko-kt__main">
+            <div class="card card--pad ko-prog" id="ktProg"></div>
+            <div class="ko-books" id="ktBooks"></div>
+            <p class="ko-src" id="ktBooksNote"></p>
+            <div class="card card--pad ko-lad" id="ktLadder"></div>
+            <div class="ko-tests" id="ktTests"></div>
+          </div>
+          <aside class="ko-kt__aside">
+            <div class="ko-cert" id="ktCert"></div>
+          </aside>
+        </div>
+        <div class="card card--pad ko-motiv" id="ktMotiv"></div>
+        <div class="ko-next" id="ktNext"></div>
+        <p class="ko-src" id="ktSrc"></p>
+      </section>
+
       <section class="view" id="view-cert">
         <div class="page-head">
           <span class="eyebrow">⭐️ Asosiy maqsad</span>
