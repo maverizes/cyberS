@@ -618,7 +618,7 @@
     assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
-    yollar:"Xavf yo'llari", kitobxonlik:"Kitobxonlik va sertifikat"
+    yollar:"Xavf yo'llari", kitobxonlik:"Kitobxonlik va sertifikat", umumiy:"Umumiy bo'lim"
   };
   let dashAnimated = false, quizBuilt = false;
 

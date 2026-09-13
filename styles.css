@@ -2234,3 +2234,16 @@ a.ko-book:hover{ border-color:var(--blue); transform:translateX(2px); }
   .ko-ft-cert__btn{ width:100%; }
   .ko-ft-bot{ justify-content:flex-start; }
 }
+
+/* footer alohida panel sifatida ishlatilganda (view-umumiy ichida) */
+.ko-ft--panel {
+  margin-top: 0;
+}
+
+/* shoshilinch yordam bosh sahifada mustaqil blok sifatida */
+.ko-ft--solo {
+  margin: 0 0 18px;
+}
+.ko-ft--solo .ko-ft-sos {
+  border-left-width: 5px;
+}
