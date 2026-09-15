@@ -294,7 +294,7 @@
     return `<svg viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg" class="qr"><rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#10162e">${rects}</g></svg>`;
   }
 
-  // onlayn testdan o'tib, ruxsatnomasi tayyor bo'lgan fuqarolar (faqat yetakchiga ko'rinadi)
+  // onlayn testdan o'tib, ruxsatnomasi tayyor bo'lgan fuqarolar (faqat mahalla adminiga ko'rinadi)
   const PERMITS = [
     { rep:"Alisher", hh:"Abdullayevlar", full:"Alisher Abdullayev", code:"RX-2026-0142", date:"27.06.2026", isNew:true },
     { rep:"Madina", hh:"Rahimovlar", full:"Madina Rahimova", code:"RX-2026-0138", date:"25.06.2026", isNew:true },
@@ -362,14 +362,12 @@
   const ROLE_META = {
     superadmin: { name:"Superadmin", scope:"Butun platforma" },
     tuman:      { name:"Tuman mas'uli", scope:"Nurafshon shahri" },
-    raisi:      { name:"Yoshlar yetakchisi", scope:"Navro'z MFY" },
+    raisi:      { name:"Mahalla admini", scope:"Navro'z MFY" },
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
   const MY_TUMAN = "Nurafshon shahri";
   /* ---- Autentifikatsiya (demo) ---- */
-  const AUTH = { login: "admin", pass: "1234" };            // imtiyozli rollar uchun
-  const LOCKED_ROLES = ["superadmin", "tuman", "raisi"];    // login talab qilinadi
-  const unlockedRoles = {};                                  // sessiya davomida eslab qolinadi
+  // xodim akkauntlari ACCOUNTS da (NAVIGATSIYA bloki) — rol akkaunt orqali aniqlanadi
   function loadUser() { try { return JSON.parse(localStorage.getItem("ko_user") || "null"); } catch (e) { return null; } }
   function saveUser(u) { try { localStorage.setItem("ko_user", JSON.stringify(u)); } catch (e) {} }
   let KO_USER = loadUser();                                  // user: bir marta ro'yxat — ID saqlanadi, logout yo'q
@@ -390,7 +388,7 @@
     { r:"O'z mahallasi KXI statistikasi", s:"y", tm:"dist", a:"own", u:"n" },
     { r:"Boshqa tumanlar / butun platforma", s:"y", tm:"n", a:"n", u:"n" },
     { r:"Barcha mahalla va raislarni boshqarish", s:"y", tm:"n", a:"n", u:"n" },
-    { r:"Rol biriktirish (yetakchi tayinlash)", s:"y", tm:"n", a:"n", u:"n" },
+    { r:"Rol biriktirish (mahalla admini tayinlash)", s:"y", tm:"n", a:"n", u:"n" },
     { r:"Imtiyoz shartini tasdiqlash", s:"y", tm:"n", a:"own", u:"n" }
   ];
   // mahalla foydalanuvchilari = HOUSEHOLDS vakillari (Navbahor MFY)
@@ -618,7 +616,8 @@
     assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
-    umumiy:"Umumiy bo'lim"
+    umumiy:"Umumiy bo'lim",
+    mavzular:"Mavzular", natijalar:"Sinov natijalarim", yollar:"Xavf yo'llari", ball:"Ball va daraja", elchi:"Kiber elchi bo'lish"
   };
   let dashAnimated = false, quizBuilt = false;
 
@@ -627,16 +626,24 @@
   const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"], kxi: ["superadmin", "tuman", "raisi"] };
   const canSeeView = v => !RESTRICTED[v] || RESTRICTED[v].includes(currentRole);
 
-  function showView(v) {
+  function showView(v, opts = {}) {
+    v = resolveView(v);
     if (!canSeeView(v)) v = "dash"; // RBAC: ruxsat bo'lmasa, asosiy panelga qaytadi
-    $$(".view").forEach(s => s.classList.toggle("is-active", s.id === "view-" + v));
-    $$(".nav-item").forEach(b => b.classList.toggle("is-active", b.dataset.view === v));
+    $$(".view").forEach(sec => sec.classList.toggle("is-active", sec.id === "view-" + v));
+    markNavActive(v);
+    document.body.dataset.view = v;
     document.title = (VIEW_TITLES[v] || "KiberOgoh UZ") + " · KiberOgoh UZ";
+    if (!opts.fromHash) setRouteHash(v);
     $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
-    if (v === "appeals") renderAppeals();
+    if (v === "appeals" && typeof renderAppeals === "function") renderAppeals();
+    if (v === "mavzular") { koTopic = null; renderMavzular(); }   // menyu yoki havola orqali kirilganda — mavzular ro'yxati
+    if (v === "natijalar") renderNatijalar();
+    if (v === "ball") renderBall();
     if (v === "quiz") {
+      if (!opts.topicQuiz && !quizBuilt) koQuizTopic = null;   // to'g'ridan-to'g'ri ochilgan sinov — mavzusiz
+      updateQuizHead();
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
       else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
     }
@@ -668,83 +675,25 @@
     $$("[data-view]").forEach(b => b.addEventListener("click", e => { e.preventDefault(); showView(b.dataset.view); }));
   }
 
-  // RBAC: rolga qarab navigatsiyani va ko'rinishni boshqaradi
+  // RBAC: rol login (akkaunt) orqali aniqlanadi — menyu, bosh sahifa va ma'lumot doirasi rolga moslanadi
   function applyRole(role) {
-    if (LOCKED_ROLES.includes(role) && !unlockedRoles[role]) { openLogin(role); return; }
+    if (!ROLE_META[role]) role = "user";
     currentRole = role;
-    $$(".role-switch button").forEach(b => b.classList.toggle("is-active", b.dataset.role === role));
-    // rolga tegishli nav elementlarini ko'rsatish/yashirish
-    $$(".nav-item[data-role]").forEach(b => {
-      const allowed = b.dataset.role.split(/\s+/).includes(role);
-      b.style.display = allowed ? "" : "none";
-    });
-    // "Boshqaruv" guruhini bo'sh bo'lsa yashirish
-    const grp = $("[data-admin-group]");
-    if (grp) {
-      const anyVisible = $$(".nav-item[data-role]", grp).some(b => b.style.display !== "none");
-      grp.style.display = anyVisible ? "" : "none";
-    }
-    // agar joriy ko'rinish endi yopiq bo'lsa, asosiy panelga qaytadi
-    const active = ($(".view.is-active") || {}).id || "";
-    const v = active.replace("view-", "");
-    if (!canSeeView(v)) showView("dash");
+    renderNav();
+    renderStaffUI();
+    // joriy ko'rinish endi yopiq bo'lsa, rolning bosh sahifasiga qaytadi
+    if (!canSeeView(currentViewId())) showView(ROLE_HOME[role] || "dash");
     mapDrill = null;
     if (typeof renderMap === "function") renderMap();
+    if (typeof renderKxi === "function") renderKxi();
+    if (typeof renderMahalla === "function") renderMahalla();
     if (typeof updateQuizLock === "function") updateQuizLock();
-    if (typeof updateAppealsBadge === "function") updateAppealsBadge();
-    if ($("#view-appeals") && $("#view-appeals").classList.contains("is-active") && typeof renderAppeals === "function") renderAppeals();
     if ($("#view-quiz") && $("#view-quiz").classList.contains("is-active")) {
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
       else if (!quizBuilt) { startQuiz(); quizBuilt = true; }
     }
   }
-  function bindRoleSwitch() {
-    $$(".role-switch button").forEach(b => b.addEventListener("click", () => applyRole(b.dataset.role)));
-    updateRoleLocks();
-  }
 
-  /* ---- Login oynasi (superadmin / tuman mas'uli / yoshlar yetakchisi) ---- */
-  let pendingRole = null;
-  function updateRoleLocks() {
-    $$(".role-switch button").forEach(b => {
-      const r = b.dataset.role;
-      const need = LOCKED_ROLES.includes(r) && !unlockedRoles[r];
-      let ic = b.querySelector(".rlock");
-      if (need && !ic) { ic = document.createElement("span"); ic.className = "rlock"; ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'; b.appendChild(ic); }
-      if (!need && ic) ic.remove();
-    });
-  }
-  function openLogin(role) {
-    pendingRole = role;
-    $("#loginRole").textContent = ROLE_META[role].name;
-    $("#loginErr").classList.remove("show");
-    $("#loginUser").value = ""; $("#loginPass").value = "";
-    $("#loginModal").classList.add("is-open");
-    setTimeout(() => $("#loginUser").focus(), 60);
-  }
-  function closeLogin() { $("#loginModal").classList.remove("is-open"); pendingRole = null; }
-  function tryLogin() {
-    const u = $("#loginUser").value.trim(), p = $("#loginPass").value;
-    if (u === AUTH.login && p === AUTH.pass) {
-      unlockedRoles[pendingRole] = true;
-      const r = pendingRole; closeLogin(); updateRoleLocks(); applyRole(r);
-    } else {
-      const err = $("#loginErr"); err.classList.add("show");
-      const card = $("#loginModal .login-card"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
-    }
-  }
-  function setupLogin() {
-    $("#loginGo").addEventListener("click", tryLogin);
-    $("#loginCancel").addEventListener("click", closeLogin);
-    $("#loginModal").addEventListener("click", e => { if (e.target.id === "loginModal") closeLogin(); });
-    document.addEventListener("keydown", e => {
-      if (!$("#loginModal").classList.contains("is-open")) return;
-      if (e.key === "Escape") closeLogin();
-      if (e.key === "Enter") tryLogin();
-    });
-  }
-
-  /* ---- User ID: bir marta ro'yxat, avtomatik kirish, logout yo'q ---- */
   function genUserId() { return "KO-2026-" + String(100000 + Math.floor(Math.random() * 900000)); }
   function applyUserChip() {
     const btn = $("#topRegBtn"); if (!btn) return;
@@ -771,8 +720,8 @@
   }
 
   // mobile rail
-  function openRail() { $("#rail").classList.add("is-open"); $("#railScrim").classList.add("is-open"); }
-  function closeRail() { $("#rail").classList.remove("is-open"); $("#railScrim").classList.remove("is-open"); }
+  function openRail() { $("#rail").classList.add("is-open"); $("#railScrim").classList.add("is-open"); document.body.classList.add("rail-open"); }
+  function closeRail() { $("#rail").classList.remove("is-open"); $("#railScrim").classList.remove("is-open"); document.body.classList.remove("rail-open"); }
   $("#menuToggle").addEventListener("click", () => $("#rail").classList.contains("is-open") ? closeRail() : openRail());
   $("#railScrim").addEventListener("click", closeRail);
 
@@ -1348,6 +1297,7 @@
     const earned = qScore * POINT_PER_CORRECT;
     const prev = userBall;
     userBall += earned;                // natija shaxsiy ballga qo'shiladi
+    saveResult({ slug: koQuizTopic ? koQuizTopic.slug : null, title: koQuizTopic ? koQuizTopic.t : "Umumiy sinov — Firibgarni tani", score: qScore, total: QUIZ.length, pct, lvl, earned, ts: Date.now() });
     $("#quizWrap").innerHTML = `
       <div class="card quiz-result">
         <div class="medal">${ICON.medal}</div>
@@ -1378,11 +1328,13 @@
         <p class="ripple__note">Har bir fuqaroning bilimi yuqoriga — mahalla, so'ng tuman darajasiga jamlanadi. Bitta odam ham umumiy xavfsizlikka hissa qo'shadi.</p>
       </div>
       <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
-        <button class="btn btn--gold" id="qRestart">Qayta o'ynash</button>
-        <button class="btn btn--ghost" data-view="life">Kiber Layfxak</button>
+        <button class="btn btn--gold" data-view="natijalar">Sinov natijalarim →</button>
+        <button class="btn btn--ghost" id="qRestart">Qayta topshirish</button>
+        <button class="btn btn--ghost" data-view="mavzular">Mavzularga qaytish</button>
       </div>`;
     $("#qRestart").addEventListener("click", startQuiz);
-    $("#quizWrap").querySelector('[data-view]').addEventListener("click", e => { e.preventDefault(); showView("life"); });
+    wireViewBtns($("#quizWrap"));
+    updateQuizHead(4);
   }
 
   /* =========================================================
@@ -2038,7 +1990,7 @@
         const gate = isTest ? `
           <div class="test-gate">
             <div class="test-gate__head">${ICON.shieldCheck}<span>Eslatma — testga kirish ruxsatnomasi</span></div>
-            <p>Ruxsatnoma onlayn testlar muvaffaqiyatli yakunlangach tizim tomonidan beriladi va yoshlar yetakchisi orqali rasmiylashtiriladi.</p>
+            <p>Ruxsatnoma onlayn testlar muvaffaqiyatli yakunlangach tizim tomonidan beriladi va mahalla admini orqali rasmiylashtiriladi.</p>
           </div>` : "";
         const testInfo = isTest ? `
           <div class="test-info">
@@ -2263,7 +2215,7 @@ ${rowsHtml}
 
     const t = $("#adminMahallalar");
     if (t) {
-      const head = `<div class="dtable__head dt-mahalla"><div>Mahalla</div><div>Yetakchi</div><div>Foydalanuvchilar</div><div>Faol</div><div>O'rt. ball</div><div></div></div>`;
+      const head = `<div class="dtable__head dt-mahalla"><div>Mahalla</div><div>Mahalla admini</div><div>Foydalanuvchilar</div><div>Faol</div><div>O'rt. ball</div><div></div></div>`;
       const rows = MAHALLALAR.map((m, i) => {
         const av = (m.name[0] + m.raisi[0]).toUpperCase();
         const col = avPalette[i % avPalette.length];
@@ -2285,13 +2237,13 @@ ${rowsHtml}
     if (pm) {
       const cell = v => v === "y" ? '<span class="perm-y">✓</span>' : v === "own" ? '<span class="perm-s">O‘z mahallasi</span>' : v === "dist" ? '<span class="perm-s">O‘z tumani</span>' : '<span class="perm-n">—</span>';
       pm.innerHTML = `
-        <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Tuman mas'uli</b> o'z tumani, <b style="color:var(--navy)">Yoshlar yetakchisi</b> o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Har bir rol qaysi ma'lumotni ko'ra olishi va boshqarishi — quyidagi matritsa orqali belgilanadi. <b style="color:var(--navy)">Tuman mas'uli</b> o'z tumani, <b style="color:var(--navy)">Mahalla admini</b> o'z mahallasi <b style="color:var(--navy)">doirasi</b> bilan cheklangan.</p>
         <div class="table-scroll-hint">Barcha rollarni ko'rish uchun jadvalni chapga suring →</div>
         <div style="overflow-x:auto"><table class="permtable">
           <thead><tr><th>Ruxsat / Ma'lumot</th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--gold)"></span>Superadmin</span></th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--purple)"></span>Tuman mas'uli</span></th>
-            <th><span class="perm-role"><span class="perm-dot" style="background:var(--teal)"></span>Yoshlar yetakchisi</span></th>
+            <th><span class="perm-role"><span class="perm-dot" style="background:var(--teal)"></span>Mahalla admini</span></th>
             <th><span class="perm-role"><span class="perm-dot" style="background:var(--blue)"></span>User</span></th></tr></thead>
           <tbody>${PERM_ROWS.map(r => `<tr><th>${r.r}</th><td>${cell(r.s)}</td><td>${cell(r.tm)}</td><td>${cell(r.a)}</td><td>${cell(r.u)}</td></tr>`).join("")}</tbody>
         </table></div>`;
@@ -2306,8 +2258,8 @@ ${rowsHtml}
     const sc = $("#mahallaScope");
     if (sc) sc.innerHTML = `
       <div class="scope-banner__ico">${ICON.building}</div>
-      <div><h3>Yoshlar yetakchisi · ${my.name}</h3>
-      <p><b>Faqat o'z mahallangiz ko'rinadi.</b> Boshqa mahallalar statistikasi siz uchun yopiq — u faqat Superadminga ochiq.</p></div>`;
+      <div><h3>${currentRole === "superadmin" ? "Superadmin" : "Mahalla admini"} · ${my.name}</h3>
+      <p>${currentRole === "superadmin" ? "Superadmin sifatida barcha mahallalar ochiq — boshqa mahallalar ro'yxati Superadmin panelida." : "<b>Faqat o'z mahallangiz ko'rinadi.</b> Boshqa mahallalar statistikasi siz uchun yopiq — u faqat Superadminga ochiq."}</p></div>`;
 
     const st = $("#mahallaStats");
     if (st) {
@@ -2320,7 +2272,7 @@ ${rowsHtml}
       st.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
     }
 
-    // test ruxsatnomalari (onlayn testdan o'tganlar) — faqat yetakchiga
+    // test ruxsatnomalari (onlayn testdan o'tganlar) — faqat mahalla adminiga
     const pl = $("#permitsList");
     if (pl) {
       pl.innerHTML = PERMITS.map((p, i) => `
@@ -2373,8 +2325,10 @@ ${rowsHtml}
     if (locked) locked.innerHTML = `
       <div class="locked-box">
         ${ICON.lock}
-        <h4>Boshqa mahallalar yopiq</h4>
-        <p>Yoshlar yetakchisi sifatida siz faqat <b>${my.name}</b> ma'lumotlarini ko'rasiz. Qolgan ${MAHALLALAR.length - 1}+ mahalla statistikasi faqat Superadminga ochiq — bu RBAC doirasi (scope) bilan ta'minlanadi.</p>
+        <h4>${currentRole === "superadmin" ? "Barcha mahallalar ochiq" : "Boshqa mahallalar yopiq"}</h4>
+        <p>${currentRole === "superadmin"
+          ? `Superadmin sifatida ${MAHALLALAR.length}+ mahallaning barchasi ko'rinadi — ro'yxat va mahalla adminlari Superadmin panelida.`
+          : `Mahalla admini sifatida siz faqat <b>${my.name}</b> ma'lumotlarini ko'rasiz. Qolgan ${MAHALLALAR.length - 1}+ mahalla statistikasi faqat Superadminga ochiq — bu RBAC doirasi (scope) bilan ta'minlanadi.`}</p>
       </div>`;
 
     // bildirishnoma badge — yangi ruxsatnomalar soni
@@ -2382,7 +2336,7 @@ ${rowsHtml}
     if (badge) { const n = PERMITS.filter(p => p.isNew).length; badge.textContent = n; badge.style.display = n ? "" : "none"; }
   }
 
-  /* ---- ruxsatnoma (QR) modal — faqat yetakchiga ---- */
+  /* ---- ruxsatnoma (QR) modal — faqat mahalla adminiga ---- */
   function openPermit(i) {
     const p = PERMITS[i]; if (!p) return;
     const doc = $("#permitDoc"), modal = $("#permitModal");
@@ -2403,7 +2357,7 @@ ${rowsHtml}
         <div><span class="k">Holat</span><span class="v"><span class="permit-doc__live">Faol</span></span></div>
       </div>
       <div class="permit-doc__foot">
-        <span>Onlayn testlar yakunlangani uchun <b>tizim tomonidan</b> berildi. Yoshlar yetakchisi rasmiylashtiradi.</span>
+        <span>Onlayn testlar yakunlangani uchun <b>tizim tomonidan</b> berildi. Mahalla admini rasmiylashtiradi.</span>
         ${SEAL}
       </div>`;
     modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
@@ -2421,7 +2375,7 @@ ${rowsHtml}
      KIBERXAVFSIZLIK INDEKSI (KXI) — tuman mas'uli / superadmin
      ========================================================= */
   function renderKxi() {
-    const rows = KXI_MAHALLALAR.map(m => ({ ...m, score: kxiScore(m), lvl: kxiLevel(kxiScore(m)) }))
+    const rows = KXI_MAHALLALAR.filter(m => currentRole !== "raisi" || m.own).map(m => ({ ...m, score: kxiScore(m), lvl: kxiLevel(kxiScore(m)) }))
       .sort((a, b) => b.score - a.score);
     const counts = { green: 0, yellow: 0, red: 0 };
     rows.forEach(r => counts[r.lvl.key]++);
@@ -2591,6 +2545,8 @@ ${rowsHtml}
   function renderMap() {
     const wrap = $("#view-kxi"); if (!wrap || !$("#mapSvg")) return;
     const svg = $("#mapSvg"), tip = $("#mapTip");
+    // RBAC doirasi: tuman mas'uli va mahalla admini faqat o'z tumanini ko'radi (viloyat darajasi yopiq)
+    if (currentRole === "tuman" || currentRole === "raisi") mapDrill = TUMANLAR.find(t => t.own) || null;
     if (!mapDrill) return renderRegionMap(svg, tip);
     if (mapDrill.own) return renderNurafshonMap(svg, tip);
     return renderDemoDistrictMap(svg, tip, mapDrill);
@@ -2732,16 +2688,33 @@ ${rowsHtml}
     const counts = { green: 0, yellow: 0, red: 0 }; rows.forEach(r => counts[r.lvl.key]++);
     const riskiest = [...rows].sort((a, b) => b.rate - a.rate);
     const safest = [...rows].sort((a, b) => a.rate - b.rate);
+    const locked = currentRole === "raisi", scoped = locked || currentRole === "tuman";
+    const ownIdx = Math.max(0, rows.findIndex(r => r.name === MY_MAHALLA));
+    const own = rows[ownIdx];
 
     $("#mapTitle") && ($("#mapTitle").textContent = "Nurafshon shahri — murojaatlar xaritasi");
     $("#mapLead") && ($("#mapLead").textContent = "16 mahalla · rang — 1000 aholiga to'g'ri keladigan murojaatlar (kam = xavfsiz). Mahalla ustiga bosing.");
     const scope = $("#mapScope");
-    if (scope) { scope.className = "scope-banner scope-banner--admin";
+    if (scope) {
+      if (locked) { scope.className = "scope-banner scope-banner--raisi";
+        scope.innerHTML = `<div class="scope-banner__ico">${ICON.building}</div><div><h3>Mahalla admini · ${MY_MAHALLA}</h3><p>Faqat <b>o'z mahallangiz</b> ochiq. Nurafshon shahridagi qolgan ${rows.length - 1} ta mahalla yopiq — bu RBAC doirasi bilan ta'minlanadi.</p></div>`; }
+      else if (scoped) { scope.className = "scope-banner scope-banner--tuman";
+        scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Tuman mas'uli · ${MY_TUMAN}</h3><p>Tumaningizdagi <b>${rows.length} ta mahalla</b> ochiq · jami <b>${totMur} murojaat</b>. Boshqa hududlar yopiq.</p></div>`; }
+      else { scope.className = "scope-banner scope-banner--admin";
       scope.innerHTML = `<div class="scope-banner__ico">${ICON.globe}</div><div><h3>Nurafshon shahri · rasmiy ma'lumot</h3><p><b>${rows.length} mahalla</b> · jami <b>${totMur} murojaat</b> · qamrab olingan aholi <b>${fmtN(NUR_SUMMARY.aholi)}</b> · 1000 aholiga <b>${per1000.toFixed(2)}</b>.</p></div>`; }
+    }
     const crumb = $("#mapCrumb");
-    if (crumb) crumb.innerHTML = `<button class="crumb__seg crumb__back" id="crumbBack">${ICON.map} ${REGION_NAME}</button><span class="crumb__sep">›</span><span class="crumb__seg is-cur">Nurafshon shahri</span><button class="crumb__return" id="crumbReturn">← Viloyatga qaytish</button>`;
+    if (crumb) crumb.innerHTML = scoped
+      ? `<span class="crumb__seg${locked ? "" : " is-cur"}">${ICON.map} Nurafshon shahri</span>${locked ? `<span class="crumb__sep">›</span><span class="crumb__seg is-cur">${own.short}</span>` : ""}`
+      : `<button class="crumb__seg crumb__back" id="crumbBack">${ICON.map} ${REGION_NAME}</button><span class="crumb__sep">›</span><span class="crumb__seg is-cur">Nurafshon shahri</span><button class="crumb__return" id="crumbReturn">← Viloyatga qaytish</button>`;
 
-    mapCards([
+    mapCards(locked ? [
+      { num: own.murojaat, lab: `Murojaat · ${own.short}`, cls: "i-blue", ico: ICON.sms },
+      { num: fmtN(own.aholi), lab: "Mahalla aholisi", cls: "i-purple", ico: ICON.users },
+      { num: own.rate.toFixed(2), lab: "1000 aholiga murojaat", cls: "i-gold", ico: ICON.spark },
+      { num: own.lvl.label, lab: "Mahalla holati", cls: "i-amber", ico: ICON.shieldCheck },
+      { num: per1000.toFixed(2), lab: "Tuman o'rtachasi (1000 aholiga)", cls: "i-teal", ico: ICON.globe }
+    ] : [
       { num: totMur, lab: "Jami murojaat", cls: "i-blue", ico: ICON.sms },
       { num: fmtN(NUR_SUMMARY.aholi), lab: "Qamrab olingan aholi", cls: "i-purple", ico: ICON.users },
       { num: per1000.toFixed(2), lab: "1000 aholiga murojaat", cls: "i-gold", ico: ICON.spark },
@@ -2755,9 +2728,10 @@ ${rowsHtml}
       `<path class="dist-under" d="${geo.o}"/>` +
       rows.map((r, i) => {
         const cell = geo.c[i]; if (!cell) return "";
-        const fill = kxiColor(r.safety);
-        const label = `<text x="${cell.cx}" y="${cell.cy - 5}" class="mcell__name mcell__name--sm">${r.short}</text><text x="${cell.cx}" y="${cell.cy + 15}" class="mcell__val mcell__val--sm">${r.murojaat}</text>`;
-        return `<g class="mcell" data-cell="${i}"><path d="${cell.d}" fill="${fill}" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>${label}</g>`;
+        const shut = locked && i !== ownIdx;
+        const fill = shut ? "#d7dcea" : kxiColor(r.safety);
+        const label = `<text x="${cell.cx}" y="${cell.cy - 5}" class="mcell__name mcell__name--sm">${r.short}</text>` + (shut ? "" : `<text x="${cell.cx}" y="${cell.cy + 15}" class="mcell__val mcell__val--sm">${r.murojaat}</text>`);
+        return `<g class="mcell${shut ? " is-locked" : ""}" data-cell="${i}"><path d="${cell.d}" fill="${fill}" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/>${label}</g>`;
       }).join("") +
       `<g class="mhi"></g><path class="dist-outline" d="${geo.o}"/>`;
 
@@ -2769,6 +2743,10 @@ ${rowsHtml}
     }
     svg.querySelectorAll(".mcell").forEach(gEl => {
       const r = rows[+gEl.dataset.cell];
+      if (gEl.classList.contains("is-locked")) {
+        wireHover(svg, tip, gEl, () => `<div class="mtip__t">${r.short}</div><div class="mtip__row"><span>Holat</span><b>🔒 Yopiq</b></div><div class="mtip__cta">Faqat o'z mahallangiz ochiq</div>`, null);
+        return;
+      }
       wireHover(svg, tip, gEl,
         () => `<div class="mtip__t">${r.short}</div>
           <div class="mtip__row"><span>Murojaat</span><b>${r.murojaat}</b></div>
@@ -2788,7 +2766,13 @@ ${rowsHtml}
     }
 
     const bars = $("#mapBars");
-    if (bars) {
+    if (bars && locked) {
+      const rowB = (name, v, w, col, you) => `<div class="mbar${you ? " is-you" : ""}"><div class="mbar__name">${you ? '<span class="kxi-you">SIZ</span> ' : ""}${name}</div><div class="mbar__track"><i style="width:${w}%;background:${col}"></i></div><div class="mbar__val">${v}</div></div>`;
+      const maxR = Math.max(own.rate, per1000, 0.001);
+      bars.innerHTML = `<p style="font-size:13px;color:var(--muted);margin:0 0 12px">Mahallangiz tuman o'rtachasi bilan taqqoslanadi (1000 aholiga murojaat). Boshqa mahallalarning alohida ko'rsatkichlari yopiq.</p>` +
+        rowB(own.short, own.rate.toFixed(2), own.rate / maxR * 100, kxiColor(own.safety), true) +
+        rowB(`${MY_TUMAN} o'rtachasi`, per1000.toFixed(2), per1000 / maxR * 100, "var(--blue)", false);
+    } else if (bars) {
       const bmode = renderMap._barMode || "count";
       const maxRate = Math.max(...rows.map(r => r.rate), 0.001);
       const maxMur = Math.max(...rows.map(r => r.murojaat), 1);
@@ -2826,8 +2810,10 @@ ${rowsHtml}
     $("#kxiTableHint") && ($("#kxiTableHint").textContent = "Nurafshon shahrining 16 real mahallasi · qatorni bosib batafsil ko'ring");
 
     wireMapBack();
-    const topEl = svg.querySelector(`.mcell[data-cell="${riskiest[0].i}"]`);
-    if (topEl) selectCell(topEl, riskiest[0]);
+    const first = locked ? own : riskiest[0];
+    const topEl = svg.querySelector(`.mcell[data-cell="${first.i}"]`);
+    if (topEl) selectCell(topEl, first);
+    if (locked && $("#kxiTableHint")) $("#kxiTableHint").textContent = `Faqat o'z mahallangiz — ${MY_MAHALLA}`;
   }
 
   /* ---- 2-bosqich (boshqa hudud) — DEMO ---- */
@@ -3148,7 +3134,7 @@ ${rowsHtml}
       const p = url.pathname;
       // footer va bo'limlar marshrutlari — mavjud ko'rinishlarga moslanadi
       const KO_ROUTES = {
-        "/": "dash", "/elchi": "cert",
+        "/": "dash", "/elchi": "elchi",
         "/yangiliklar": "feed", "/savol-javob": "help", "/materiallar": "life",
         "/qoidalar": "legal", "/maxfiylik": "legal", "/haqida": "legal"
       };
@@ -3236,6 +3222,361 @@ ${rowsHtml}
     }));
   }
 
+
+  /* =========================================================
+     NAVIGATSIYA — nav-config.js (window.KO_NAV) asosida quriladi:
+     menyu, marshrut (#/<id>), xodim kirishi (rol akkaunt orqali),
+     Mavzular oqimi, Sinov natijalarim, Ball va daraja
+     ========================================================= */
+  const svgI = p => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${p}</svg>`;
+  const NAV_ICO = {
+    book:   svgI('<path d="M4 4.5h5.5A2.5 2.5 0 0 1 12 7v12a2 2 0 0 0-1.7-1H4Z" stroke-linejoin="round"/><path d="M20 4.5h-5.5A2.5 2.5 0 0 0 12 7v12a2 2 0 0 1 1.7-1H20Z" stroke-linejoin="round"/>'),
+    bulb:   svgI('<path d="M9 18h6M10 21h4" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" stroke-linejoin="round"/>'),
+    chart:  svgI('<path d="M4 20V11M10 20V5M16 20v-7M21 20H3" stroke-linecap="round"/>'),
+    bell:   svgI('<path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/>'),
+    route:  svgI('<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" stroke-linecap="round"/>'),
+    search: svgI('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>'),
+    medal:  svgI('<circle cx="12" cy="14" r="6"/><path d="m9 8-3-5M15 8l3-5M10.5 14l1.5 1.5 2.5-3" stroke-linecap="round" stroke-linejoin="round"/>'),
+    cert:   svgI('<path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" stroke-linejoin="round"/><path d="M22 10v5" stroke-linecap="round"/>'),
+    gift:   svgI('<circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/>'),
+    flag:   svgI('<path d="M5 21V4M5 4h11l-2 4 2 4H5" stroke-linecap="round" stroke-linejoin="round"/>'),
+    shield: svgI('<path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/>'),
+    gauge:  svgI('<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'),
+    home:   svgI('<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/>'),
+    dot:    svgI('<circle cx="12" cy="12" r="3"/>')
+  };
+  const SOS_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3.8 2.6 20h18.8L12 3.8Z" stroke-linejoin="round"/><path d="M12 10v4.2" stroke-linecap="round"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></svg>';
+  const escH = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+  /* ---- xodim akkauntlari: rol tanlash tugmasi o'rniga rol akkaunt orqali aniqlanadi (demo) ---- */
+  const ACCOUNTS = [
+    { login: "superadmin", pass: "1234", role: "superadmin", name: "Platforma administratori" },
+    { login: "tuman",      pass: "1234", role: "tuman",      name: "Nurafshon shahri mas'uli" },
+    { login: "mahalla",    pass: "1234", role: "raisi",      name: "Akmal Yusupov" },
+    { login: "admin",      pass: "1234", role: "superadmin", name: "Platforma administratori" }   // eski demo hisob — ishlashda qoladi
+  ];
+  const ROLE_HOME = { user: "dash", superadmin: "admin", tuman: "kxi", raisi: "mahalla" };
+  let staffSession = null;
+  function loadStaff() {
+    try {
+      const s = JSON.parse(sessionStorage.getItem("ko_staff") || "null");
+      return s && ACCOUNTS.some(a => a.login === s.login && a.role === s.role) ? s : null;
+    } catch (e) { return null; }
+  }
+  function saveStaff() {
+    try { staffSession ? sessionStorage.setItem("ko_staff", JSON.stringify(staffSession)) : sessionStorage.removeItem("ko_staff"); } catch (e) {}
+  }
+  const staffAccount = () => staffSession && ACCOUNTS.find(a => a.login === staffSession.login) || null;
+  function restoredRole() { staffSession = loadStaff(); return staffSession ? staffSession.role : "user"; }
+
+  /* ---- marshrut: #/<id>, eski manzillar KO_NAV.aliases orqali yo'naltiriladi ---- */
+  const currentViewId = () => (($(".view.is-active") || {}).id || "view-dash").replace("view-", "");
+  function resolveView(v) {
+    v = String(v || "").replace(/^#\/?/, "").split(/[/?]/)[0] || "dash";
+    const al = (window.KO_NAV && window.KO_NAV.aliases) || {};
+    if (al[v]) v = al[v];
+    return document.getElementById("view-" + v) ? v : "dash";
+  }
+  function setRouteHash(v, replace) {
+    try {
+      if (location.hash === "#/" + v) return;
+      history[replace ? "replaceState" : "pushState"](null, "", "#/" + v);
+    } catch (e) {}
+  }
+  function setupNavRouter() {
+    const rail = $("#rail");
+    if (rail) rail.addEventListener("click", e => {
+      const b = e.target.closest("[data-view]"); if (!b || !rail.contains(b)) return;
+      e.preventDefault(); showView(b.dataset.view);
+    });
+    const onHash = () => {
+      if (!location.hash) return;
+      const v = resolveView(location.hash);
+      if (v !== currentViewId()) showView(v, { fromHash: true });
+    };
+    window.addEventListener("popstate", onHash);
+    window.addEventListener("hashchange", onHash);
+  }
+  function openInitialRoute() {
+    if (location.hash && location.hash !== "#") showView(location.hash, { fromHash: true });
+    else if (currentRole !== "user") showView(ROLE_HOME[currentRole]);
+    else setRouteHash(currentViewId(), true);
+  }
+
+  /* ---- menyu ---- */
+  function navItemHtml(it) {
+    const badge = it.badge ? `<span class="badge" id="${it.badge.id}">${escH(it.badge.text)}</span>` : "";
+    const soon = it.soon ? '<span class="nav-soon">Tez orada</span>' : "";
+    return `<button type="button" class="nav-item" data-view="${it.id}" data-match="${(it.match || []).join(" ")}">${NAV_ICO[it.icon] || NAV_ICO.dot}<span class="nav-item__t">${escH(it.label)}</span>${badge}${soon}</button>`;
+  }
+  function accountCardHtml() {
+    const acc = staffAccount(), meta = ROLE_META[currentRole] || {};
+    return acc
+      ? `<div class="nav-acc"><b>${escH(acc.name)}</b><span>${escH(meta.name)} · ${escH(meta.scope)}</span>
+          <div class="nav-acc__btns"><button type="button" class="btn btn--ghost" data-staff-home>Mening panelim</button><button type="button" class="btn btn--ghost" data-staff-logout>Chiqish</button></div></div>`
+      : `<div class="nav-acc"><b>Mas'ul xodimmisiz?</b><span>Superadmin, tuman mas'uli va mahalla admini akkaunt orqali kiradi.</span>
+          <div class="nav-acc__btns"><button type="button" class="btn btn--gold" data-staff-login>Xodim kirishi</button></div></div>`;
+  }
+  function renderNav() {
+    const cfg = window.KO_NAV, box = $("#railMenu");
+    if (!cfg || !box) return;
+    const keep = {};
+    ["feedBadge", "mahallaBadge"].forEach(id => { const e = document.getElementById(id); if (e) keep[id] = { t: e.textContent, d: e.style.display }; });
+    const sec = s => `<div class="rail__group nav-sec" data-sec="${s.key}"><div class="rail__label nav-sec__h">${escH(s.title)}</div>${s.items.map(navItemHtml).join("")}</div>`;
+    const staff = cfg.staff && cfg.staff[currentRole];
+    box.innerHTML =
+      `<button type="button" class="nav-sos" data-view="${cfg.sos.id}">${SOS_ICO}<span>${escH(cfg.sos.label)}</span></button>` +
+      (staff ? sec(staff) + '<div class="nav-divider">Fuqaro bo\'limlari</div>' : "") +
+      cfg.sections.map(sec).join("") +
+      `<div class="nav-more"><div class="rail__label">${escH(cfg.more.title)}</div><div class="nav-more__list">${cfg.more.items.map(i => `<button type="button" class="nav-more__i" data-view="${i.id}">${escH(i.label)}</button>`).join("")}</div></div>` +
+      accountCardHtml();
+    Object.keys(keep).forEach(id => { const e = document.getElementById(id); if (e) { e.textContent = keep[id].t; e.style.display = keep[id].d; } });
+    markNavActive(currentViewId());
+  }
+  function markNavActive(v) {
+    const rail = $("#rail"); if (!rail) return;
+    rail.querySelectorAll("[data-view]").forEach(b => {
+      const on = b.dataset.view === v || (b.dataset.match || "").split(" ").includes(v);
+      b.classList.toggle("is-active", on);
+      if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    });
+    rail.querySelectorAll(".nav-sec").forEach(g => g.classList.toggle("is-active", !!g.querySelector(".nav-item.is-active")));
+  }
+
+  /* ---- xodim paneli: topbar tugmasi, menyu, kirish / chiqish ---- */
+  function renderStaffUI() {
+    const btn = $("#staffBtn"), menu = $("#staffMenu"), reg = $("#topRegBtn");
+    const acc = staffAccount(), meta = ROLE_META[currentRole] || {};
+    document.body.classList.toggle("is-staff", !!acc);
+    if (reg) reg.style.display = acc ? "none" : "";
+    if (btn) {
+      if (acc) {
+        const ini = acc.name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+        btn.className = "staff-chip";
+        btn.innerHTML = `<span class="staff-chip__av" aria-hidden="true">${escH(ini)}</span><span class="staff-chip__txt"><b>${escH(meta.name)}</b><i>${escH(meta.scope)}</i></span>${ICON.caret}`;
+        btn.setAttribute("aria-label", `${meta.name} — hisob menyusi`);
+        btn.setAttribute("aria-haspopup", "true");
+      } else {
+        btn.className = "staff-btn";
+        btn.innerHTML = `${ICON.lock}<span class="staff-btn__txt">Xodim kirishi</span>`;
+        btn.setAttribute("aria-label", "Mas'ul xodimlar uchun kirish");
+        btn.removeAttribute("aria-haspopup");
+      }
+      btn.setAttribute("aria-expanded", "false");
+    }
+    if (menu) {
+      menu.hidden = true;
+      menu.innerHTML = acc ? `
+        <div class="staff-menu__head"><b>${escH(acc.name)}</b><span>${escH(meta.name)} · ${escH(meta.scope)}</span></div>
+        <button type="button" role="menuitem" data-staff-home>${NAV_ICO.home}Mening panelim</button>
+        <button type="button" role="menuitem" class="is-danger" data-staff-logout>${ICON.ban}Chiqish</button>` : "";
+    }
+  }
+  function closeStaffMenu() {
+    const m = $("#staffMenu"), b = $("#staffBtn");
+    if (m) m.hidden = true;
+    if (b) b.setAttribute("aria-expanded", "false");
+  }
+  function openLogin() {
+    closeStaffMenu();
+    $("#loginErr").classList.remove("show");
+    $("#loginUser").value = ""; $("#loginPass").value = "";
+    const m = $("#loginModal"); m.classList.add("is-open"); m.setAttribute("aria-hidden", "false");
+    setTimeout(() => $("#loginUser").focus(), 60);
+  }
+  function closeLogin() { const m = $("#loginModal"); m.classList.remove("is-open"); m.setAttribute("aria-hidden", "true"); }
+  function tryLogin() {
+    const u = $("#loginUser").value.trim().toLowerCase(), p = $("#loginPass").value;
+    const acc = ACCOUNTS.find(a => a.login === u && a.pass === p);
+    if (!acc) {
+      $("#loginErr").classList.add("show");
+      const card = $("#loginModal .login-card"); card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+      return;
+    }
+    staffSession = { login: acc.login, role: acc.role }; saveStaff();
+    closeLogin();
+    applyRole(acc.role);
+    showView(ROLE_HOME[acc.role]);
+    koToast(`Xush kelibsiz! Siz ${ROLE_META[acc.role].name} sifatida kirdingiz.`);
+  }
+  function logoutStaff() {
+    staffSession = null; saveStaff(); closeStaffMenu();
+    applyRole("user");
+    showView("dash");
+    koToast("Tizimdan chiqdingiz. Fuqaro rejimi yoqildi.");
+  }
+  function setupLogin() {
+    $("#loginGo").addEventListener("click", tryLogin);
+    $("#loginCancel").addEventListener("click", closeLogin);
+    $("#loginModal").addEventListener("click", e => { if (e.target.id === "loginModal") closeLogin(); });
+    $$("[data-fill-login]").forEach(b => b.addEventListener("click", () => { $("#loginUser").value = b.dataset.fillLogin; $("#loginPass").focus(); }));
+    $("#staffBtn").addEventListener("click", e => {
+      e.stopPropagation();
+      if (!staffAccount()) { openLogin(); return; }
+      const m = $("#staffMenu"), open = m.hidden;
+      m.hidden = !open; $("#staffBtn").setAttribute("aria-expanded", String(open));
+    });
+    document.addEventListener("click", e => {
+      if (e.target.closest("[data-staff-login]")) { e.preventDefault(); closeRail(); openLogin(); return; }
+      if (e.target.closest("[data-staff-logout]")) { e.preventDefault(); logoutStaff(); return; }
+      if (e.target.closest("[data-staff-home]")) { e.preventDefault(); closeStaffMenu(); showView(ROLE_HOME[currentRole] || "dash"); return; }
+      if (!e.target.closest("#staffMenu")) closeStaffMenu();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeStaffMenu();
+      if (!$("#loginModal").classList.contains("is-open")) return;
+      if (e.key === "Escape") closeLogin();
+      if (e.key === "Enter") tryLogin();
+    });
+  }
+
+  /* ---- MAVZULAR: mavzu -> darslik -> sinov -> natija ----
+     Mavzular = CERT.topics (mavjud). Darslik = mavjud yo'riqnoma (HELP) va layfxak (LIFEHACKS) matni.
+     Mos matn yo'q mavzuda "Darslik tez orada". Sinov = mavjud Kibersinov (QUIZ). Yangi matn yozilmagan. */
+  const TOPIC_SLUGS = ["parollar", "telegram", "qongiroqlar", "ai-firibgarlik", "fishing", "bank"];
+  const TOPIC_LESSONS = {
+    "Parollar": [{ help: 1 }, { life: 4 }],
+    "Telegram xavfsizligi": [{ life: 0 }, { help: 2 }],
+    "Firibgar qo'ng'iroqlar": [{ life: 3 }],
+    "AI firibgarligi": [{ life: 5 }],
+    "Fishing havolalar": [],
+    "Bank xavfsizligi": [{ life: 1 }, { help: 0 }]
+  };
+  let koTopic = null, koQuizTopic = null;
+  const topicList = () => CERT.topics.map((t, i) => ({ ...t, slug: TOPIC_SLUGS[i] || "mavzu-" + (i + 1), refs: TOPIC_LESSONS[t.t] || [] }));
+  function lessonBlocks(topic) {
+    return topic.refs.map(ref => {
+      if (ref.help != null && HELP[ref.help]) return { src: "Yo'riqnoma", t: HELP[ref.help].t, html: HELP[ref.help].body };
+      if (ref.life != null && LIFEHACKS[ref.life]) {
+        const l = LIFEHACKS[ref.life];
+        return { src: "Kiberlayfxak", t: l.t, html: `<p>${l.d}</p><ol>${l.steps.map(s => `<li>${s}</li>`).join("")}</ol>` };
+      }
+      return null;
+    }).filter(Boolean);
+  }
+  function flowSteps(cur) {
+    return ["Mavzu", "Darslik", "Sinov", "Natija"].map((s, i) => {
+      const n = i + 1, cls = n < cur ? "is-done" : n === cur ? "is-cur" : "";
+      return `<span class="mv-step ${cls}"><i>${n < cur ? "✓" : n}</i>${s}</span>`;
+    }).join('<span class="mv-step__sep" aria-hidden="true">→</span>');
+  }
+  function renderMavzular() {
+    const w = $("#mvWrap"); if (!w) return;
+    const list = topicList(), res = loadResults();
+    const topic = koTopic && list.find(t => t.slug === koTopic);
+    if (!topic) {
+      koTopic = null;
+      w.innerHTML = `<div class="mv-flow">${flowSteps(1)}</div>
+        <div class="mv-grid">${list.map(t => {
+          const n = lessonBlocks(t).length, last = res.find(r => r.slug === t.slug);
+          return `<button type="button" class="card mv-card" data-topic="${t.slug}">
+            <span class="mv-card__top"><b>${escH(t.t)}</b><span class="mv-tag${n ? "" : " is-soon"}">${n ? n + " ta darslik" : "Darslik tez orada"}</span></span>
+            <span class="mv-card__lab">Bilim darajangiz <b>${t.pct}%</b></span>
+            <span class="mv-card__bar"><i style="width:${t.pct}%;background:${kxiColor(t.pct)}"></i></span>
+            <span class="mv-card__foot">${last ? `Oxirgi sinov: <b>${+last.score}/${+last.total}</b>` : "Sinov hali topshirilmagan"}<span class="mv-card__go">Darslikni ochish →</span></span>
+          </button>`;
+        }).join("")}</div>`;
+      w.querySelectorAll("[data-topic]").forEach(b => b.addEventListener("click", () => {
+        koTopic = b.dataset.topic; renderMavzular(); window.scrollTo({ top: 0, behavior: "smooth" });
+      }));
+      return;
+    }
+    const blocks = lessonBlocks(topic);
+    w.innerHTML = `
+      <div class="mv-crumb"><button type="button" class="mv-back" data-mv-back>← Mavzular</button><span aria-hidden="true">›</span><b>${escH(topic.t)}</b></div>
+      <div class="mv-flow">${flowSteps(2)}</div>
+      ${blocks.length
+        ? blocks.map((b, i) => `<article class="card card--pad mv-block"><span class="mv-block__src">${i + 1}-darslik · ${b.src}</span><h3>${escH(b.t)}</h3><div class="mv-block__body">${b.html}</div></article>`).join("")
+        : `<div class="card ko-soon"><div class="ko-soon__ico">${ICON.grad}</div><span class="ko-soon__tag">Tez orada</span><h3>Bu mavzu bo'yicha darslik tayyorlanmoqda</h3><p>Darslik qo'shilgach shu yerda paydo bo'ladi. Hozircha sinovni topshirishingiz mumkin.</p></div>`}
+      <div class="card mv-cta">
+        <div><b>${blocks.length ? "Darslikni o'qib chiqdingizmi?" : "Sinovga tayyormisiz?"}</b><span>Sinov ${QUIZ.length} ta savoldan iborat. Natija «Sinov natijalarim» bo'limida saqlanadi.</span></div>
+        <button type="button" class="btn btn--gold btn--lg" data-mv-quiz>Sinovni boshlash →</button>
+      </div>`;
+    w.querySelector("[data-mv-back]").addEventListener("click", () => { koTopic = null; renderMavzular(); });
+    w.querySelector("[data-mv-quiz]").addEventListener("click", startTopicQuiz);
+  }
+  function startTopicQuiz() {
+    koQuizTopic = koTopic ? topicList().find(t => t.slug === koTopic) || null : null;
+    quizBuilt = false;
+    showView("quiz", { topicQuiz: true });
+  }
+  function updateQuizHead(step) {
+    const eb = $("#view-quiz .page-head .eyebrow");
+    if (eb) eb.textContent = koQuizTopic ? `Mavzu: ${koQuizTopic.t} · Sinov` : "Kibersinov — bilim sinovi";
+    const fl = $("#quizFlow");
+    if (fl) fl.innerHTML = koQuizTopic ? `<div class="mv-flow">${flowSteps(step || 3)}</div>` : "";
+  }
+
+  /* ---- SINOV NATIJALARIM — natijalar qurilmada saqlanadi ---- */
+  function loadResults() {
+    try { const r = JSON.parse(localStorage.getItem("ko_results") || "[]"); return Array.isArray(r) ? r : []; } catch (e) { return []; }
+  }
+  function saveResult(r) {
+    const all = loadResults(); all.unshift(r);
+    try { localStorage.setItem("ko_results", JSON.stringify(all.slice(0, 50))); } catch (e) {}
+  }
+  function renderNatijalar() {
+    const w = $("#natWrap"); if (!w) return;
+    const res = loadResults();
+    const p2 = n => String(n).padStart(2, "0");
+    const fmtD = ts => { const d = new Date(+ts); return `${p2(d.getDate())}.${p2(d.getMonth() + 1)}.${d.getFullYear()} · ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+    const topics = `<div class="section-title"><h2>Mavzular bo'yicha bilim darajasi</h2><span class="hint">platforma baholashi</span></div><div class="card card--pad">${certTopicBars()}</div>`;
+    if (!res.length) {
+      w.innerHTML = `<div class="card ko-soon"><div class="ko-soon__ico">${ICON.exam}</div><h3>Hali sinov topshirmagansiz</h3><p>«Mavzular» bo'limida mavzuni tanlang, darslikni o'qing va sinovni topshiring — natija shu yerda saqlanadi.</p><button type="button" class="btn btn--gold" data-view="mavzular">Mavzularni ochish →</button></div>` + topics;
+      wireViewBtns(w); return;
+    }
+    const avg = Math.round(res.reduce((s, r) => s + (+r.pct || 0), 0) / res.length);
+    const best = Math.max(...res.map(r => +r.pct || 0));
+    const earned = res.reduce((s, r) => s + (+r.earned || 0), 0);
+    const cards = [
+      { num: res.length, lab: "Topshirilgan sinov", cls: "i-blue", ico: ICON.exam },
+      { num: avg + "%", lab: "O'rtacha natija", cls: "i-gold", ico: ICON.target },
+      { num: best + "%", lab: "Eng yaxshi natija", cls: "i-teal", ico: ICON.medal },
+      { num: "+" + fmtN(earned), lab: "Sinovlardan olingan ball", cls: "i-purple", ico: ICON.spark }
+    ];
+    w.innerHTML = `<div class="grid stat-grid">${cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("")}</div>
+      <div class="section-title"><h2>Sinovlar tarixi</h2><button type="button" class="section-link" data-view="mavzular">Yangi sinov →</button></div>
+      <div class="card nat-list">${res.map(r => `
+        <div class="nat-row">
+          <div class="nat-row__main"><b>${escH(r.title)}</b><span>${fmtD(r.ts)} · ${escH(r.lvl)}</span></div>
+          <div class="nat-row__bar"><i style="width:${Math.min(100, +r.pct || 0)}%;background:${kxiColor(+r.pct || 0)}"></i></div>
+          <div class="nat-row__num"><b>${+r.score}/${+r.total}</b><span>${+r.pct}% · +${+r.earned} ball</span></div>
+        </div>`).join("")}</div>` + topics;
+    wireViewBtns(w);
+  }
+
+  /* ---- BALL VA DARAJA — mavjud ball, daraja, badge, ball yig'ish va haftalik vazifa ma'lumotidan ---- */
+  function renderBall() {
+    const w = $("#ballWrap"); if (!w) return;
+    const bi = badgeInfo();
+    const cur = [...LEVELS].reverse().find(l => userBall >= l.min) || LEVELS[0];
+    const nextL = LEVELS.find(l => l.min > userBall);
+    w.innerHTML = `
+      <div class="card bl-hero">
+        <div>
+          <span class="bl-hero__lab">Joriy ball</span>
+          <div class="ball-num">${fmtN(userBall)}<span>ball</span></div>
+          <span class="bl-lvl" style="--lvl:${cur.dot}"><i></i>${cur.name}</span>
+        </div>
+        <div>
+          <div class="ball-next">Keyingi badge: <b>${bi.next.name}</b></div>
+          <div class="ball-bar"><i style="width:${bi.pct}%"></i></div>
+          <div class="ball-remain">${bi.remain ? fmtN(bi.remain) + " ball qoldi" : "Eng yuqori badge olingan"}</div>
+          ${nextL ? `<div class="ball-remain">Keyingi daraja — <b>${nextL.name}</b>: ${fmtN(nextL.min - userBall)} ball qoldi</div>` : ""}
+        </div>
+      </div>
+      <div class="section-title"><h2>Darajalar</h2></div>
+      <div class="bl-ladder">${LEVELS.map(l => {
+        const st = l === cur ? "is-cur" : userBall >= l.min ? "is-done" : "";
+        return `<div class="card bl-step ${st}" style="--lvl:${l.dot}"><i></i><b>${l.name}</b><span>${fmtN(l.min)}+ ball</span>${st === "is-cur" ? "<em>Siz shu yerdasiz</em>" : ""}</div>`;
+      }).join("")}</div>
+      <div class="section-title"><h2>Ball qanday yig'iladi</h2></div>
+      <div class="bl-earn">${EARN.map(e => `<div class="card bl-earn__i"><span class="stat__ico ${e.cls}">${e.ico}</span><span>${e.a}</span><b>+${e.p}</b></div>`).join("")}</div>
+      <div class="section-title"><h2>${WEEKLY.title}</h2><span class="hint">${WEEKLY.sub}</span></div>
+      <div class="card card--pad bl-week"><p>${WEEKLY.task}</p><div class="ball-bar"><i style="width:${Math.round(WEEKLY.done / WEEKLY.total * 100)}%"></i></div>
+        <div class="bl-week__f"><span>${WEEKLY.done} / ${WEEKLY.total} bajarildi</span><b>${WEEKLY.reward}</b></div></div>`;
+  }
+
   /* =========================================================
      INIT
      ========================================================= */
@@ -3275,13 +3616,14 @@ ${rowsHtml}
     renderFooter();
     setupFooter();
     setupLogin();
-    bindRoleSwitch();
-    applyRole("user");           // boshlang'ich — oddiy fuqaro; imtiyozli rollar login talab qiladi
+    setupNavRouter();
+    applyRole(restoredRole());    // xodim sessiyasi bo'lsa tiklanadi, aks holda fuqaro rejimi
     applyUserChip();
     showRegSaved();
     updateQuizLock();
     animateDash(); dashAnimated = true;
     startLive();
+    openInitialRoute();
   }
   document.addEventListener("DOMContentLoaded", init);
 })();

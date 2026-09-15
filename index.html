@@ -30,15 +30,12 @@
       </span>
     </a>
     <div class="topbar__spacer"></div>
-    <div class="role-switch" id="roleSwitch" role="tablist" aria-label="Rol">
-      <button data-role="superadmin" class="is-active">Superadmin</button>
-      <button data-role="tuman">Tuman mas'uli</button>
-      <button data-role="raisi">Yoshlar yetakchisi</button>
-      <button data-role="user">User</button>
-    </div>
     <div class="region-pill"><span class="dot"></span> Hudud: <b id="topRegion">Toshkent viloyati</b></div>
     <button class="btn btn--gold" data-view="reg" id="topRegBtn"><span class="btn--cta-text">Ro'yxatdan
         o'tish</span></button>
+    <!-- rol tanlash tugmasi o'rniga: rol akkaunt orqali aniqlanadi -->
+    <button type="button" class="staff-btn" id="staffBtn" aria-expanded="false"></button>
+    <div class="staff-menu" id="staffMenu" role="menu" aria-label="Hisob menyusi" hidden></div>
   </header>
 
   <div class="rail-scrim" id="railScrim"></div>
@@ -46,154 +43,8 @@
   <div class="shell">
     <!-- ============ SIDEBAR ============ -->
     <nav class="rail" id="rail" aria-label="Asosiy navigatsiya">
-      <div class="rail__role" id="railRole">
-        <div class="rail__label">Rol</div>
-        <div class="role-switch role-switch--rail" role="tablist" aria-label="Rol">
-          <button data-role="superadmin" class="is-active">Superadmin</button>
-          <button data-role="tuman">Tuman mas'uli</button>
-          <button data-role="raisi">Yoshlar yetakchisi</button>
-          <button data-role="user">User</button>
-        </div>
-      </div>
-      <div class="rail__group" data-admin-group>
-        <div class="rail__label">Boshqaruv</div>
-        <button class="nav-item" data-view="admin" data-role="superadmin">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z" />
-            <path d="M12 8v8M8 12h8" stroke-linecap="round" />
-          </svg>
-          Superadmin paneli
-        </button>
-        <button class="nav-item" data-view="kxi" data-role="superadmin tuman raisi">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 21a9 9 0 1 1 9-9" />
-            <path d="M12 12l4-2.5" stroke-linecap="round" />
-            <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
-            <path d="M7 13a5 5 0 0 1 8-3" stroke-linecap="round" opacity=".5" />
-          </svg>
-          KiberXavfsizlik Indeksi
-        </button>
-        <button class="nav-item" data-view="mahalla" data-role="superadmin raisi">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 10.5 12 4l9 6.5" />
-            <path d="M5 9.5V20h14V9.5" />
-            <rect x="10" y="13" width="4" height="7" />
-          </svg>
-          Mahalla paneli
-          <span class="badge" id="mahallaBadge">2</span>
-        </button>
-      </div>
-      <div class="rail__group">
-        <div class="rail__label">Platforma</div>
-        <button class="nav-item is-active" data-view="dash">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="9" rx="1.5" />
-            <rect x="14" y="3" width="7" height="5" rx="1.5" />
-            <rect x="14" y="12" width="7" height="9" rx="1.5" />
-            <rect x="3" y="16" width="7" height="5" rx="1.5" />
-          </svg>
-          Boshqaruv paneli
-        </button>
-        <button class="nav-item nav-item--star" data-view="assist">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3.5 13.9 9l5.6 1.9-5.6 1.9L12 18l-1.9-5.2L4.5 11 10 9 12 3.5Z" stroke-linejoin="round" />
-            <path d="M19 16v3M20.5 17.5h-3" stroke-linecap="round" />
-          </svg>
-          AI Hamroh
-          <span class="badge badge--ai">AI</span>
-        </button>
-        <button class="nav-item" data-view="feed">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z" />
-            <path d="M10.5 20a1.5 1.5 0 0 0 3 0" />
-          </svg>
-          Tahdidlar lentasi
-          <span class="badge" id="feedBadge">3</span>
-        </button>
-      
-        <button class="nav-item" data-view="check">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.2-3.2" />
-          </svg>
-          Tekshirgich
-        </button>
-        <button class="nav-item" data-view="quiz">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9.1 9a3 3 0 1 1 4 2.8c-.9.4-1.6 1.2-1.6 2.2v.5" />
-            <circle cx="11.5" cy="18" r=".5" fill="currentColor" stroke="none" />
-            <rect x="3" y="3" width="18" height="18" rx="4" />
-          </svg>
-          Kibersinov
-        </button>
-        <button class="nav-item nav-item--star" data-view="life">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18h6M10 21h4" stroke-linecap="round" />
-            <path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"
-              stroke-linejoin="round" />
-          </svg>
-          Kiber Layfxak
-        </button>
-        <button class="nav-item nav-item--goal" data-view="cert">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round" />
-            <path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" stroke-linejoin="round" />
-            <path d="M22 10v5" stroke-linecap="round" />
-          </svg>
-          Offline sertifikat
-          <span class="badge badge--goal">Maqsad</span>
-        </button>
-        <button class="nav-item" data-view="privilege">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="9" r="5" />
-            <path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          Imtiyozlar
-        </button>
-      </div>
-      <div class="rail__group">
-        <div class="rail__label">Bilim</div>
-        <button class="nav-item" data-view="video">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="5" width="18" height="14" rx="3" />
-            <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
-          </svg>
-          So'nggi videolar
-        </button>
-        <button class="nav-item" data-view="help">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4v.3" />
-            <circle cx="12" cy="16.5" r=".5" fill="currentColor" stroke="none" />
-          </svg>
-          Yordam
-        </button>
-      </div>
-      <div class="rail__group">
-        <div class="rail__label">Loyiha</div>
-        <button class="nav-item" data-view="reg">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10Z" />
-            <circle cx="12" cy="11" r="2.5" />
-          </svg>
-          Ro'yxatdan o'tish
-        </button>
-        <button class="nav-item" data-view="legal">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3v18M5 7h14" stroke-linecap="round" />
-            <path d="M5 7 3 13h4L5 7ZM19 7l-2 6h4l-2-6Z" stroke-linejoin="round" />
-            <path d="M8 21h8" stroke-linecap="round" />
-          </svg>
-          Huquqiy asoslar
-        </button>
-        <button class="nav-item" data-view="umumiy">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="4" width="18" height="16" rx="2.5" />
-            <path d="M3 9h18M8 9v11" stroke-linecap="round" />
-          </svg>
-          Umumiy bo'lim
-        </button>
-      </div>
+      <!-- Menyu nav-config.js (window.KO_NAV) asosida app.js dagi renderNav() orqali quriladi -->
+      <div id="railMenu"></div>
       <div class="rail__foot">
         <p><b style="color:var(--navy)">Maxfiylik birinchi o'rinda.</b> Manzilingiz emas — faqat mahalla qamrovi
           yig'iladi.</p>
@@ -372,6 +223,7 @@
             javob ballaringizni oshiradi — bu esa mahallangiz reytingi va tumaningiz KXI ko'rsatkichiga ta'sir qiladi.
           </p>
         </div>
+        <div id="quizFlow"></div>
         <div class="quiz" id="quizWrap"></div>
       </section>
 
@@ -905,8 +757,75 @@
               </div>
       </section>
 
+      <!-- ===== O'RGANISH: MAVZULAR (mavzu -> darslik -> sinov -> natija) ===== -->
+      <section class="view" id="view-mavzular">
+        <div class="page-head">
+          <span class="eyebrow">O'rganish</span>
+          <h1>Mavzular</h1>
+          <p class="lead">Mavzuni tanlang, darslikni o'qing va sinovni topshiring. Natija «Sinov natijalarim» bo'limida
+            saqlanadi.</p>
+        </div>
+        <div id="mvWrap"></div>
+      </section>
+
+      <!-- ===== O'RGANISH: SINOV NATIJALARIM ===== -->
+      <section class="view" id="view-natijalar">
+        <div class="page-head">
+          <span class="eyebrow">O'rganish</span>
+          <h1>Sinov natijalarim</h1>
+          <p class="lead">Topshirgan sinovlaringiz natijalari va mavzular bo'yicha bilim darajangiz.</p>
+        </div>
+        <div id="natWrap"></div>
+      </section>
+
+      <!-- ===== MENING NATIJAM: BALL VA DARAJA ===== -->
+      <section class="view" id="view-ball">
+        <div class="page-head">
+          <span class="eyebrow">Mening natijam</span>
+          <h1>Ball va daraja</h1>
+          <p class="lead">Joriy ballingiz, darajangiz va keyingi badge'gacha qolgan yo'l. Ball platformadagi faolligingiz
+            uchun beriladi.</p>
+        </div>
+        <div id="ballWrap"></div>
+      </section>
+
+      <!-- ===== PLACEHOLDER: XAVF YO'LLARI ===== -->
+      <section class="view" id="view-yollar">
+        <div class="page-head">
+          <span class="eyebrow">Xavfdan xabar</span>
+          <h1>Xavf yo'llari</h1>
+        </div>
+        <div class="card ko-soon">
+          <div class="ko-soon__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+          <span class="ko-soon__tag">Tez orada</span>
+          <h3>Bu bo'lim tayyorlanmoqda</h3>
+          <p>Xavf yo'llari sahifasi hozircha ishlab chiqilmoqda. Tayyor bo'lgach shu yerda paydo bo'ladi.</p>
+          <button type="button" class="btn btn--gold" data-view="dash">Bosh sahifaga qaytish</button>
+        </div>
+      </section>
+
+      <!-- ===== PLACEHOLDER: KIBER ELCHI BO'LISH ===== -->
+      <section class="view" id="view-elchi">
+        <div class="page-head">
+          <span class="eyebrow">Mening natijam</span>
+          <h1>Kiber elchi bo'lish</h1>
+        </div>
+        <div class="card ko-soon">
+          <div class="ko-soon__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+          <span class="ko-soon__tag">Tez orada</span>
+          <h3>Bu bo'lim tayyorlanmoqda</h3>
+          <p>Kiber elchi bo'lish sahifasi hozircha ishlab chiqilmoqda. Tayyor bo'lgach shu yerda paydo bo'ladi.</p>
+          <button type="button" class="btn btn--gold" data-view="dash">Bosh sahifaga qaytish</button>
+        </div>
+      </section>
+
     </main>
   </div>
+
+  <!-- ===== AI HAMROH — suzuvchi tugma (bo'limlardan tashqarida) ===== -->
+  <button type="button" class="ko-fab" id="koFab" data-view="assist" aria-label="AI Hamroh chatini ochish">
+    <span class="ko-fab__ico" aria-hidden="true">💬</span><span class="ko-fab__t">AI Hamroh</span>
+  </button>
 
   <!-- ===== VIDEO PLEYER MODAL ===== -->
   <div class="reel-modal" id="reelModal" aria-hidden="true">
@@ -920,19 +839,21 @@
     <div class="permit-doc" id="permitDoc"></div>
   </div>
 
+  <script src="nav-config.js"></script>
   <script src="app.js"></script>
   <!-- ===== LOGIN MODAL (imtiyozli rollar) ===== -->
   <div class="login-modal" id="loginModal" aria-hidden="true">
-    <div class="login-card">
+    <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <div class="login-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="5" y="11" width="14" height="9" rx="2" />
           <path d="M8 11V8a4 4 0 0 1 8 0v3" />
           <circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none" />
         </svg></div>
-      <h3>Tizimga kirish</h3>
-      <p class="login-card__sub"><b id="loginRole">Rol</b> paneli himoyalangan — login va parolni kiriting.</p>
+      <h3 id="loginTitle">Xodim kirishi</h3>
+      <p class="login-card__sub">Superadmin, tuman mas'uli va mahalla admini uchun. <b>Rol akkaunt orqali</b>
+        aniqlanadi.</p>
       <div class="field"><label for="loginUser">Login</label><input type="text" id="loginUser" autocomplete="username"
-          placeholder="admin"></div>
+          placeholder="superadmin" autocapitalize="none" spellcheck="false"></div>
       <div class="field"><label for="loginPass">Parol</label><input type="password" id="loginPass"
           autocomplete="current-password" placeholder="••••"></div>
       <div class="login-err" id="loginErr">Login yoki parol noto'g'ri. Qayta urinib ko'ring.</div>
@@ -940,7 +861,14 @@
         <button class="btn btn--ghost" id="loginCancel">Bekor qilish</button>
         <button class="btn btn--gold" id="loginGo">Kirish</button>
       </div>
-      <div class="login-hint">Demo hisob: <code>admin</code> / <code>1234</code></div>
+      <div class="login-hint">
+        <div class="login-hint__t">Demo hisoblar (parol: <code>1234</code>)</div>
+        <div class="login-demo">
+          <button type="button" data-fill-login="superadmin"><code>superadmin</code><span>Superadmin</span></button>
+          <button type="button" data-fill-login="tuman"><code>tuman</code><span>Tuman mas'uli</span></button>
+          <button type="button" data-fill-login="mahalla"><code>mahalla</code><span>Mahalla admini</span></button>
+        </div>
+      </div>
     </div>
   </div>
 </body>
