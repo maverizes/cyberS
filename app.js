@@ -617,7 +617,7 @@
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
     umumiy:"Umumiy bo'lim",
-    mavzular:"Mavzular", natijalar:"Sinov natijalarim", yollar:"Xavf yo'llari", ball:"Ball va daraja", elchi:"Kiber elchi bo'lish"
+    mavzular:"Mavzular", natijalar:"Sinov natijalarim", yollar:"Xavf yo'llari", ball:"Ball va daraja"
   };
   let dashAnimated = false, quizBuilt = false;
 
@@ -3110,7 +3110,7 @@ ${rowsHtml}
       const p = url.pathname;
       // footer va bo'limlar marshrutlari — mavjud ko'rinishlarga moslanadi
       const KO_ROUTES = {
-        "/": "dash", "/elchi": "elchi",
+        "/": "dash", "/elchi": "cert",
         "/yangiliklar": "feed", "/savol-javob": "mavzular", "/materiallar": "life",
         "/qoidalar": "legal", "/maxfiylik": "legal", "/haqida": "legal"
       };
@@ -3215,7 +3215,6 @@ ${rowsHtml}
     medal:  svgI('<circle cx="12" cy="14" r="6"/><path d="m9 8-3-5M15 8l3-5M10.5 14l1.5 1.5 2.5-3" stroke-linecap="round" stroke-linejoin="round"/>'),
     cert:   svgI('<path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" stroke-linejoin="round"/><path d="M22 10v5" stroke-linecap="round"/>'),
     gift:   svgI('<circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/>'),
-    flag:   svgI('<path d="M5 21V4M5 4h11l-2 4 2 4H5" stroke-linecap="round" stroke-linejoin="round"/>'),
     shield: svgI('<path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/>'),
     gauge:  svgI('<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'),
     academy:svgI('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7"/><path d="M3 20h18" stroke-linecap="round"/>'),

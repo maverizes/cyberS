@@ -26,8 +26,7 @@ window.KO_NAV = {
     { key: "result", title: "MENING NATIJAM", items: [
       { id: "ball",      label: "Ball va daraja",      icon: "medal" },
       { id: "cert",      label: "Sertifikatlarim",     icon: "cert" },
-      { id: "privilege", label: "Imtiyozlar",          icon: "gift" },
-      { id: "elchi",     label: "Kiber elchi bo'lish", icon: "flag", soon: true }
+      { id: "privilege", label: "Imtiyozlar",          icon: "gift" }
     ]}
   ],
 
@@ -60,6 +59,6 @@ window.KO_NAV = {
   aliases: {
     home: "dash", rating: "life", priv: "privilege", condition: "privilege", map: "kxi",
     kitobxonlik: "cert", sertifikat: "cert", sinov: "quiz", "yosh-yollar": "yollar",
-    help: "mavzular"
+    help: "mavzular", elchi: "cert"
   }
 };
