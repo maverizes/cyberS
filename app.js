@@ -807,6 +807,7 @@
       if (FEED.length > 14) FEED.pop();
       const badge = $("#feedBadge");
       badge.textContent = Math.min(99, (+badge.textContent || 0) + 1);
+      syncNavGroupBadges();
       if ($("#view-feed").classList.contains("is-active")) {
         if (feedFilter === "all" || a.cat === feedFilter) $("#fullFeed").prepend(alertNode(a, true));
       }
@@ -3217,6 +3218,8 @@ ${rowsHtml}
     gift:   svgI('<circle cx="12" cy="9" r="5"/><path d="m9 13.4-1.4 7.1L12 18l4.4 2.5-1.4-7.1" stroke-linecap="round" stroke-linejoin="round"/>'),
     shield: svgI('<path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/>'),
     gauge:  svgI('<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'),
+    alert:  svgI('<path d="M12 3.8 2.6 20h18.8L12 3.8Z" stroke-linejoin="round"/><path d="M12 10v4.2" stroke-linecap="round"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/>'),
+    trophy: svgI('<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" stroke-linejoin="round"/><path d="M8 6H5v1.5a3 3 0 0 0 3 3M16 6h3v1.5a3 3 0 0 1-3 3" stroke-linejoin="round"/><path d="M12 13v4M8.5 20h7" stroke-linecap="round"/>'),
     academy:svgI('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7"/><path d="M3 20h18" stroke-linecap="round"/>'),
     home:   svgI('<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/>'),
     dot:    svgI('<circle cx="12" cy="12" r="3"/>')
@@ -3290,13 +3293,22 @@ ${rowsHtml}
   function navGroupHtml(s) {
     const open = !!navOpen[s.key], pid = "navGrp-" + s.key;
     return `<div class="rail__group nav-sec nav-grp${open ? " is-open" : ""}" data-sec="${s.key}">` +
-      `<button type="button" class="nav-item nav-grp__btn" data-grp aria-expanded="${open}" aria-controls="${pid}">${NAV_ICO[s.icon] || NAV_ICO.dot}<span class="nav-item__t">${escH(s.title)}</span><span class="nav-grp__car" aria-hidden="true">${ICON.caret}</span></button>` +
+      `<button type="button" class="nav-item nav-grp__btn" data-grp aria-expanded="${open}" aria-controls="${pid}">${NAV_ICO[s.icon] || NAV_ICO.dot}<span class="nav-item__t">${escH(s.title)}</span>${s.items.some(i => i.badge) ? '<span class="badge nav-grp__badge" hidden></span>' : ""}<span class="nav-grp__car" aria-hidden="true">${ICON.caret}</span></button>` +
       `<div class="nav-grp__panel" id="${pid}"><div class="nav-grp__list"><div class="nav-grp__in">${s.items.map(navItemHtml).join("")}</div></div></div></div>`;
   }
   function setNavGroup(g, open) {
+    if (open) g.parentNode.querySelectorAll(".nav-grp.is-open").forEach(o => { if (o !== g) setNavGroup(o, false); });
     navOpen[g.dataset.sec] = open;
     g.classList.toggle("is-open", open);
     const b = g.querySelector("[data-grp]"); if (b) b.setAttribute("aria-expanded", String(open));
+  }
+  // guruh yopiq bo'lsa, ichidagi nishonlar yig'indisi guruh qatorida ko'rinadi
+  function syncNavGroupBadges() {
+    $$("#rail .nav-grp").forEach(g => {
+      const gb = g.querySelector(".nav-grp__badge"); if (!gb) return;
+      const n = [...g.querySelectorAll(".nav-grp__in .badge")].filter(x => x.style.display !== "none").reduce((a, x) => a + (+x.textContent || 0), 0);
+      gb.textContent = Math.min(99, n); gb.hidden = !n;
+    });
   }
   function accountCardHtml() {
     const acc = staffAccount(), meta = ROLE_META[currentRole] || {};
@@ -3319,6 +3331,7 @@ ${rowsHtml}
       `<div class="nav-more"><div class="rail__label">${escH(cfg.more.title)}</div><div class="nav-more__list">${cfg.more.items.map(i => `<button type="button" class="nav-more__i" data-view="${i.id}">${escH(i.label)}</button>`).join("")}</div></div>` +
       accountCardHtml();
     Object.keys(keep).forEach(id => { const e = document.getElementById(id); if (e) { e.textContent = keep[id].t; e.style.display = keep[id].d; } });
+    syncNavGroupBadges();
     markNavActive(currentViewId());
   }
   function markNavActive(v) {

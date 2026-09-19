@@ -2063,7 +2063,10 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
    AI Hamroh suzuvchi tugmasi, Mavzular / Sinov natijalarim / Ball va daraja
    ========================================================= */
 /* yig'iladigan bo'lim (Kiber akademiya): yopiq holda bitta qator, bosilganda bandlari ostida ochiladi */
+.rail__group.nav-grp{ margin-bottom:4px; }
 .nav-grp__btn{ font-weight:600; cursor:pointer; }
+.nav-grp__badge + .nav-grp__car{ margin-left:6px; }
+.nav-grp.is-open .nav-grp__badge{ display:none; }
 .nav-grp__car{ margin-left:auto; display:inline-flex; color:var(--faint); transition:transform .2s ease; }
 .nav-grp__car svg{ width:16px; height:16px; }
 .nav-grp.is-open .nav-grp__car{ transform:rotate(180deg); }
@@ -2075,7 +2078,7 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
   transition:grid-template-rows .2s ease, visibility 0s linear .2s; }
 .nav-grp.is-open .nav-grp__panel{ grid-template-rows:1fr; visibility:visible; transition:grid-template-rows .2s ease, visibility 0s; }
 .nav-grp__list{ min-height:0; overflow:hidden; }
-.nav-grp__in{ margin:3px 0 0 23px; padding-left:8px; border-left:1.5px solid var(--line); }
+.nav-grp__in{ margin:3px 0 6px 23px; padding-left:8px; border-left:1.5px solid var(--line); }
 .nav-grp__in .nav-item{ gap:10px; padding:8px 10px; font-size:14px; }
 .nav-grp__in .nav-item .ico{ width:18px; height:18px; flex-basis:18px; }
 

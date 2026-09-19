@@ -18,15 +18,15 @@ window.KO_NAV = {
       { id: "life",      label: "Kiberlayfxaklar",   icon: "bulb" },
       { id: "natijalar", label: "Sinov natijalarim", icon: "chart" }
     ]},
-    { key: "alert", title: "XAVFDAN XABAR", items: [
+    { key: "alert", title: "Xavfdan xabar", icon: "alert", collapsible: true, items: [
       { id: "feed",   label: "Tahdidlar lentasi", icon: "bell", badge: { id: "feedBadge", text: "3" } },
       { id: "yollar", label: "Xavf yo'llari",     icon: "route", soon: true },
       { id: "check",  label: "Tekshirgich",       icon: "search" }
     ]},
-    { key: "result", title: "MENING NATIJAM", items: [
+    { key: "result", title: "Mening natijam", icon: "trophy", collapsible: true, items: [
       { id: "ball",      label: "Ball va daraja",      icon: "medal" },
       { id: "cert",      label: "Sertifikatlarim",     icon: "cert" },
-      { id: "privilege", label: "Imtiyozlar",          icon: "gift" }
+      { id: "privilege", label: "Imtiyozlarim",        icon: "gift" }
     ]}
   ],
 
