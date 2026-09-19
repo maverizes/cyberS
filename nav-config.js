@@ -6,16 +6,14 @@
      match — shu band aktiv ko'rinadigan qo'shimcha ko'rinishlar
      soon  — "Tez orada" placeholder sahifa
      badge — menyu nishoni { id, text }
+     collapsible — bo'lim bitta yig'iladigan band bo'lib chiziladi (bosilganda bandlari ochiladi)
    ========================================================= */
 window.KO_NAV = {
-  // bo'limlardan tashqarida, menyuning eng tepasida
-  sos: { id: "help", label: "Menga hozir yordam kerak" },
-
   // bo'limlardan tashqarida, o'ng pastki burchakdagi suzuvchi tugma
   assistant: { id: "assist", label: "AI Hamroh", emoji: "💬" },
 
   sections: [
-    { key: "learn", title: "O'RGANISH", items: [
+    { key: "learn", title: "Kiber akademiya", icon: "academy", collapsible: true, items: [
       { id: "mavzular",  label: "Mavzular",          icon: "book", match: ["quiz"] },
       { id: "life",      label: "Kiberlayfxaklar",   icon: "bulb" },
       { id: "natijalar", label: "Sinov natijalarim", icon: "chart" }
@@ -61,6 +59,7 @@ window.KO_NAV = {
   // eski yoki muqobil manzillar -> joriy ko'rinish (redirect)
   aliases: {
     home: "dash", rating: "life", priv: "privilege", condition: "privilege", map: "kxi",
-    kitobxonlik: "cert", sertifikat: "cert", sinov: "quiz", "yosh-yollar": "yollar"
+    kitobxonlik: "cert", sertifikat: "cert", sinov: "quiz", "yosh-yollar": "yollar",
+    help: "mavzular"
   }
 };

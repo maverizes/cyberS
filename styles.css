@@ -2059,16 +2059,25 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
 }
 
 /* =========================================================
-   YANGI NAVIGATSIYA — 3 bo'lim, shoshilinch yordam, xodim kirishi,
+   YANGI NAVIGATSIYA — bo'limlar, Kiber akademiya guruhi, xodim kirishi,
    AI Hamroh suzuvchi tugmasi, Mavzular / Sinov natijalarim / Ball va daraja
    ========================================================= */
-.nav-sos{ display:flex; align-items:center; gap:11px; width:100%; margin:0 0 18px; padding:12px 13px;
-  border-radius:12px; border:1.5px solid var(--red); background:var(--red-soft); color:#B4282D;
-  font-weight:700; font-size:14px; line-height:1.3; text-align:left; cursor:pointer;
-  transition:background .15s ease, color .15s ease, box-shadow .15s ease; }
-.nav-sos svg{ width:22px; height:22px; flex:0 0 22px; color:var(--red); }
-.nav-sos:hover, .nav-sos.is-active{ background:var(--red); color:#fff; box-shadow:0 8px 20px rgba(229,72,77,.28); }
-.nav-sos:hover svg, .nav-sos.is-active svg{ color:#fff; }
+/* yig'iladigan bo'lim (Kiber akademiya): yopiq holda bitta qator, bosilganda bandlari ostida ochiladi */
+.nav-grp__btn{ font-weight:600; cursor:pointer; }
+.nav-grp__car{ margin-left:auto; display:inline-flex; color:var(--faint); transition:transform .2s ease; }
+.nav-grp__car svg{ width:16px; height:16px; }
+.nav-grp.is-open .nav-grp__car{ transform:rotate(180deg); }
+.nav-grp.is-active .nav-grp__btn{ color:var(--navy); }
+.nav-grp.is-active .nav-grp__btn .ico{ color:var(--gold); }
+.nav-grp.is-active:not(.is-open) .nav-grp__btn{ background:var(--navy); color:#fff; }
+.nav-grp.is-active:not(.is-open) .nav-grp__car{ color:#fff; }
+.nav-grp__panel{ display:grid; grid-template-rows:0fr; visibility:hidden;
+  transition:grid-template-rows .2s ease, visibility 0s linear .2s; }
+.nav-grp.is-open .nav-grp__panel{ grid-template-rows:1fr; visibility:visible; transition:grid-template-rows .2s ease, visibility 0s; }
+.nav-grp__list{ min-height:0; overflow:hidden; }
+.nav-grp__in{ margin:3px 0 0 23px; padding-left:8px; border-left:1.5px solid var(--line); }
+.nav-grp__in .nav-item{ gap:10px; padding:8px 10px; font-size:14px; }
+.nav-grp__in .nav-item .ico{ width:18px; height:18px; flex-basis:18px; }
 
 .nav-sec__h{ display:flex; align-items:center; gap:8px; }
 .nav-sec__h::before{ content:""; width:3px; height:12px; border-radius:2px; background:transparent; transition:background .15s ease; }

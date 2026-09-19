@@ -613,7 +613,7 @@
      ========================================================= */
   const VIEW_TITLES = {
     dash:"Boshqaruv paneli", feed:"Tahdidlar lentasi", check:"Tekshirgich", quiz:"Kibersinov",
-    assist:"AI Hamroh", help:"Yordam", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
+    assist:"AI Hamroh", reg:"Ro'yxatdan o'tish", legal:"Huquqiy asoslar",
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
     umumiy:"Umumiy bo'lim",
@@ -1499,30 +1499,6 @@
      MUROJAATLAR — fuqaro yuboradi, mas'ullar ko'rib chiqadi
      ========================================================= */
   
-  /* =========================================================
-     YORDAM (help accordion)
-     ========================================================= */
-  function renderHelp() {
-    const acc = $("#helpAcc"); acc.innerHTML = "";
-    HELP.forEach((h, i) => {
-      const item = el("div", "acc__item" + (i === 0 ? " open" : ""));
-      item.innerHTML = `<button class="acc__btn">
-          <span class="num">${String(i+1).padStart(2,"0")}</span>
-          <span class="t">${h.t}</span>
-          <span class="caret">${ICON.caret}</span>
-        </button>
-        <div class="acc__panel"><div class="acc__panel-inner">${h.body}</div></div>`;
-      const panel = $(".acc__panel", item);
-      $(".acc__btn", item).addEventListener("click", () => {
-        const isOpen = item.classList.contains("open");
-        $$(".acc__item", acc).forEach(it => { it.classList.remove("open"); $(".acc__panel", it).style.maxHeight = null; });
-        if (!isOpen) { item.classList.add("open"); panel.style.maxHeight = panel.scrollHeight + "px"; }
-      });
-      acc.appendChild(item);
-      if (i === 0) requestAnimationFrame(() => { panel.style.maxHeight = panel.scrollHeight + "px"; });
-    });
-  }
-
   /* =========================================================
      RO'YXATDAN O'TISH (registration cascade)
      ========================================================= */
@@ -3135,7 +3111,7 @@ ${rowsHtml}
       // footer va bo'limlar marshrutlari — mavjud ko'rinishlarga moslanadi
       const KO_ROUTES = {
         "/": "dash", "/elchi": "elchi",
-        "/yangiliklar": "feed", "/savol-javob": "help", "/materiallar": "life",
+        "/yangiliklar": "feed", "/savol-javob": "mavzular", "/materiallar": "life",
         "/qoidalar": "legal", "/maxfiylik": "legal", "/haqida": "legal"
       };
       if (KO_ROUTES[p]) { showView(KO_ROUTES[p]); return; }
@@ -3242,10 +3218,10 @@ ${rowsHtml}
     flag:   svgI('<path d="M5 21V4M5 4h11l-2 4 2 4H5" stroke-linecap="round" stroke-linejoin="round"/>'),
     shield: svgI('<path d="M12 3 4 6v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/>'),
     gauge:  svgI('<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 12l4-2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>'),
+    academy:svgI('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7"/><path d="M3 20h18" stroke-linecap="round"/>'),
     home:   svgI('<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/>'),
     dot:    svgI('<circle cx="12" cy="12" r="3"/>')
   };
-  const SOS_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3.8 2.6 20h18.8L12 3.8Z" stroke-linejoin="round"/><path d="M12 10v4.2" stroke-linecap="round"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/></svg>';
   const escH = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
   /* ---- xodim akkauntlari: rol tanlash tugmasi o'rniga rol akkaunt orqali aniqlanadi (demo) ---- */
@@ -3286,6 +3262,8 @@ ${rowsHtml}
   function setupNavRouter() {
     const rail = $("#rail");
     if (rail) rail.addEventListener("click", e => {
+      const t = e.target.closest("[data-grp]");
+      if (t && rail.contains(t)) { const g = t.closest(".nav-grp"); setNavGroup(g, !g.classList.contains("is-open")); return; }
       const b = e.target.closest("[data-view]"); if (!b || !rail.contains(b)) return;
       e.preventDefault(); showView(b.dataset.view);
     });
@@ -3309,6 +3287,18 @@ ${rowsHtml}
     const soon = it.soon ? '<span class="nav-soon">Tez orada</span>' : "";
     return `<button type="button" class="nav-item" data-view="${it.id}" data-match="${(it.match || []).join(" ")}">${NAV_ICO[it.icon] || NAV_ICO.dot}<span class="nav-item__t">${escH(it.label)}</span>${badge}${soon}</button>`;
   }
+  const navOpen = {};   // yig'iladigan bo'limlar holati: key -> ochiqmi (menyu qayta chizilganda saqlanadi)
+  function navGroupHtml(s) {
+    const open = !!navOpen[s.key], pid = "navGrp-" + s.key;
+    return `<div class="rail__group nav-sec nav-grp${open ? " is-open" : ""}" data-sec="${s.key}">` +
+      `<button type="button" class="nav-item nav-grp__btn" data-grp aria-expanded="${open}" aria-controls="${pid}">${NAV_ICO[s.icon] || NAV_ICO.dot}<span class="nav-item__t">${escH(s.title)}</span><span class="nav-grp__car" aria-hidden="true">${ICON.caret}</span></button>` +
+      `<div class="nav-grp__panel" id="${pid}"><div class="nav-grp__list"><div class="nav-grp__in">${s.items.map(navItemHtml).join("")}</div></div></div></div>`;
+  }
+  function setNavGroup(g, open) {
+    navOpen[g.dataset.sec] = open;
+    g.classList.toggle("is-open", open);
+    const b = g.querySelector("[data-grp]"); if (b) b.setAttribute("aria-expanded", String(open));
+  }
   function accountCardHtml() {
     const acc = staffAccount(), meta = ROLE_META[currentRole] || {};
     return acc
@@ -3322,10 +3312,9 @@ ${rowsHtml}
     if (!cfg || !box) return;
     const keep = {};
     ["feedBadge", "mahallaBadge"].forEach(id => { const e = document.getElementById(id); if (e) keep[id] = { t: e.textContent, d: e.style.display }; });
-    const sec = s => `<div class="rail__group nav-sec" data-sec="${s.key}"><div class="rail__label nav-sec__h">${escH(s.title)}</div>${s.items.map(navItemHtml).join("")}</div>`;
+    const sec = s => s.collapsible ? navGroupHtml(s) : `<div class="rail__group nav-sec" data-sec="${s.key}"><div class="rail__label nav-sec__h">${escH(s.title)}</div>${s.items.map(navItemHtml).join("")}</div>`;
     const staff = cfg.staff && cfg.staff[currentRole];
     box.innerHTML =
-      `<button type="button" class="nav-sos" data-view="${cfg.sos.id}">${SOS_ICO}<span>${escH(cfg.sos.label)}</span></button>` +
       (staff ? sec(staff) + '<div class="nav-divider">Fuqaro bo\'limlari</div>' : "") +
       cfg.sections.map(sec).join("") +
       `<div class="nav-more"><div class="rail__label">${escH(cfg.more.title)}</div><div class="nav-more__list">${cfg.more.items.map(i => `<button type="button" class="nav-more__i" data-view="${i.id}">${escH(i.label)}</button>`).join("")}</div></div>` +
@@ -3341,6 +3330,8 @@ ${rowsHtml}
       if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
     });
     rail.querySelectorAll(".nav-sec").forEach(g => g.classList.toggle("is-active", !!g.querySelector(".nav-item.is-active")));
+    // joriy sahifa yig'iladigan bo'lim ichida bo'lsa — bo'lim ochiq turadi
+    rail.querySelectorAll(".nav-grp.is-active:not(.is-open)").forEach(g => setNavGroup(g, true));
   }
 
   /* ---- xodim paneli: topbar tugmasi, menyu, kirish / chiqish ---- */
@@ -3590,7 +3581,6 @@ ${rowsHtml}
     renderKxi();
     renderMap();
     renderAssist();
-    renderHelp();
     setupReg();
     renderLegal();
     // foydalanuvchi paneli (odat yondashuvi)
