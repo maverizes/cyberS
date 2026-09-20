@@ -264,9 +264,9 @@
   const VIDEOS = [
     { id:1, cat:"Tahdid", c1:"#E25555", c2:"#7d1f1f", ico:ICON.sms, title:"Soxta “Click bloklandi” SMS'ni 10 soniyada tanish", dur:"0:45", views:"12.4K", likes:"1.2K", author:"KiberOgoh UZ", src:"./videos/video_1.mp4", poster:"",
       cap:"Rasmiy SMS hech qachon havola yubormaydi. Domenni tekshiring: click.uz to'g'ri, clik-uz.xyz soxta. Shubha bo'lsa — ilovani o'zingiz oching." },
-    { id:2, cat:"Himoya", c1:"#3A86D8", c2:"#163f73", ico:ICON.shieldCheck, title:"Telegram akkauntni o'g'irlatmang: ikki bosqichli parol", dur:"1:02", views:"9.8K", likes:"940", author:"KiberOgoh UZ", src:"./videos/video_2.mp4", poster:"",
+    { id:2, cat:"Himoya", c1:"#3A86D8", c2:"#2e2b5e", ico:ICON.shieldCheck, title:"Telegram akkauntni o'g'irlatmang: ikki bosqichli parol", dur:"1:02", views:"9.8K", likes:"940", author:"KiberOgoh UZ", src:"./videos/video_2.mp4", poster:"",
       cap:"Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash. Parolingiz o'g'irlansa ham, akkauntga begona kira olmaydi." },
-    { id:3, cat:"Aldov", c1:"#F0A92E", c2:"#9a6207", ico:ICON.phone, title:"Bank kodi aldovi: nega hech qachon kod aytmaslik kerak", dur:"0:38", views:"15.1K", likes:"1.6K", author:"KiberOgoh UZ", src:"./videos/video_3.mp4", poster:"",
+    { id:3, cat:"Aldov", c1:"#4F3FDF", c2:"#20148d", ico:ICON.phone, title:"Bank kodi aldovi: nega hech qachon kod aytmaslik kerak", dur:"0:38", views:"15.1K", likes:"1.6K", author:"KiberOgoh UZ", src:"./videos/video_3.mp4", poster:"",
       cap:"Bank xodimi hech qachon SMS-kod, parol yoki PIN so'ramaydi. Kim so'rasa — firibgar. Darhol go'shakni qo'ying." }
   ];
 
@@ -291,7 +291,7 @@
       else on = rand() > 0.52;
       if (on) rects += `<rect x="${(c + quiet) * cell}" y="${(r + quiet) * cell}" width="${cell}" height="${cell}"/>`;
     }
-    return `<svg viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg" class="qr"><rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#10162e">${rects}</g></svg>`;
+    return `<svg viewBox="0 0 ${dim} ${dim}" xmlns="http://www.w3.org/2000/svg" class="qr"><rect width="${dim}" height="${dim}" fill="#fff"/><g fill="#181727">${rects}</g></svg>`;
   }
 
   // onlayn testdan o'tib, ruxsatnomasi tayyor bo'lgan fuqarolar (faqat mahalla adminiga ko'rinadi)
@@ -1089,7 +1089,7 @@
 
     const demo = $("#dashAppealsDemo");
     if (demo) {
-      const soc = [["Ish bilan band", S.band, "#12A594"], ["Ishsiz", S.ishsiz, "#F5A623"], ["Nafaqada", S.nafaqa, "#3E7BFA"]];
+      const soc = [["Ish bilan band", S.band, "#12A594"], ["Ishsiz", S.ishsiz, "#4736E2"], ["Nafaqada", S.nafaqa, "#3E7BFA"]];
       demo.innerHTML = `<div class="appeals-card__h">Jabrlanuvchilar — ijtimoiy tarkib</div>
         <div class="appeals-card__sub">${S.erkak + S.ayol} jabrlanuvchi · erkaklar ${S.erkak} · ayollar ${S.ayol}</div>
         <div class="kxi-breakdown" style="padding:0">
@@ -2116,7 +2116,7 @@
     const pct = (a, b) => (b ? (a / b * 100).toFixed(1).replace(".", ",") + "%" : "—");
     const num = n => fmtN(n);
     const rowsHtml = rows.map((r, i) => `
-      <tr${r.own ? ' style="background:#FEF6E4"' : ""}>
+      <tr${r.own ? ' style="background:#E8E6FC"' : ""}>
         <td style="text-align:center">${i + 1}</td>
         <td>${r.name}${r.own ? " ★" : ""}</td>
         <td style="text-align:right">${num(r.aholi)}</td>
@@ -2414,7 +2414,7 @@ ${rowsHtml}
 
     const formula = $("#kxiFormula");
     if (formula) {
-      const palette = { 0: "var(--blue)", 1: "var(--purple)", 2: "var(--teal)", 3: "var(--gold)", 4: "#e07b3e" };
+      const palette = { 0: "var(--blue)", 1: "var(--purple)", 2: "var(--teal)", 3: "var(--gold)", 4: "#5a4dd1" };
       formula.innerHTML = `
         <p style="font-size:13.5px;color:var(--muted);margin:0 0 14px">Tizim har bir ko'rsatkichni baholab, og'irligiga ko'ra <b style="color:var(--navy)">100 ballik indeksni avtomatik hisoblaydi</b>:</p>
         <div class="kxi-weights">${KXI_WEIGHTS.map((x, i) => `<div class="kxi-wseg" style="width:${x.w}%;background:${palette[i]}" title="${x.k} ${x.w}%"></div>`).join("")}</div>
@@ -2627,10 +2627,10 @@ ${rowsHtml}
     if (donut) {
       const tot = units.length, gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
       donut.innerHTML = `
-        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #f5a623 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">hudud</div></div></div>
+        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #4736e2 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">hudud</div></div></div>
         <div class="donut__legend">
           <div><span class="dleg" style="background:#40af6e"></span>Xavfsiz <b>${counts.green}</b></div>
-          <div><span class="dleg" style="background:#f5a623"></span>Ogohlantirish <b>${counts.yellow}</b></div>
+          <div><span class="dleg" style="background:#4736e2"></span>Ogohlantirish <b>${counts.yellow}</b></div>
           <div><span class="dleg" style="background:#e5484d"></span>Yuqori xavf <b>${counts.red}</b></div>
         </div>`;
     }
@@ -2879,10 +2879,10 @@ ${rowsHtml}
     if (donut) {
       const tot = mhz.length, gp = counts.green / tot * 100, yp = counts.yellow / tot * 100;
       donut.innerHTML = `
-        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #f5a623 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">mahalla</div></div></div>
+        <div class="donut" style="background:conic-gradient(#40af6e 0 ${gp}%, #4736e2 ${gp}% ${gp + yp}%, #e5484d ${gp + yp}% 100%)"><div class="donut__hole"><div class="donut__num">${tot}</div><div class="donut__lab">mahalla</div></div></div>
         <div class="donut__legend">
           <div><span class="dleg" style="background:#40af6e"></span>Xavfsiz <b>${counts.green}</b></div>
-          <div><span class="dleg" style="background:#f5a623"></span>Ogohlantirish <b>${counts.yellow}</b></div>
+          <div><span class="dleg" style="background:#4736e2"></span>Ogohlantirish <b>${counts.yellow}</b></div>
           <div><span class="dleg" style="background:#e5484d"></span>Yuqori xavf <b>${counts.red}</b></div>
         </div>`;
     }
@@ -2902,7 +2902,7 @@ ${rowsHtml}
     const det = $("#mapDetail"); if (!det) return;
     const soc = [
       { k: "Ish bilan band", v: r.band, c: "#12A594" },
-      { k: "Ishsiz", v: r.ishsiz, c: "#F5A623" },
+      { k: "Ishsiz", v: r.ishsiz, c: "#4736E2" },
       { k: "Nafaqada", v: r.nafaqa, c: "#3E7BFA" }
     ];
     det.innerHTML = `
