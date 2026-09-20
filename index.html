@@ -69,14 +69,14 @@
 
         <div class="card seclevel" id="dashSec"></div>
 
-        <!-- ===== MUROJAATLAR — Nurafshon shahri (rasmiy ma'lumot) ===== -->
-        <div class="gov-block">
+        <!-- ===== MUROJAATLAR — rasmiy tahlil, faqat mas'ul xodimlar uchun (app.js: renderDashAppeals) ===== -->
+        <div class="gov-block" id="dashGov" style="display:none">
           <div class="gov-head">
             <div>
               <span class="eyebrow">Rasmiy tahlil</span>
-              <h2>Murojaatlar — Nurafshon shahri</h2>
+              <h2 id="dashGovTitle">Murojaatlar — Nurafshon shahri</h2>
             </div>
-            <span class="gov-head__meta">16 mahalla · 2025</span>
+            <span class="gov-head__meta" id="dashGovMeta">16 mahalla · 2025</span>
           </div>
           <div class="grid stat-grid" id="dashAppealsStats"></div>
           <div class="appeals-2col">
@@ -117,16 +117,6 @@
 
       <!-- ===== THREAT FEED ===== -->
       <!-- ===== MUROJAATLAR ===== -->
-      <section class="view" id="view-appeals">
-        <div class="page-head">
-          <span class="eyebrow">Murojaatlar</span>
-          <h1 id="appealsTitle">Platformaga murojaat yuboring</h1>
-          <p class="lead" id="appealsLead">Firibgarlik holati haqida xabar bering, shikoyat, taklif yoki savol yo'llang
-            — murojaatingiz mas'ullarga yetkaziladi va holatini shu yerda kuzatasiz.</p>
-        </div>
-        <div id="appealsWrap"></div>
-      </section>
-
       <section class="view" id="view-feed">
         <div class="page-head">
           <span class="eyebrow">Tahdidlar lentasi</span>
@@ -177,8 +167,8 @@
       <section class="view" id="view-quiz">
         <div class="page-head">
           <span class="eyebrow">Kibersinov — bilim sinovi</span>
-          <h1>Firibgarni tani</h1>
-          <p class="lead">Real holatlarni ko'rib, bu firibgarlikmi yoki xavfsizmi — o'zingiz hal qiling. Har to'g'ri
+          <h1 id="quizTitle">Firibgarni tani</h1>
+          <p class="lead" id="quizLead">Real holatlarni ko'rib, bu firibgarlikmi yoki xavfsizmi — o'zingiz hal qiling. Har to'g'ri
             javob ballaringizni oshiradi — bu esa mahallangiz reytingi va tumaningiz KXI ko'rsatkichiga ta'sir qiladi.
           </p>
         </div>
@@ -630,8 +620,8 @@
           <nav class="ko-ft-col" aria-label="Platforma havolalari">
             <h3>Platforma</h3>
             <ul>
-              <li><a href="/statistika" data-ko-link>Murojaatlar statistikasi</a></li>
-              <li><a href="/mahalla" data-ko-link>Mahalla kesimida</a></li>
+              <li class="ft-staff"><a href="/statistika" data-ko-link>Murojaatlar statistikasi</a></li>
+              <li class="ft-staff"><a href="/mahalla" data-ko-link>Mahalla kesimida</a></li>
               <li><a href="/materiallar" data-ko-link>Yuklab olish materiallari</a></li>
             </ul>
           </nav>
@@ -734,21 +724,6 @@
             uchun beriladi.</p>
         </div>
         <div id="ballWrap"></div>
-      </section>
-
-      <!-- ===== PLACEHOLDER: XAVF YO'LLARI ===== -->
-      <section class="view" id="view-yollar">
-        <div class="page-head">
-          <span class="eyebrow">Xavfdan xabar</span>
-          <h1>Xavf yo'llari</h1>
-        </div>
-        <div class="card ko-soon">
-          <div class="ko-soon__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
-          <span class="ko-soon__tag">Tez orada</span>
-          <h3>Bu bo'lim tayyorlanmoqda</h3>
-          <p>Xavf yo'llari sahifasi hozircha ishlab chiqilmoqda. Tayyor bo'lgach shu yerda paydo bo'ladi.</p>
-          <button type="button" class="btn btn--gold" data-view="dash">Bosh sahifaga qaytish</button>
-        </div>
       </section>
 
     </main>

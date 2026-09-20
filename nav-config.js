@@ -9,6 +9,9 @@
      collapsible — bo'lim bitta yig'iladigan band bo'lib chiziladi (bosilganda bandlari ochiladi)
    ========================================================= */
 window.KO_NAV = {
+  // bo'limlardan tashqarida, menyuning eng tepasida
+  home: { id: "dash", label: "Bosh sahifa", icon: "grid" },
+
   // bo'limlardan tashqarida, o'ng pastki burchakdagi suzuvchi tugma
   assistant: { id: "assist", label: "AI Hamroh", emoji: "💬" },
 
@@ -20,13 +23,18 @@ window.KO_NAV = {
     ]},
     { key: "alert", title: "Xavfdan xabar", icon: "alert", collapsible: true, items: [
       { id: "feed",   label: "Tahdidlar lentasi", icon: "bell", badge: { id: "feedBadge", text: "3" } },
-      { id: "yollar", label: "Xavf yo'llari",     icon: "route", soon: true },
-      { id: "check",  label: "Tekshirgich",       icon: "search" }
+      { id: "check",  label: "Tekshirgich",       icon: "search" },
+      { id: "video",  label: "So'nggi videolar",  icon: "play" }
     ]},
     { key: "result", title: "Mening natijam", icon: "trophy", collapsible: true, items: [
       { id: "ball",      label: "Ball va daraja",      icon: "medal" },
       { id: "cert",      label: "Sertifikatlarim",     icon: "cert" },
       { id: "privilege", label: "Imtiyozlarim",        icon: "gift" }
+    ]},
+    { key: "more", title: "Boshqa", icon: "dots", collapsible: true, items: [
+      { id: "reg",    label: "Ro'yxatdan o'tish", icon: "userplus" },
+      { id: "legal",  label: "Huquqiy asoslar",   icon: "legal" },
+      { id: "umumiy", label: "Umumiy bo'lim",     icon: "info" }
     ]}
   ],
 
@@ -46,19 +54,10 @@ window.KO_NAV = {
     ]}
   },
 
-  // bo'lim emas — menyu pastidagi ixcham havolalar
-  more: { title: "Boshqa", items: [
-    { id: "dash",   label: "Bosh sahifa" },
-    { id: "video",  label: "So'nggi videolar" },
-    { id: "reg",    label: "Ro'yxatdan o'tish" },
-    { id: "legal",  label: "Huquqiy asoslar" },
-    { id: "umumiy", label: "Umumiy bo'lim" }
-  ]},
-
   // eski yoki muqobil manzillar -> joriy ko'rinish (redirect)
   aliases: {
     home: "dash", rating: "life", priv: "privilege", condition: "privilege", map: "kxi",
-    kitobxonlik: "cert", sertifikat: "cert", sinov: "quiz", "yosh-yollar": "yollar",
+    kitobxonlik: "cert", sertifikat: "cert", sinov: "quiz", yollar: "feed", "yosh-yollar": "feed",
     help: "mavzular", elchi: "cert"
   }
 };

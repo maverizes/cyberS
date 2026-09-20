@@ -350,6 +350,12 @@ img,svg{ display:block; }
 .q-choice.correct{ border-color:var(--teal); background:var(--teal-soft); color:var(--teal); }
 .q-choice.wrong{ border-color:var(--red); background:var(--red-soft); color:var(--red); }
 .q-choice:disabled{ cursor:default; }
+.q-choices--list{ grid-template-columns:1fr; gap:10px; }
+.q-choice--opt{ justify-content:flex-start; text-align:left; font-size:14.5px; font-weight:500; line-height:1.45; padding:14px 16px; }
+.q-choice__n{ width:26px; height:26px; flex:0 0 26px; border-radius:8px; background:var(--canvas); color:var(--muted);
+  font-size:12.5px; font-weight:800; display:grid; place-items:center; }
+.q-choice--opt.correct .q-choice__n{ background:var(--teal); color:#fff; }
+.q-choice--opt.wrong .q-choice__n{ background:var(--red); color:#fff; }
 .q-explain{ margin-top:16px; padding:16px 18px; border-radius:14px; font-size:14px; line-height:1.55; display:none; }
 .q-explain.show{ display:block; animation:viewIn .3s ease both; }
 .q-explain.good{ background:var(--teal-soft); color:#0f6b5a; }
@@ -2071,27 +2077,23 @@ button.crumb__seg{ cursor:pointer; } button.crumb__seg:hover{ color:var(--navy);
   transition:grid-template-rows .2s ease, visibility 0s linear .2s; }
 .nav-grp.is-open .nav-grp__panel{ grid-template-rows:1fr; visibility:visible; transition:grid-template-rows .2s ease, visibility 0s; }
 .nav-grp__list{ min-height:0; overflow:hidden; }
-.nav-grp__in{ margin:3px 0 6px 23px; padding-left:8px; border-left:1.5px solid var(--line); }
-.nav-grp__in .nav-item{ gap:10px; padding:8px 10px; font-size:14px; }
-.nav-grp__in .nav-item .ico{ width:18px; height:18px; flex-basis:18px; }
+.nav-grp__in{ margin:3px 0 6px 12px; padding-left:8px; border-left:1.5px solid var(--line); }
+.nav-grp__in .nav-item{ gap:12px; padding:10px 12px; font-size:14.5px; }
 
 .nav-sec__h{ display:flex; align-items:center; gap:8px; }
 .nav-sec__h::before{ content:""; width:3px; height:12px; border-radius:2px; background:transparent; transition:background .15s ease; }
 .nav-sec.is-active .nav-sec__h{ color:var(--navy); }
 .nav-sec.is-active .nav-sec__h::before{ background:var(--gold); }
-.nav-item__t{ min-width:0; }
+.nav-item__t{ min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .nav-soon{ margin-left:auto; font-size:10px; font-weight:700; color:var(--faint); background:var(--canvas);
   border:1px solid var(--line); border-radius:999px; padding:1px 7px; white-space:nowrap; }
 .nav-item.is-active .nav-soon{ background:rgba(255,255,255,.14); color:#fff; border-color:transparent; }
 .nav-divider{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--faint);
   padding:12px 12px 8px; border-top:1px dashed var(--line); }
-.nav-more{ margin-top:6px; padding-top:14px; border-top:1px solid var(--line); }
-.nav-more__list{ display:flex; flex-wrap:wrap; gap:4px 2px; padding:0 6px; }
-.nav-more__i{ border:0; background:transparent; font-size:12.5px; font-weight:500; color:var(--muted);
-  padding:5px 8px; border-radius:7px; cursor:pointer; }
-.nav-more__i:hover{ background:var(--canvas); color:var(--ink); }
-.nav-more__i.is-active{ background:var(--navy); color:#fff; }
+.rail__group.nav-top{ margin-bottom:4px; }
 .nav-acc{ display:none; }
+/* rasmiy statistikaga olib boradigan havolalar — faqat mas'ul xodimlarga */
+body:not(.is-staff) .ft-staff{ display:none; }
 
 /* xodim kirishi (rol tanlash tugmasi o'rniga) */
 .staff-btn{ display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.18);

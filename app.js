@@ -617,12 +617,12 @@
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
     umumiy:"Umumiy bo'lim",
-    mavzular:"Mavzular", natijalar:"Sinov natijalarim", yollar:"Xavf yo'llari", ball:"Ball va daraja"
+    mavzular:"Mavzular", natijalar:"Sinov natijalarim", ball:"Ball va daraja"
   };
   let dashAnimated = false, quizBuilt = false;
 
   /* ---- RBAC state ---- */
-  let currentRole = "superadmin";
+  let currentRole = "user";   // eng past huquq — rol applyRole() orqali akkauntdan aniqlanadi
   const RESTRICTED = { admin: ["superadmin"], mahalla: ["superadmin", "raisi"], kxi: ["superadmin", "tuman", "raisi"] };
   const canSeeView = v => !RESTRICTED[v] || RESTRICTED[v].includes(currentRole);
 
@@ -637,7 +637,6 @@
     $("#main").scrollTo ? window.scrollTo({ top: 0, behavior: "smooth" }) : window.scrollTo(0, 0);
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
-    if (v === "appeals" && typeof renderAppeals === "function") renderAppeals();
     if (v === "mavzular") { koTopic = null; renderMavzular(); }   // menyu yoki havola orqali kirilganda — mavzular ro'yxati
     if (v === "natijalar") renderNatijalar();
     if (v === "ball") renderBall();
@@ -687,6 +686,7 @@
     if (typeof renderMap === "function") renderMap();
     if (typeof renderKxi === "function") renderKxi();
     if (typeof renderMahalla === "function") renderMahalla();
+    if (typeof renderDashAppeals === "function") renderDashAppeals();
     if (typeof updateQuizLock === "function") updateQuizLock();
     if ($("#view-quiz") && $("#view-quiz").classList.contains("is-active")) {
       if (quizGateNeeded()) { renderQuizGate(); quizBuilt = false; }
@@ -1047,25 +1047,54 @@
     wireViewBtns(c);
   }
   /* Dashboard — Murojaatlar bo'limi (Nurafshon shahri, rasmiy ma'lumot) */
+  /* Rasmiy tahlil — qamrov rolga qarab:
+     fuqaro ko'rmaydi · mahalla admini faqat o'z mahallasini · tuman mas'uli va superadmin butun shahar kesimini */
   function renderDashAppeals() {
+    const gov = $("#dashGov");
+    if (currentRole === "user") {
+      // fuqaroga rasmiy tahlil ko'rsatilmaydi — blok yashiriladi va ichidagi ma'lumot tozalanadi
+      if (gov) gov.style.display = "none";
+      ["dashAppealsStats", "dashAppealsBars", "dashAppealsMethods", "dashAppealsDemo", "dashAppealsRisk"]
+        .forEach(id => { const e = document.getElementById(id); if (e) e.innerHTML = ""; });
+      return;
+    }
+    if (gov) gov.style.display = "";
+
     const S = NUR_SUMMARY;
-    const rows = NUR_APPEALS.map(m => ({ ...m, rate: nurRate(m), safety: nurSafety(m), short: m.name.replace(" MFY", "") }));
+    const all = NUR_APPEALS.map(m => ({ ...m, rate: nurRate(m), safety: nurSafety(m), short: m.name.replace(" MFY", "") }));
+    const own = currentRole === "raisi" ? all.find(m => m.name === MY_MAHALLA) : null;
+    const rows = own ? [own] : all;
     const tot = rows.reduce((s, r) => s + r.murojaat, 0);
-    const per1000 = (tot / S.aholi * 1000).toFixed(2);
+    const aholi = own ? own.aholi : S.aholi;
+    const per1000 = (tot / aholi * 1000).toFixed(2);
+    const cityRate = S.murojaat / S.aholi * 1000;
+
+    const head = $("#dashGovTitle"), meta = $("#dashGovMeta");
+    if (head) head.textContent = own ? "Murojaatlar — " + own.name : "Murojaatlar — Nurafshon shahri";
+    if (meta) meta.textContent = own ? "1 mahalla · 2025" : all.length + " mahalla · 2025";
 
     const st = $("#dashAppealsStats");
     if (st) {
       const cards = [
-        { num: tot, lab: "Jami murojaat · 16 mahalla", cls: "i-blue", ico: ICON.sms },
-        { num: fmtN(S.aholi), lab: "Qamrab olingan aholi", cls: "i-purple", ico: ICON.users },
+        { num: tot, lab: own ? "Jami murojaat · " + own.short : "Jami murojaat · " + all.length + " mahalla", cls: "i-blue", ico: ICON.sms },
+        { num: fmtN(aholi), lab: "Qamrab olingan aholi", cls: "i-purple", ico: ICON.users },
         { num: per1000, lab: "1000 aholiga murojaat", cls: "i-gold", ico: ICON.spark },
-        { num: S.topRiskIsh, lab: `Jinoyat ishi · ${S.topRisk.replace(" MFY", "")} (${S.topRiskIsh2025} tasi 2025)`, cls: "i-red", ico: ICON.alert }
+        own ? { num: own.ish || 0, lab: "Jinoyat ishi qo'zg'atilgan", cls: "i-red", ico: ICON.alert }
+            : { num: S.topRiskIsh, lab: `Jinoyat ishi · ${S.topRisk.replace(" MFY", "")} (${S.topRiskIsh2025} tasi 2025)`, cls: "i-red", ico: ICON.alert }
       ];
       st.innerHTML = cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("");
     }
 
     const bars = $("#dashAppealsBars");
-    if (bars) {
+    if (bars && own) {
+      const max = Math.max(own.rate, cityRate) || 1;
+      bars.innerHTML = `<div class="appeals-card__h">Shahar o'rtachasiga nisbatan</div>
+        <div class="appeals-card__sub">1000 aholiga to'g'ri keladigan murojaatlar · boshqa mahallalar ma'lumoti yopiq</div>
+        <div class="appeals-barwrap">
+          <div class="mbar"><div class="mbar__name">${own.short}</div><div class="mbar__track"><i style="width:${own.rate / max * 100}%;background:${kxiColor(own.safety)}"></i></div><div class="mbar__val">${own.rate.toFixed(2)}</div></div>
+          <div class="mbar"><div class="mbar__name">Shahar o'rtacha</div><div class="mbar__track"><i style="width:${cityRate / max * 100}%;background:#9AA7BE"></i></div><div class="mbar__val">${cityRate.toFixed(2)}</div></div>
+        </div>`;
+    } else if (bars) {
       const sorted = [...rows].sort((a, b) => b.murojaat - a.murojaat);
       const max = sorted[0].murojaat || 1;
       bars.innerHTML = `<div class="appeals-card__h">Mahallalar bo'yicha murojaatlar</div>
@@ -1076,7 +1105,11 @@
     }
 
     const meth = $("#dashAppealsMethods");
-    if (meth) {
+    if (meth && own) {
+      meth.innerHTML = `<div class="appeals-card__h">Firibgarlik usuli</div>
+        <div class="appeals-card__sub">${own.short} bo'yicha qayd etilgan ${own.murojaat} holat</div>
+        <div class="kxi-rec kxi-red" style="margin:12px 0 0">${ICON.alert}<span><b>${own.usul}</b> — mahallada eng ko'p uchragan usul. Tushuntirish ishlarini shu yo'nalishdan boshlang.</span></div>`;
+    } else if (meth) {
       let acc = 0;
       const stops = NUR_METHODS.map(m => { const a = acc; acc += m.pct; return `${m.c} ${a}% ${Math.min(100, acc)}%`; }).join(", ");
       meth.innerHTML = `<div class="appeals-card__h">Jinoyat sodir etish usullari</div>
@@ -1089,17 +1122,24 @@
 
     const demo = $("#dashAppealsDemo");
     if (demo) {
-      const soc = [["Ish bilan band", S.band, "#12A594"], ["Ishsiz", S.ishsiz, "#4736E2"], ["Nafaqada", S.nafaqa, "#3E7BFA"]];
-      demo.innerHTML = `<div class="appeals-card__h">Jabrlanuvchilar — ijtimoiy tarkib</div>
-        <div class="appeals-card__sub">${S.erkak + S.ayol} jabrlanuvchi · erkaklar ${S.erkak} · ayollar ${S.ayol}</div>
+      const soc = own
+        ? [["Ish bilan band", own.band, "#12A594"], ["Ishsiz", own.ishsiz, "#4736E2"], ["Nafaqada", own.nafaqa, "#3A8EBB"]]
+        : [["Ish bilan band", S.band, "#12A594"], ["Ishsiz", S.ishsiz, "#4736E2"], ["Nafaqada", S.nafaqa, "#3A8EBB"]];
+      demo.innerHTML = `<div class="appeals-card__h">Aholi — ijtimoiy tarkib</div>
+        <div class="appeals-card__sub">${own ? `${own.short} · ${fmtN(own.aholi)} aholi` : `${S.erkak + S.ayol} jabrlanuvchi · erkaklar ${S.erkak} · ayollar ${S.ayol}`}</div>
         <div class="kxi-breakdown" style="padding:0">
           ${soc.map(([k, v, c]) => `<div class="kxi-ind"><div class="kxi-ind__top"><span>${k}</span><span class="kxi-ind__w">${v}%</span></div><div class="kxi-ind__bar"><i style="width:${Math.min(100, v)}%;background:${c}"></i></div></div>`).join("")}
         </div>
-        <p style="font-size:12.5px;color:var(--muted);margin-top:12px">O'rtacha yosh <b style="color:var(--navy)">${S.yoshAsosiy}</b> — mehnatga layoqatli, raqamli xizmatlardan faol foydalanuvchilar. ${S.yoshNote}.</p>`;
+        <p style="font-size:12.5px;color:var(--muted);margin-top:12px">O'rtacha yosh <b style="color:var(--navy)">${own ? own.yosh : S.yoshAsosiy}</b> — mehnatga layoqatli, raqamli xizmatlardan faol foydalanuvchilar.${own ? "" : " " + S.yoshNote + "."}</p>`;
     }
 
     const risk = $("#dashAppealsRisk");
-    if (risk) {
+    if (risk && own) {
+      const hi = own.rate > cityRate;
+      risk.innerHTML = `<div class="appeals-card__h">Xavf darajasi</div>
+        <div class="appeals-card__sub">Aholi soniga nisbatan murojaat zichligi</div>
+        <div class="kxi-rec ${hi ? "kxi-red" : "kxi-green"}" style="margin:0">${hi ? ICON.alert : ICON.shieldCheck}<span><b>${own.short} — ${own.rate.toFixed(2)}:</b> shahar o'rtachasi ${cityRate.toFixed(2)} ${hi ? "dan yuqori. Mahallada qo'shimcha tushuntirish ishlari talab qilinadi." : "dan past. Hozirgi sur'atni saqlab turing."}</span></div>`;
+    } else if (risk) {
       const safest = [...rows].sort((a, b) => a.rate - b.rate).slice(0, 3).map(r => `${r.short} (${r.murojaat})`).join(" · ");
       risk.innerHTML = `<div class="appeals-card__h">Xavf darajasi</div>
         <div class="appeals-card__sub">Aholi soniga nisbatan murojaat zichligi</div>
@@ -1239,7 +1279,7 @@
   /* =========================================================
      KIBERSINOV (quiz) — natija foydalanuvchi → mahalla → tuman ga ta'sir qiladi
      ========================================================= */
-  let qi = 0, qScore = 0;
+  let qi = 0, qScore = 0, quizSet = null;   // quizSet — mavzu sinovi (variantli savollar); null bo'lsa umumiy «firibgarni tani» sinovi
   const POINT_PER_CORRECT = 15;
   let userBall = 1280;               // Azizbek — joriy ball
   function levelFor(pct) {
@@ -1248,10 +1288,29 @@
     if (pct >= 40) return "Hushyor fuqaro";
     return "Yangi boshlovchi";
   }
-  function startQuiz() { qi = 0; qScore = 0; renderQuestion(); }
+  function startQuiz() { qi = 0; qScore = 0; quizSet = (koQuizTopic && koQuizTopic.quiz) || null; renderQuestion(); }
   function renderQuestion() {
     const wrap = $("#quizWrap");
-    if (qi >= QUIZ.length) return renderQuizResult();
+    const tot = quizSet ? quizSet.length : QUIZ.length;
+    if (qi >= tot) return renderQuizResult();
+    if (quizSet) {
+      const q = quizSet[qi];
+      wrap.innerHTML = `
+      <div class="quiz__progress">
+        <div class="quiz__bar"><i style="width:${Math.round(qi / tot * 100)}%"></i></div>
+        <div><span class="quiz__score">${qScore}/${tot}</span> · <span class="quiz__level">${levelFor(Math.round(qScore / tot * 100))}</span></div>
+      </div>
+      <div class="card q-card">
+        <div style="font-size:13px;color:var(--muted);font-weight:600">Savol ${qi + 1} / ${tot}</div>
+        <div class="q-ask">${escH(q.q)}</div>
+        <div class="q-choices q-choices--list">${q.a.map((opt, i) => `<button class="q-choice q-choice--opt" data-opt="${i}"><span class="q-choice__n">${String.fromCharCode(65 + i)}</span><span>${escH(opt)}</span></button>`).join("")}</div>
+        <div class="q-explain" id="qExplain"></div>
+        <div class="q-actions"><button class="btn btn--gold" id="qNext" style="display:none">Keyingi savol</button></div>
+      </div>`;
+      $$(".q-choice", wrap).forEach(b => b.addEventListener("click", () => answerMcq(+b.dataset.opt, b)));
+      $("#qNext").addEventListener("click", () => { qi++; renderQuestion(); });
+      return;
+    }
     const q = QUIZ[qi];
     const pct = Math.round((qi / QUIZ.length) * 100);
     wrap.innerHTML = `
@@ -1276,6 +1335,20 @@
     $$(".q-choice", wrap).forEach(b => b.addEventListener("click", () => answerQuestion(b.dataset.ans === "true", b)));
     $("#qNext").addEventListener("click", () => { qi++; renderQuestion(); });
   }
+  function answerMcq(idx, btn) {
+    const q = quizSet[qi], correct = idx === q.c;
+    if (correct) qScore++;
+    $$(".q-choice").forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.c) b.classList.add("correct");
+      else if (b === btn) b.classList.add("wrong");
+    });
+    const ex = $("#qExplain");
+    ex.className = "q-explain show " + (correct ? "good" : "bad");
+    ex.innerHTML = `<b>${correct ? "To'g'ri! ✓" : "Noto'g'ri."}</b> ${q.why}`;
+    $("#qNext").style.display = "inline-flex";
+    $("#qNext").textContent = qi + 1 >= quizSet.length ? "Natijani ko'rish" : "Keyingi savol";
+  }
   function answerQuestion(ans, btn) {
     const q = QUIZ[qi];
     const correct = ans === q.scam;
@@ -1293,18 +1366,21 @@
     $("#qNext").textContent = qi + 1 >= QUIZ.length ? "Natijani ko'rish" : "Keyingi savol";
   }
   function renderQuizResult() {
-    const pct = Math.round(qScore / QUIZ.length * 100);
+    const tot = quizSet ? quizSet.length : QUIZ.length;
+    const pct = Math.round(qScore / tot * 100);
     const lvl = levelFor(pct);
     const earned = qScore * POINT_PER_CORRECT;
     const prev = userBall;
     userBall += earned;                // natija shaxsiy ballga qo'shiladi
-    saveResult({ slug: koQuizTopic ? koQuizTopic.slug : null, title: koQuizTopic ? koQuizTopic.t : "Umumiy sinov — Firibgarni tani", score: qScore, total: QUIZ.length, pct, lvl, earned, ts: Date.now() });
+    saveResult({ slug: koQuizTopic ? koQuizTopic.slug : null, title: koQuizTopic ? koQuizTopic.t : "Umumiy sinov — Firibgarni tani", score: qScore, total: tot, pct, lvl, earned, ts: Date.now() });
     $("#quizWrap").innerHTML = `
       <div class="card quiz-result">
         <div class="medal">${ICON.medal}</div>
-        <h2>${qScore} / ${QUIZ.length} to'g'ri</h2>
+        <h2>${qScore} / ${tot} to'g'ri</h2>
         <div class="lvl">Darajangiz: ${lvl}</div>
-        <p>${pct >= 70 ? "Ajoyib! Siz firibgarlik belgilarini yaxshi tanidingiz." : "Yaxshi boshlanish. Firibgarliklar bazasini ko'rib, yana urinib ko'ring."}</p>
+        <p>${pct >= 70
+          ? (quizSet ? "Ajoyib! Mavzuni yaxshi o'zlashtirdingiz." : "Ajoyib! Siz firibgarlik belgilarini yaxshi tanidingiz.")
+          : (quizSet ? "Darslikni yana bir bor o'qib chiqing va qayta urinib ko'ring." : "Yaxshi boshlanish. Firibgarliklar bazasini ko'rib, yana urinib ko'ring.")}</p>
         <div class="qpoints"><span class="qpoints__plus">+${earned} ball</span><span class="qpoints__sub">shaxsiy ballingizga qo'shildi</span></div>
       </div>
       <div class="card ripple">
@@ -1539,7 +1615,6 @@
       applyUserChip();
       updateQuizLock();
       if ($("#view-quiz").classList.contains("is-active")) { startQuiz(); quizBuilt = true; }
-      if ($("#view-appeals").classList.contains("is-active")) renderAppeals();
     });
   }
 
@@ -3117,6 +3192,7 @@ ${rowsHtml}
       };
       if (KO_ROUTES[p]) { showView(KO_ROUTES[p]); return; }
       if (p === "/statistika" || p === "/mahalla" || p === "/manba") {
+        if (currentRole === "user") { koToast("Rasmiy statistika faqat mas'ul xodimlar uchun ochiq."); return; }
         showView("dash");
         setTimeout(() => { const g = $(".gov-block"); if (g) g.scrollIntoView({ behavior: "smooth", block: "start" }); }, 120);
         return;
@@ -3211,7 +3287,6 @@ ${rowsHtml}
     bulb:   svgI('<path d="M9 18h6M10 21h4" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" stroke-linejoin="round"/>'),
     chart:  svgI('<path d="M4 20V11M10 20V5M16 20v-7M21 20H3" stroke-linecap="round"/>'),
     bell:   svgI('<path d="M12 3a6 6 0 0 0-6 6c0 4-1.5 6-2 7h16c-.5-1-2-3-2-7a6 6 0 0 0-6-6Z"/><path d="M10.5 20a1.5 1.5 0 0 0 3 0"/>'),
-    route:  svgI('<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" stroke-linecap="round"/>'),
     search: svgI('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/>'),
     medal:  svgI('<circle cx="12" cy="14" r="6"/><path d="m9 8-3-5M15 8l3-5M10.5 14l1.5 1.5 2.5-3" stroke-linecap="round" stroke-linejoin="round"/>'),
     cert:   svgI('<path d="M22 10 12 5 2 10l10 5 10-5Z" stroke-linejoin="round"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5" stroke-linejoin="round"/><path d="M22 10v5" stroke-linecap="round"/>'),
@@ -3222,6 +3297,12 @@ ${rowsHtml}
     trophy: svgI('<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" stroke-linejoin="round"/><path d="M8 6H5v1.5a3 3 0 0 0 3 3M16 6h3v1.5a3 3 0 0 1-3 3" stroke-linejoin="round"/><path d="M12 13v4M8.5 20h7" stroke-linecap="round"/>'),
     academy:svgI('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7"/><path d="M3 20h18" stroke-linecap="round"/>'),
     home:   svgI('<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/>'),
+    grid:   svgI('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'),
+    play:   svgI('<circle cx="12" cy="12" r="9"/><path d="M10.3 8.7 15.6 12l-5.3 3.3V8.7Z" stroke-linejoin="round"/>'),
+    userplus: svgI('<circle cx="10" cy="8.5" r="3.4"/><path d="M4 20c0-3.3 2.7-5.6 6-5.6 1 0 2 .2 2.8.5" stroke-linecap="round"/><path d="M17.5 14.6v5.2M14.9 17.2h5.2" stroke-linecap="round"/>'),
+    legal:  svgI('<path d="M12 4.2v15.6M8 20h8M4.5 7.5h15" stroke-linecap="round"/><path d="M7.5 7.9 4.7 13.3h5.6L7.5 7.9Z" stroke-linejoin="round"/><path d="M16.5 7.9l-2.8 5.4h5.6l-2.8-5.4Z" stroke-linejoin="round"/>'),
+    info:   svgI('<circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4" stroke-linecap="round"/><circle cx="12" cy="7.9" r=".95" fill="currentColor" stroke="none"/>'),
+    dots:   svgI('<circle cx="5.6" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.4" cy="12" r="1.5" fill="currentColor" stroke="none"/>'),
     dot:    svgI('<circle cx="12" cy="12" r="3"/>')
   };
   const escH = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -3327,8 +3408,8 @@ ${rowsHtml}
     const staff = cfg.staff && cfg.staff[currentRole];
     box.innerHTML =
       (staff ? sec(staff) + '<div class="nav-divider">Fuqaro bo\'limlari</div>' : "") +
+      (cfg.home ? `<div class="rail__group nav-top">${navItemHtml(cfg.home)}</div>` : "") +
       cfg.sections.map(sec).join("") +
-      `<div class="nav-more"><div class="rail__label">${escH(cfg.more.title)}</div><div class="nav-more__list">${cfg.more.items.map(i => `<button type="button" class="nav-more__i" data-view="${i.id}">${escH(i.label)}</button>`).join("")}</div></div>` +
       accountCardHtml();
     Object.keys(keep).forEach(id => { const e = document.getElementById(id); if (e) { e.textContent = keep[id].t; e.style.display = keep[id].d; } });
     syncNavGroupBadges();
@@ -3436,6 +3517,138 @@ ${rowsHtml}
   /* ---- MAVZULAR: mavzu -> darslik -> sinov -> natija ----
      Mavzular = CERT.topics (mavjud). Darslik = mavjud yo'riqnoma (HELP) va layfxak (LIFEHACKS) matni.
      Mos matn yo'q mavzuda "Darslik tez orada". Sinov = mavjud Kibersinov (QUIZ). Yangi matn yozilmagan. */
+  /* =========================================================
+     KIBERXAVFSIZLIK KURSI — «Kiberxavfsizlik: asosiy tushunchalar, xavf turlari va tahdidlar»
+     hujjati asosidagi darsliklar va ularning sinov savollari.
+     Har bir mavzu: blocks = darslik bo'limlari, quiz = shu mavzu bo'yicha test.
+     ========================================================= */
+  const KURS = [
+    {
+      slug: "kx-asoslar", t: "Kiberxavfsizlik asoslari",
+      blocks: [
+        { t: "Raqamli dunyo va yangi xavflar", html: "<p>Internet kundalik hayotga chuqur singib borgani sari ma'lumot almashish usuli tubdan o'zgardi: dial-up ulanishlardan keng polosali internetga, so'ng uyali va Wi-Fi texnologiyalariga o'tildi. Elektron tijorat, onlayn bank xizmatlari va masofaviy ish keng tarqaldi — ammo ayni shu qulayliklar kiberjinoyatchilar uchun ham yangi imkoniyat ochdi.</p><p><b>Buyumlar interneti (IoT)</b> — aqlli qurilmalar, uy jihozlari va sanoat tizimlarining internetga ulanishi. Bunday qurilmalar ko'pincha zaif xavfsizlik choralari bilan ishlab chiqariladi va hujumchi uchun qo'shimcha kirish nuqtasiga aylanadi.</p><p><b>COVID-19 pandemiyasi</b> davrida kompaniyalar masofaviy ish infratuzilmasini shoshilinch yo'lga qo'ydi — ko'pincha xavfsizlikni to'liq hisobga olmasdan. Natijada video-konferensiyaga ruxsatsiz kirish, uy tarmoqlaridagi zaifliklar va korporativ ma'lumotlarga masofaviy kirishdagi bo'shliqlar yuzaga keldi.</p>" },
+        { t: "CIA modeli — uchta asosiy ustun", html: "<p>Ma'lumotni himoya qilishning asosiy maqsadlari klassik <b>CIA</b> modeli orqali tushuntiriladi:</p><ol><li><b>Maxfiylik (Confidentiality)</b> — ma'lumotga faqat ruxsat berilgan shaxslar kira olishi. Bunga shaxsiy hayotni himoya qilish va shifrlash kiradi.</li><li><b>Yaxlitlik (Integrity)</b> — ma'lumotning to'g'ri va o'zgartirilmagan holda saqlanishi. Ruxsatsiz o'zgartirish yoki buzish — yaxlitlikning buzilishi.</li><li><b>Mavjudlik (Availability)</b> — tizim va ma'lumot kerak bo'lgan vaqtda ishlab turishi. DDoS hujumlari aynan shu tamoyilga qaratilgan.</li></ol><p>Uchala tamoyil bir-biri bilan bog'liq: xavfsizlik strategiyasi ularning barchasini muvozanatda ta'minlashi kerak.</p>" },
+        { t: "Geosiyosiy va ijtimoiy o'lchov", html: "<p>Kiberxavfsizlik faqat texnik emas, siyosiy va ijtimoiy masala hamdir. Davlatlar orasidagi kuch muvozanati endi kiberimkoniyatlar bilan ham belgilanadi.</p><ul><li><b>Saylov jarayonlariga aralashuv</b> — ovoz berish tizimlari va ro'yxatga olish bazalariga hujum, ijtimoiy tarmoqlar orqali dezinformatsiya tarqatish jamoat ishonchiga putur yetkazadi.</li><li><b>Texnologik cheklovlar</b> — davlatlar xorijiy tarmoq jihozlarida yashirin kirish yo'llari (backdoor) bo'lishidan xavfsirab, ayrim mahsulotlarni taqiqlashi mumkin.</li></ul>" },
+        { t: "Iqtisodiy qarash: xavfsizlik xarajat sifatida", html: "<p>Ko'plab tashkilotlarda kiberxavfsizlik daromad keltirmaydigan, ammo zarur xarajat sifatida qaraladi — shuning uchun ba'zan yetarlicha mablag' ajratilmaydi. Xarajatni kamaytirish maqsadida IT xizmatlarini tashqi tashkilotga topshirish (outsourcing) nazoratni zaiflashtirishi mumkin. Yetkazib berish zanjirining murakkabligi — komponentlar turli davlatlarda ishlab chiqarilishi — qo'shimcha tahdid tug'diradi.</p>" }
+      ],
+      quiz: [
+        { q: "CIA modelidagi «C» harfi nimani anglatadi?", a: ["Nazorat (Control)", "Maxfiylik (Confidentiality)", "Sertifikat (Certificate)", "Markazlashtirish (Centralization)"], c: 1,
+          why: "Maxfiylik — ma'lumotga faqat ruxsat berilgan shaxslar kira olishini ta'minlash." },
+        { q: "DDoS hujumi CIA modelining qaysi tamoyilini buzadi?", a: ["Maxfiylikni", "Yaxlitlikni", "Mavjudlikni", "Hech qaysisini"], c: 2,
+          why: "DDoS tizimni so'rovlar bilan to'ldirib ishdan chiqaradi — ya'ni mavjudlikka zarba beradi." },
+        { q: "Ma'lumot ruxsatsiz o'zgartirilsa, qaysi tamoyil buzilgan bo'ladi?", a: ["Maxfiylik", "Yaxlitlik", "Mavjudlik", "Shifrlash"], c: 1,
+          why: "Yaxlitlik — ma'lumotning o'zgartirilmagan holda saqlanishi. Ruxsatsiz o'zgartirish aynan shuni buzadi." },
+        { q: "IoT qurilmalari nega qo'shimcha xavf tug'diradi?", a: ["Ular internetga ulanmaydi", "Ko'pincha zaif xavfsizlik choralari bilan ishlab chiqariladi", "Ular faqat sanoatda ishlatiladi", "Ularda ma'lumot saqlanmaydi"], c: 1,
+          why: "Aqlli qurilmalar arzon va zaif himoya bilan chiqariladi, shu sababli hujumchi uchun qulay kirish nuqtasi bo'ladi." }
+      ]
+    },
+    {
+      slug: "kx-jinoyatchilar", t: "Kiberjinoyatchilar kimlar",
+      blocks: [
+        { t: "Hujumchilar toifalari", html: "<p>Xavfni tushunish uchun avvalo uning ortida kim turganini bilish kerak. Turli hujumchilar turli maqsad bilan harakat qiladi:</p><ul><li><b>Skriptchi go'daklar</b> — o'zlari yaratmagan tayyor dastur va skriptlardan foydalanadigan tajribasiz hujumchilar.</li><li><b>Davlatlar va hukumatlar</b> — eng katta resursga ega tomon; josuslik, infratuzilmaga ta'sir va harbiy maqsadlarda harakat qiladi.</li><li><b>Korporativ josuslar</b> — raqobatchining intellektual mulki, biznes rejalari va mijozlar ro'yxatini o'g'irlaydi.</li><li><b>Jinoyatchilar</b> — moliyaviy foyda uchun: karta ma'lumotlari, shaxsiy ma'lumot yoki to'lov undirish.</li><li><b>Haktivistlar</b> — siyosiy yoki ijtimoiy g'oyani ilgari surish uchun saytlarni buzadi, ma'lumotni oshkor qiladi.</li><li><b>Terrorchilar</b> — qo'rqitish va infratuzilmaga zarar yetkazish maqsadida.</li><li><b>Ichki xoinlar (insayderlar)</b> — tashkilot ichida ishlab, o'z vakolatini suiiste'mol qiladigan xodimlar.</li></ul>" },
+        { t: "Shlyapa rangi bo'yicha tasnif", html: "<p>Hakerlar maqsadiga qarab «shlyapa rangi» metaforasi bilan tasniflanadi:</p><ul><li><b>Qora shlyapa</b> — noqonuniy maqsadda, shaxsiy manfaat yoki zarar uchun tizimga kiradi.</li><li><b>Oq shlyapa</b> — kompaniya roziligi bilan zaifliklarni topadi va tuzatadi; axloqiy hakerlik.</li><li><b>Kulrang shlyapa</b> — ruxsatsiz kiradi, lekin yomon niyatsiz: zaiflikni topib tashkilotga xabar beradi.</li><li><b>Yashil shlyapa</b> — tajribasi kam, o'rganayotgan boshlovchi.</li><li><b>Moviy shlyapa</b> — asosan shaxsiy qasos maqsadida harakat qiladi.</li></ul>" },
+        { t: "Davlat homiyligidagi hujumlar", html: "<p>Davlat qo'llab-quvvatlaydigan guruhlar eng uzoq muddatli va eng yaxshi moliyalashtirilgan hujumlarni uyushtiradi. Hujjatda misol sifatida Xitoy xalq ozodlik armiyasining 61398-sonli bo'linmasi keltiriladi — bu tuzilma xorijiy kompaniyalarga qarshi muntazam kiberjosuslik bilan bog'lanadi.</p>" }
+      ],
+      quiz: [
+        { q: "«Oq shlyapali haker» kim?", a: ["Tizimga ruxsatsiz kirib zarar yetkazuvchi", "Tashkilot roziligi bilan zaifliklarni topib tuzatuvchi mutaxassis", "Boshlovchi, tajribasiz haker", "Qasos olish uchun hujum qiluvchi"], c: 1,
+          why: "Oq shlyapa — axloqiy haker: kompaniya roziligi bilan zaiflikni qidiradi va tuzatishga yordam beradi." },
+        { q: "«Skriptchi go'daklar» (script kiddies) qanday hujumchilar?", a: ["Davlat homiyligidagi professional guruhlar", "Tayyor skript va dasturlardan foydalanadigan tajribasiz hujumchilar", "Tashkilot ichidagi xoin xodimlar", "Zaiflikni topib xabar beradigan mutaxassislar"], c: 1,
+          why: "Ular o'zlari dastur yozmaydi — internetdan topilgan tayyor vositalardan foydalanadi." },
+        { q: "Insayder tahdidi deganda kim tushuniladi?", a: ["Raqobatchi kompaniya", "Tashkilot ichida ishlab, vakolatini suiiste'mol qiladigan xodim", "Chet eldagi haker guruhi", "Avtomatlashtirilgan botnet"], c: 1,
+          why: "Insayder — ichkaridagi odam. U allaqachon ruxsatga ega bo'lgani uchun aniqlash qiyin." },
+        { q: "Haktivistlarning asosiy maqsadi nima?", a: ["Moliyaviy foyda", "Siyosiy yoki ijtimoiy g'oyani ilgari surish", "Harbiy josuslik", "Dasturlash ko'nikmasini oshirish"], c: 1,
+          why: "Haktivistlar pul emas, e'tibor va ta'sir uchun harakat qiladi — saytlarni buzish yoki ma'lumot oshkor qilish orqali." }
+      ]
+    },
+    {
+      slug: "kx-ijtimoiy", t: "Ijtimoiy muhandislik va fishing",
+      blocks: [
+        { t: "Ijtimoiy muhandislik nima", html: "<p><b>Ijtimoiy muhandislik</b> — texnik zaiflikdan emas, inson psixologiyasidan foydalanib, kishini maxfiy ma'lumot berishga yoki zararli harakat qilishga ishontirish. Hujumchi ishonch, qo'rquv, shoshilinchlik va hokimiyatga bo'ysunish hissiyotlaridan foydalanadi.</p><p>Aynan shu sababli eng qimmat texnik himoya ham bitta shoshilinch qaror tufayli ishlamay qolishi mumkin.</p>" },
+        { t: "Fishing va uning turlari", html: "<ul><li><b>Fishing (Phishing)</b> — o'zini ishonchli manba qilib ko'rsatib, elektron pochta orqali shaxsiy yoki moliyaviy ma'lumot olishga urinish.</li><li><b>Spear phishing</b> — aniq bir shaxsga moslashtirilgan, u haqidagi ma'lumotdan foydalangan nishonli hujum.</li><li><b>Whaling</b> — kompaniyaning yuqori martabali rahbarlariga qaratilgan fishing.</li><li><b>Smishing</b> — SMS xabarlar orqali amalga oshiriladigan fishing.</li><li><b>Vishing</b> — telefon qo'ng'irog'i orqali, o'zini bank yoki davlat idorasi vakili qilib ko'rsatish.</li><li><b>Pharming</b> — foydalanuvchini asl saytga o'xshash soxta saytga yo'naltirib, kiritilgan ma'lumotni o'g'irlash.</li><li><b>CEO fraud</b> — rahbar nomidan soxta buyruq berib, pul o'tkazma yoki maxfiy ma'lumot talab qilish.</li></ul><p>Hujjatdagi misol: firibgarlar «rahbar» nomidan shoshilinch bank o'tkazmasini so'raganda, xodimlarning tekshirmasdan bajarishi katta moliyaviy zarar keltirgan.</p>" },
+        { t: "Boshqa firibgarlik texnikalari", html: "<ul><li><b>Tampering</b> — ma'lumot yoki hujjatni ruxsatsiz o'zgartirish, masalan hisob raqamini almashtirish.</li><li><b>Interception</b> — uzatilayotgan ma'lumotni yo'lda ushlab qolish va o'qish.</li><li><b>O'rtadagi odam (MITM)</b> — hujumchi ikki tomon o'rtasidagi aloqaga bilinmasdan kirib, ma'lumot almashinuvini kuzatadi yoki o'zgartiradi.</li><li><b>Proksi orqali firibgarlik</b> — soxta bank sayti orqali login va parolni real vaqtda o'g'irlab, asl saytga uzatish.</li></ul>" }
+      ],
+      quiz: [
+        { q: "SMS xabar orqali amalga oshiriladigan fishing nima deb ataladi?", a: ["Vishing", "Smishing", "Whaling", "Pharming"], c: 1,
+          why: "Smishing — SMS + phishing. Havolali soxta SMS shu turga kiradi." },
+        { q: "Telefon qo'ng'irog'i orqali, o'zini bank xodimi qilib ko'rsatuvchi firibgarlik nima deyiladi?", a: ["Vishing", "Smishing", "Spear phishing", "Tampering"], c: 0,
+          why: "Vishing — «voice phishing», ya'ni ovozli firibgarlik." },
+        { q: "Kompaniyaning bosh direktori kabi yuqori rahbarlarga qaratilgan fishing turi qaysi?", a: ["Smishing", "Whaling", "Adware", "Botnet"], c: 1,
+          why: "Whaling — «katta baliq»ga, ya'ni rahbarga qaratilgan nishonli fishing." },
+        { q: "«O'rtadagi odam» (MITM) hujumi nima qiladi?", a: ["Faylni shifrlab to'lov talab qiladi", "Ikki tomon o'rtasidagi aloqaga bilinmasdan kirib, ma'lumotni kuzatadi yoki o'zgartiradi", "Serverni so'rovlar bilan to'ldiradi", "Reklama ko'rsatadi"], c: 1,
+          why: "Hujumchi aloqa oqimining o'rtasiga joylashadi — ikkala tomon ham buni sezmaydi." }
+      ]
+    },
+    {
+      slug: "kx-malware", t: "Zararli dasturlar (Malware)",
+      blocks: [
+        { t: "Malware nima", html: "<p><b>Zararli dastur (malware)</b> — tizimga zarar yetkazish, ma'lumot o'g'irlash yoki qurilmani nazorat qilish uchun yaratilgan dasturlar majmui. Ular tarqalish usuli va maqsadiga ko'ra farqlanadi.</p>" },
+        { t: "Asosiy turlari", html: "<ul><li><b>Virus</b> — boshqa dastur yoki faylga «yopishib» tarqaladi, foydalanuvchi faylni ochganda faollashadi.</li><li><b>Qurt (Worm)</b> — foydalanuvchi aralashuvisiz, tarmoq orqali o'z-o'zidan tarqaladi.</li><li><b>Troyan</b> — foydali dastur qiyofasida yashiringan zararli dastur.</li><li><b>Ransomware</b> — ma'lumotni shifrlab, ochish uchun to'lov (odatda kriptovalyutada) talab qiladi.</li><li><b>Spyware</b> — foydalanuvchi bilmagan holda uning harakatlarini, klaviatura bosishlarini kuzatadi.</li><li><b>Adware</b> — xohlanmagan reklama ko'rsatadi, ko'pincha bepul dasturlar bilan birga o'rnatiladi.</li><li><b>Kriptomayner (cryptojacking)</b> — qurilmaning hisoblash quvvatidan ruxsatsiz kriptovalyuta qazib olish uchun foydalanadi.</li><li><b>Rootkit</b> — tizimga chuqur kirib, o'zining va boshqa zararli dasturlarning mavjudligini yashiradi.</li><li><b>Scareware</b> — yolg'on ogohlantirish bilan qo'rqitib, keraksiz dastur sotib olishga majburlaydi.</li><li><b>Zero-day</b> — hali ma'lum bo'lmagan, tuzatilmagan zaiflikdan foydalanadi.</li><li><b>Blended malware</b> — bir nechta tur xususiyatini birlashtiradi (masalan, troyan + qurt).</li><li><b>Malvertising</b> — qonuniy saytlardagi reklama tarmog'i orqali zararli dastur tarqatadi.</li></ul>" }
+      ],
+      quiz: [
+        { q: "Ransomware nima qiladi?", a: ["Reklama ko'rsatadi", "Ma'lumotni shifrlab, ochish uchun to'lov talab qiladi", "Parolni taxmin qiladi", "Tarmoqni sekinlashtiradi"], c: 1,
+          why: "Ransomware fayllarni shifrlaydi va kalit evaziga to'lov so'raydi. To'lov qilish ham ma'lumot qaytishini kafolatlamaydi." },
+        { q: "Qurt (worm) virusdan nimasi bilan farq qiladi?", a: ["Faqat telefonlarga yuqadi", "Foydalanuvchi aralashuvisiz o'zi tarqaladi", "Faqat reklama ko'rsatadi", "Antivirus tomonidan aniqlanmaydi"], c: 1,
+          why: "Virus faollashishi uchun odam faylni ochishi kerak; qurt esa tarmoq orqali mustaqil tarqaladi." },
+        { q: "Troyan dasturning asosiy belgisi nima?", a: ["O'zini foydali dastur qiyofasida ko'rsatadi", "Faqat tarmoq orqali tarqaladi", "Ma'lumotni shifrlaydi", "Faqat serverlarga hujum qiladi"], c: 0,
+          why: "Troyan foydali yoki zararsiz ko'ringan dastur ichida yashiringan bo'ladi — foydalanuvchi uni o'zi o'rnatadi." },
+        { q: "Cryptojacking nima?", a: ["Kriptovalyuta hamyonini o'g'irlash", "Qurilma quvvatidan ruxsatsiz mayning uchun foydalanish", "Kriptografik kalitni buzish", "Soxta birja yaratish"], c: 1,
+          why: "Qurilma sekinlashadi va qiziydi, chunki uning quvvati birovning kriptovalyutasini qazib beradi." }
+      ]
+    },
+    {
+      slug: "kx-texnik", t: "Texnik hujum usullari",
+      blocks: [
+        { t: "Xizmatni to'xtatishga qaratilgan hujumlar", html: "<ul><li><b>DoS</b> — bitta manbadan kelib, tizimni ko'p so'rov bilan to'ldirib, oddiy foydalanuvchilar uchun ishlamay qo'yadi.</li><li><b>DDoS</b> — bir vaqtning o'zida minglab kompyuterdan uyushtiriladigan, ancha kuchliroq tarqoq hujum.</li><li><b>Botnet va «zombi» kompyuterlar</b> — egalari bilmagan holda zararlangan, hujumchi nazoratidagi qurilmalar tarmog'i.</li></ul>" },
+        { t: "Ilova va tarmoq darajasidagi hujumlar", html: "<ul><li><b>SQL injeksiya</b> — sayt ma'lumotlar bazasiga zararli SQL buyrug'ini kiritib, maxfiy ma'lumot olish.</li><li><b>XSS</b> — saytga zararli skript joylashtirib, uni ko'rgan boshqa foydalanuvchilarga hujum qilish.</li><li><b>Brute-force</b> — parolni barcha mumkin bo'lgan kombinatsiyalarni sinab topishga urinish.</li><li><b>Sessiyani o'g'irlash</b> — foydalanuvchining faol sessiyasini egallab, uning nomidan ish yuritish.</li><li><b>Bufer to'lib ketishi</b> — dasturga hajmidan ortiq ma'lumot yuborib, xotirani buzish va nazoratni olish.</li><li><b>Drive-by yuklash</b> — zararli sahifaga kirgan zahoti avtomatik yuklab olinadigan dastur.</li><li><b>DNS zaharlash</b> — domen tizimini buzib, foydalanuvchini soxta saytga yo'naltirish.</li><li><b>APT</b> — uzoq muddat sezilmasdan tizimda qolib, muntazam ma'lumot to'playdigan yuqori darajadagi hujum.</li><li><b>Wiper</b> — ma'lumotni o'g'irlash emas, butunlay yo'q qilishga qaratilgan dastur.</li></ul>" },
+        { t: "Veb-server va tarmoq infratuzilmasi", html: "<p>Hujumchi veb-serverga kirib, saytga zararli kod joylashtirsa, o'sha saytga kirgan barcha foydalanuvchilar xavf ostida qoladi. Shuning uchun tarmoq infratuzilmasiga qaratilgan hujumlar bitta emas, minglab qurbon hosil qiladi.</p>" }
+      ],
+      quiz: [
+        { q: "DDoS hujumi DoS dan nimasi bilan farq qiladi?", a: ["Faqat mobil qurilmalarga qaratilgan", "Bir vaqtda ko'plab kompyuterlardan uyushtiriladi", "Ma'lumotni shifrlaydi", "Faqat parolni o'g'irlaydi"], c: 1,
+          why: "DDoS — tarqoq hujum: minglab zararlangan qurilma (botnet) bir vaqtda so'rov yuboradi, shu sababli to'sish qiyin." },
+        { q: "Brute-force hujumi nimaga asoslangan?", a: ["Foydalanuvchini aldab parol so'rashga", "Barcha mumkin bo'lgan kombinatsiyalarni sinab ko'rishga", "Serverni o'chirib qo'yishga", "Saytga reklama joylashtirishga"], c: 1,
+          why: "Shuning uchun uzun va murakkab parol muhim: kombinatsiya qancha ko'p bo'lsa, sinab topish shuncha qiyin." },
+        { q: "SQL injeksiya nimaga qaratilgan?", a: ["Ma'lumotlar bazasiga zararli so'rov kiritib, ma'lumot olishga", "Tarmoq kabelini uzishga", "Parolni SMS orqali so'rashga", "Reklama ko'rsatishga"], c: 0,
+          why: "Tekshirilmagan kiritish maydoni orqali baza buyruqlari yuboriladi — natijada maxfiy ma'lumot oshkor bo'ladi." },
+        { q: "APT (Advanced Persistent Threat) hujumining asosiy xususiyati nima?", a: ["Bir zumda ma'lumotni o'chiradi", "Uzoq muddat sezilmasdan tizimda qolib, ma'lumot to'playdi", "Faqat reklama ko'rsatadi", "Faqat yangi qurilmalarga hujum qiladi"], c: 1,
+          why: "APT shoshilmaydi: oylab, ba'zan yillab yashirinib turadi va muntazam ma'lumot uzatadi." }
+      ]
+    },
+    {
+      slug: "kx-ogirlik", t: "Ma'lumot va moliyaviy o'g'irlik",
+      blocks: [
+        { t: "Nima o'g'irlanadi", html: "<p>Kiberjinoyatchilarning aksariyati oxir-oqibat moliyaviy foyda ko'zlaydi:</p><ul><li><b>Shaxsiy ma'lumot</b> — ism, manzil, hujjat raqamlari yig'ilib, soxta hujjat tayyorlash yoki boshqa jinoyat uchun ishlatiladi (identifikatsiya o'g'irligi).</li><li><b>Karta ma'lumotlari</b> — karta raqami va CVV o'g'irlanib, ruxsatsiz xarid qilinadi yoki qora bozorda sotiladi.</li><li><b>Biznes ma'lumotlari</b> — maxfiy strategiya, mijozlar bazasi, intellektual mulk raqobatchiga sotiladi yoki shantaj uchun ishlatiladi.</li></ul>" },
+        { t: "Moliyaviy bozorlardagi manipulyatsiya", html: "<ul><li><b>Pump and dump</b> — aksiya narxini sun'iy ko'tarib, yuqori narxda sotish va boshqa investorlarni zarar ko'rishga qoldirish.</li><li><b>Insayder treyding</b> — hali oshkor qilinmagan moliyaviy ma'lumotdan noqonuniy foyda olish.</li><li><b>Soxta press-reliz va ijtimoiy tarmoq xabarlari</b> — yolg'on yangilik tarqatib, aksiya narxiga ta'sir qilish.</li></ul>" }
+      ],
+      quiz: [
+        { q: "Identifikatsiya o'g'irligi (identity theft) nima?", a: ["Telefonni o'g'irlash", "Shaxsiy ma'lumotni yig'ib, boshqa shaxs nomidan ish yuritish", "Parolni unutish", "Kartani bloklash"], c: 1,
+          why: "O'g'irlangan ism va hujjat ma'lumotlari bilan kredit olinishi yoki jinoyat sodir etilishi mumkin — javobgarlik esa haqiqiy egasiga tushadi." },
+        { q: "«Pump and dump» sxemasi nima?", a: ["Aksiya narxini sun'iy ko'tarib, so'ng sotib yuborish", "Serverni so'rov bilan to'ldirish", "Parolni brute-force qilish", "Soxta antivirus sotish"], c: 0,
+          why: "Yolg'on xabar bilan narx ko'tariladi, tashkilotchilar sotib chiqadi, kech qolgan investorlar zarar ko'radi." },
+        { q: "O'g'irlangan karta ma'lumotlari odatda nima uchun ishlatiladi?", a: ["Faqat statistika uchun", "Ruxsatsiz xarid qilish yoki qora bozorda sotish", "Bankni ogohlantirish uchun", "Reklama ko'rsatish uchun"], c: 1,
+          why: "Karta ma'lumoti tez pulga aylantiriladi — shuning uchun CVV va SMS-kodni hech kimga aytmaslik kerak." },
+        { q: "Insayder treyding nima?", a: ["Kompaniya ichidagi tarmoqni himoya qilish", "Hali oshkor qilinmagan ma'lumotdan noqonuniy foyda olish", "Xodimlarni o'qitish", "Ochiq hisobotlarni o'qish"], c: 1,
+          why: "Bozorga hali yetib bormagan ma'lumotdan foydalanish — qonunbuzarlik hisoblanadi." }
+      ]
+    },
+    {
+      slug: "kx-zarar", t: "Zarar ko'lami va xulosa",
+      blocks: [
+        { t: "Kimga qanday ta'sir qiladi", html: "<ul><li><b>Shaxsiy daraja</b> — moliyaviy yo'qotish, shaxsiy ma'lumotning oshkor bo'lishi, obro'ga putur.</li><li><b>Kasbiy daraja</b> — e'tiborsizlik oqibatida ishdan bo'shatilish yoki kasbiy obro'ning yo'qolishi.</li><li><b>Biznes darajasi</b> — moliyaviy zarar, mijozlar ishonchining yo'qolishi, sud jarayonlari.</li><li><b>Jismoniy xavf</b> — energiya yoki suv ta'minoti kabi infratuzilmaga hujum real hayotda jismoniy zarar keltirishi mumkin.</li><li><b>Jamiyat darajasi</b> — davlat institutlari, saylov jarayoni va milliy infratuzilmaga qaratilgan hujumlar butun jamiyatga ta'sir qiladi.</li></ul>" },
+        { t: "Asosiy xulosa", html: "<p><b>Inson xatosi — kiberxavfsizlikdagi eng katta va eng ko'p uchraydigan zaif nuqta.</b> Eng kuchli texnik himoya ham bitta shoshilinch bosilgan havola tufayli ishlamay qolishi mumkin.</p><p>Xavfsizlik — bir martalik chora emas, <b>doimiy jarayon</b>. Texnologiya rivojlangani sari tahdidlar ham murakkablashadi, shuning uchun ogohlik va bilimni muntazam yangilab borish kerak.</p><p><i>Ushbu darslik «Hammasi bittada: Kiberxavfsizlik, yengil tushuntirish» kitobi asosida tayyorlangan qisqacha xulosa materialidan olingan.</i></p>" }
+      ],
+      quiz: [
+        { q: "Hujjat xulosasiga ko'ra, kiberxavfsizlikdagi eng zaif nuqta nima?", a: ["Eskirgan antivirus", "Inson xatosi", "Sekin internet", "Arzon qurilmalar"], c: 1,
+          why: "Texnika qanchalik kuchli bo'lmasin, qaror odam tomonidan qabul qilinadi — shuning uchun ogohlik birinchi himoya." },
+        { q: "Energiya yoki suv ta'minoti tizimiga qilingan kiberhujum qanday oqibatga olib kelishi mumkin?", a: ["Faqat moliyaviy zarar", "Real hayotdagi jismoniy zarar", "Faqat obro' yo'qotish", "Hech qanday oqibat"], c: 1,
+          why: "Infratuzilma hujumlari raqamli chegaradan chiqib, odamlarning hayotiga bevosita ta'sir qiladi." },
+        { q: "Xavfsizlikka to'g'ri yondashuv qaysi?", a: ["Bir marta sozlab qo'yish kifoya", "Doimiy jarayon — bilim va choralarni muntazam yangilash", "Faqat antivirus o'rnatish", "Faqat IT bo'limining ishi"], c: 1,
+          why: "Tahdidlar o'zgarib turadi, shuning uchun himoya ham muntazam yangilanishi kerak." },
+        { q: "Biznes darajasidagi zarar qanday namoyon bo'ladi?", a: ["Faqat kompyuter sekinlashadi", "Moliyaviy zarar, mijozlar ishonchining yo'qolishi va sud jarayonlari", "Faqat xodimlar charchaydi", "Hech qanday zarar bo'lmaydi"], c: 1,
+          why: "Ma'lumot sizib chiqqan kompaniya pul, mijoz va obro'ni bir vaqtda yo'qotadi." }
+      ]
+    }
+  ];
+
   const TOPIC_SLUGS = ["parollar", "telegram", "qongiroqlar", "ai-firibgarlik", "fishing", "bank"];
   const TOPIC_LESSONS = {
     "Parollar": [{ help: 1 }, { life: 4 }],
@@ -3446,8 +3659,14 @@ ${rowsHtml}
     "Bank xavfsizligi": [{ life: 1 }, { help: 0 }]
   };
   let koTopic = null, koQuizTopic = null;
-  const topicList = () => CERT.topics.map((t, i) => ({ ...t, slug: TOPIC_SLUGS[i] || "mavzu-" + (i + 1), refs: TOPIC_LESSONS[t.t] || [] }));
+  const topicList = () => {
+    const res = loadResults();
+    const lastPct = slug => { const r = res.find(x => x.slug === slug); return r ? +r.pct || 0 : 0; };
+    return KURS.map(k => ({ ...k, kurs: true, refs: [], pct: lastPct(k.slug) }))
+      .concat(CERT.topics.map((t, i) => ({ ...t, slug: TOPIC_SLUGS[i] || "mavzu-" + (i + 1), refs: TOPIC_LESSONS[t.t] || [] })));
+  };
   function lessonBlocks(topic) {
+    if (topic.kurs) return topic.blocks.map(b => ({ src: "Darslik", t: b.t, html: b.html }));
     return topic.refs.map(ref => {
       if (ref.help != null && HELP[ref.help]) return { src: "Yo'riqnoma", t: HELP[ref.help].t, html: HELP[ref.help].body };
       if (ref.life != null && LIFEHACKS[ref.life]) {
@@ -3474,7 +3693,7 @@ ${rowsHtml}
           const n = lessonBlocks(t).length, last = res.find(r => r.slug === t.slug);
           return `<button type="button" class="card mv-card" data-topic="${t.slug}">
             <span class="mv-card__top"><b>${escH(t.t)}</b><span class="mv-tag${n ? "" : " is-soon"}">${n ? n + " ta darslik" : "Darslik tez orada"}</span></span>
-            <span class="mv-card__lab">Bilim darajangiz <b>${t.pct}%</b></span>
+            <span class="mv-card__lab">${t.kurs ? (last ? `Natijangiz <b>${t.pct}%</b>` : "Darslikni o'qing va sinovni topshiring") : `Bilim darajangiz <b>${t.pct}%</b>`}</span>
             <span class="mv-card__bar"><i style="width:${t.pct}%;background:${kxiColor(t.pct)}"></i></span>
             <span class="mv-card__foot">${last ? `Oxirgi sinov: <b>${+last.score}/${+last.total}</b>` : "Sinov hali topshirilmagan"}<span class="mv-card__go">Darslikni ochish →</span></span>
           </button>`;
@@ -3492,7 +3711,7 @@ ${rowsHtml}
         ? blocks.map((b, i) => `<article class="card card--pad mv-block"><span class="mv-block__src">${i + 1}-darslik · ${b.src}</span><h3>${escH(b.t)}</h3><div class="mv-block__body">${b.html}</div></article>`).join("")
         : `<div class="card ko-soon"><div class="ko-soon__ico">${ICON.grad}</div><span class="ko-soon__tag">Tez orada</span><h3>Bu mavzu bo'yicha darslik tayyorlanmoqda</h3><p>Darslik qo'shilgach shu yerda paydo bo'ladi. Hozircha sinovni topshirishingiz mumkin.</p></div>`}
       <div class="card mv-cta">
-        <div><b>${blocks.length ? "Darslikni o'qib chiqdingizmi?" : "Sinovga tayyormisiz?"}</b><span>Sinov ${QUIZ.length} ta savoldan iborat. Natija «Sinov natijalarim» bo'limida saqlanadi.</span></div>
+        <div><b>${blocks.length ? "Darslikni o'qib chiqdingizmi?" : "Sinovga tayyormisiz?"}</b><span>Sinov ${(topic.quiz || QUIZ).length} ta savoldan iborat. Natija «Sinov natijalarim» bo'limida saqlanadi.</span></div>
         <button type="button" class="btn btn--gold btn--lg" data-mv-quiz>Sinovni boshlash →</button>
       </div>`;
     w.querySelector("[data-mv-back]").addEventListener("click", () => { koTopic = null; renderMavzular(); });
@@ -3503,9 +3722,20 @@ ${rowsHtml}
     quizBuilt = false;
     showView("quiz", { topicQuiz: true });
   }
+  const QUIZ_HEAD = {
+    t: "Firibgarni tani",
+    lead: "Real holatlarni ko'rib, bu firibgarlikmi yoki xavfsizmi — o'zingiz hal qiling. Har to'g'ri javob ballaringizni oshiradi — bu esa mahallangiz reytingi va tumaningiz KXI ko'rsatkichiga ta'sir qiladi."
+  };
   function updateQuizHead(step) {
     const eb = $("#view-quiz .page-head .eyebrow");
     if (eb) eb.textContent = koQuizTopic ? `Mavzu: ${koQuizTopic.t} · Sinov` : "Kibersinov — bilim sinovi";
+    // mavzu sinovida sarlavha ham shu mavzuga moslashadi
+    const kurs = koQuizTopic && koQuizTopic.quiz;
+    const ti = $("#quizTitle"), ld = $("#quizLead");
+    if (ti) ti.textContent = kurs ? koQuizTopic.t : QUIZ_HEAD.t;
+    if (ld) ld.textContent = kurs
+      ? `Darslikda o'qiganlaringiz bo'yicha ${koQuizTopic.quiz.length} ta savol. Har bir javobdan keyin izoh ko'rsatiladi, natija «Sinov natijalarim» bo'limida saqlanadi.`
+      : QUIZ_HEAD.lead;
     const fl = $("#quizFlow");
     if (fl) fl.innerHTML = koQuizTopic ? `<div class="mv-flow">${flowSteps(step || 3)}</div>` : "";
   }
