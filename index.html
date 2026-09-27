@@ -464,6 +464,7 @@
           <h2>Test ruxsatnomalari</h2><span class="hint">onlayn testdan o'tgan fuqarolar · faqat sizga ko'rinadi</span>
         </div>
         <div id="permitsList" style="margin-bottom:6px"></div>
+        <div class="card card--pad" id="mahallaCare" style="margin:18px 0 6px"></div>
         <div class="section-title">
           <h2>Foydalanuvchilar</h2><span class="hint" id="mahallaUserHint"></span>
         </div>
@@ -705,6 +706,17 @@
         <div id="mvWrap"></div>
       </section>
 
+      <!-- ===== KIBER AKADEMIYA: KIBER G'AMXO'R (amaliy bosqich) ===== -->
+      <section class="view" id="view-gamxor">
+        <div class="page-head">
+          <span class="eyebrow">Kiber akademiya</span>
+          <h1>Kiber G'amxo'r</h1>
+          <p class="lead">Mavzularni o'rgandingiz — endi bilimingizni amalda qo'llang. Qo'shningizga bergan yordamingiz
+            tasdiqlangach, hisobingizga qo'shimcha ball qo'shiladi.</p>
+        </div>
+        <div id="careWrap"></div>
+      </section>
+
       <!-- ===== KIBER AKADEMIYA: SINOV NATIJALARIM ===== -->
       <section class="view" id="view-natijalar">
         <div class="page-head">
@@ -735,9 +747,12 @@
   </button>
 
   <!-- ===== VIDEO PLEYER MODAL ===== -->
-  <div class="reel-modal" id="reelModal" aria-hidden="true">
-    <div class="reel-modal__backdrop" data-reel-close></div>
-    <div class="reel-player" id="reelPlayer"></div>
+  <!-- ===== REELS KO'RINISHI — vertikal, svayp bilan (app.js: openReels) ===== -->
+  <div class="rv" id="reelsView" aria-hidden="true" hidden>
+    <button type="button" class="rv__close" data-rv-close aria-label="Yopish">&times;</button>
+    <button type="button" class="rv__nav rv__nav--up" data-rv-nav="-1" aria-label="Oldingi video"></button>
+    <button type="button" class="rv__nav rv__nav--down" data-rv-nav="1" aria-label="Keyingi video"></button>
+    <div class="rv__scroll" id="rvScroll"></div>
   </div>
 
   <!-- ===== RUXSATNOMA MODAL ===== -->

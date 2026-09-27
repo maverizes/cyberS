@@ -19,6 +19,7 @@ window.KO_NAV = {
     { key: "learn", title: "Kiber akademiya", icon: "academy", collapsible: true, items: [
       { id: "mavzular",  label: "Mavzular",          icon: "book", match: ["quiz"] },
       { id: "life",      label: "Kiberlayfxaklar",   icon: "bulb" },
+      { id: "gamxor",    label: "Kiber G'amxo'r",     icon: "hands", badge: { id: "careBadge", text: "0" } },
       { id: "natijalar", label: "Sinov natijalarim", icon: "chart" }
     ]},
     { key: "alert", title: "Xavfdan xabar", icon: "alert", collapsible: true, items: [

@@ -617,7 +617,7 @@
     life:"Kiber Layfxak", rating:"Kiber Layfxak", cert:"Offline sertifikat sinovi", video:"So'nggi videolar", priv:"Imtiyozlar", privilege:"Imtiyozlar", condition:"Imtiyoz sharti",
     admin:"Superadmin paneli", mahalla:"Mahalla paneli", kxi:"KiberXavfsizlik Indeksi", map:"Platforma kartasi",
     umumiy:"Umumiy bo'lim",
-    mavzular:"Mavzular", natijalar:"Sinov natijalarim", ball:"Ball va daraja"
+    mavzular:"Mavzular", natijalar:"Sinov natijalarim", ball:"Ball va daraja", gamxor:"Kiber G'amxo'r"
   };
   let dashAnimated = false, quizBuilt = false;
 
@@ -638,6 +638,8 @@
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
     if (v === "mavzular") { koTopic = null; renderMavzular(); }   // menyu yoki havola orqali kirilganda — mavzular ro'yxati
+    if (v === "gamxor") renderCare();
+    if (v === "mahalla") renderMahallaCare();
     if (v === "natijalar") renderNatijalar();
     if (v === "ball") renderBall();
     if (v === "quiz") {
@@ -680,6 +682,7 @@
     currentRole = role;
     renderNav();
     renderStaffUI();
+    if (typeof renderMahallaCare === "function" && $("#view-mahalla").classList.contains("is-active")) renderMahallaCare();
     // joriy ko'rinish endi yopiq bo'lsa, rolning bosh sahifasiga qaytadi
     if (!canSeeView(currentViewId())) showView(ROLE_HOME[role] || "dash");
     mapDrill = null;
@@ -1779,80 +1782,147 @@
     c.querySelector("[data-view]").addEventListener("click", e => { e.preventDefault(); showView("video"); });
   }
 
-  /* ---- video pleyer (simulyatsiya) ---- */
-  let reelRAF = null, reelStart = null, reelElapsed = 0, reelPaused = true, reelBar = null, reelCenter = null;
-  const REEL_DUR = 7000;
-  function reelTick(ts) {
-    if (reelPaused) { reelRAF = null; return; }
-    if (reelStart == null) reelStart = ts - reelElapsed;
-    reelElapsed = ts - reelStart;
-    const p = Math.min(1, reelElapsed / REEL_DUR);
-    if (reelBar) reelBar.style.width = (p * 100) + "%";
-    if (p >= 1) { reelPaused = true; reelElapsed = 0; reelStart = null; reelRAF = null; if (reelCenter) reelCenter.classList.remove("playing"); return; }
-    reelRAF = requestAnimationFrame(reelTick);
-  }
-  function reelToggle() {
-    if (reelPaused) { reelPaused = false; reelStart = null; if (reelCenter) reelCenter.classList.add("playing"); if (!reelRAF) reelRAF = requestAnimationFrame(reelTick); }
-    else { reelPaused = true; reelRAF = null; if (reelCenter) reelCenter.classList.remove("playing"); }
-  }
-  function openReel(id) {
-    const v = VIDEOS.find(x => x.id === +id); if (!v) return;
-    const modal = $("#reelModal"), player = $("#reelPlayer");
-    if (v.src) {
-      // === REAL VIDEO ===
-      player.innerHTML = `
-        <button class="reel-player__close" data-reel-close aria-label="Yopish">&times;</button>
-        <video class="reel-player__video" id="reelVideoEl" src="${v.src}" ${v.poster ? `poster="${v.poster}"` : ""} controls autoplay playsinline></video>
-        <div class="reel-player__gradSoft"></div>
-        <div class="reel-player__info reel-player__info--video">
-          <span class="reel-player__cat">${v.cat} · ${v.dur}</span>
-          <div class="reel-player__title">${v.title}</div>
-          <div class="reel-player__cap">${v.cap}</div>
-          <div class="reel-player__author">${ICON.shieldCheck} ${v.author} · ${v.views} ko'rishlar · ${v.likes} like</div>
-        </div>`;
-      reelBar = null; reelCenter = null; reelPaused = true; reelElapsed = 0; reelStart = null;
-      if (reelRAF) { cancelAnimationFrame(reelRAF); reelRAF = null; }
-      modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
-      player.onclick = null;
-      modal._videoEl = $("#reelVideoEl");
-      modal.classList.add("has-video");
-      return;
-    }
-    modal.classList.remove("has-video");
-    player.innerHTML = `
-      <div class="reel-player__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"></div>
-      <button class="reel-player__close" data-reel-close aria-label="Yopish">&times;</button>
-      <div class="reel-player__icon">${v.ico}</div>
-      <button class="reel-player__center" id="reelCenter">${ICON.play}</button>
-      <div class="reel-player__grad"></div>
-      <div class="reel-player__info">
-        <span class="reel-player__cat">${v.cat} · ${v.dur}</span>
-        <div class="reel-player__title">${v.title}</div>
-        <div class="reel-player__cap">${v.cap}</div>
-        <div class="reel-player__author">${ICON.shieldCheck} ${v.author} · ${v.views} ko'rishlar · ${v.likes} like</div>
+  /* ---- REELS KO'RINISHI — vertikal svayp, Instagram Reels uslubida ---- */
+  let rvMuted = true, rvOpen = false;
+  const RV_ICO = {
+    heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20.3s-7.4-4.3-7.4-9.5a4 4 0 0 1 7.4-2.1 4 4 0 0 1 7.4 2.1c0 5.2-7.4 9.5-7.4 9.5Z" stroke-linejoin="round"/></svg>',
+    sound: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z" stroke-linejoin="round"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.6 6.6a7.6 7.6 0 0 1 0 10.8" stroke-linecap="round"/></svg>',
+    muted: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z" stroke-linejoin="round"/><path d="m16.5 9.5 5 5m0-5-5 5" stroke-linecap="round"/></svg>',
+    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 3-9.5 9.5" stroke-linecap="round"/><path d="M21 3 14.5 21l-3-7.5L4 10.5 21 3Z" stroke-linejoin="round"/></svg>',
+    play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>'
+  };
+  function rvSlide(v, i) {
+    return `<section class="rv__slide" data-idx="${i}">
+      <div class="rv__frame">
+        ${v.src
+          ? `<video class="rv__video" src="${v.src}" playsinline loop muted preload="metadata"></video>`
+          : `<div class="rv__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"><span class="rv__bgico">${v.ico}</span></div>`}
+        <div class="rv__bar"><i></i></div>
+        <button type="button" class="rv__tap" aria-label="Pauza / davom ettirish"></button>
+        <span class="rv__big" aria-hidden="true">${RV_ICO.play}</span>
+        <div class="rv__side">
+          <button type="button" class="rv__act" data-rv-like aria-pressed="false">${RV_ICO.heart}<b>${v.likes}</b></button>
+          <button type="button" class="rv__act" data-rv-sound>${RV_ICO.muted}<b>Ovoz</b></button>
+          <button type="button" class="rv__act" data-rv-share>${RV_ICO.share}<b>Ulashish</b></button>
+        </div>
+        <div class="rv__info">
+          <span class="rv__cat">${escH(v.cat)} · <i data-rv-dur>${escH(v.dur)}</i></span>
+          <h3>${escH(v.title)}</h3>
+          <p>${escH(v.cap)}</p>
+          <span class="rv__author">${ICON.shieldCheck}${escH(v.author)} · ${escH(v.views)} ko'rishlar</span>
+        </div>
       </div>
-      <div class="reel-player__bar"><i id="reelBar"></i></div>`;
-    reelBar = $("#reelBar"); reelCenter = $("#reelCenter");
-    reelPaused = true; reelElapsed = 0; reelStart = null; if (reelRAF) { cancelAnimationFrame(reelRAF); reelRAF = null; }
-    modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false");
-    // toggle play on player / center; stop on close & info
-    player.onclick = (e) => { if (e.target.closest("[data-reel-close]") || e.target.closest(".reel-player__info")) return; reelToggle(); };
-    reelCenter.onclick = (e) => { e.stopPropagation(); reelToggle(); };
-    setTimeout(reelToggle, 250); // auto-start
+    </section>`;
   }
-  function closeReel() {
-    const modal = $("#reelModal");
-    reelPaused = true; if (reelRAF) cancelAnimationFrame(reelRAF); reelRAF = null; reelElapsed = 0; reelStart = null;
-    if (modal._videoEl) { modal._videoEl.pause(); modal._videoEl = null; }
-    modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true");
+  function rvVideos() { return $$("#rvScroll .rv__video"); }
+  function rvPlay(slide) {
+    const vid = slide.querySelector(".rv__video");
+    rvVideos().forEach(v => { if (v !== vid) { v.pause(); } });
+    $$("#rvScroll .rv__slide").forEach(s => s.classList.toggle("is-on", s === slide));
+    if (!vid) return;
+    vid.muted = rvMuted;
+    slide.classList.remove("is-paused");
+    const p = vid.play();
+    if (p && p.catch) p.catch(() => {               // hali yuklanmagan bo'lsa — yuklab, qayta urinadi
+      try { vid.load(); } catch (e) {}
+      vid.addEventListener("canplay", () => { const q = vid.play(); if (q && q.catch) q.catch(() => {}); }, { once: true });
+    });
+  }
+  function rvToggle(slide) {
+    const vid = slide.querySelector(".rv__video"); if (!vid) return;
+    if (vid.paused) { vid.play().catch(() => {}); slide.classList.remove("is-paused"); }
+    else { vid.pause(); slide.classList.add("is-paused"); }
+  }
+  function rvSetMuted(on) {
+    rvMuted = on;
+    rvVideos().forEach(v => { v.muted = on; });
+    $$("#rvScroll [data-rv-sound]").forEach(b => {
+      b.innerHTML = (on ? RV_ICO.muted : RV_ICO.sound) + `<b>${on ? "Ovoz" : "Ovozli"}</b>`;
+      b.classList.toggle("is-on", !on);
+    });
+  }
+  function openReels(startId) {
+    const box = $("#rvScroll"), view = $("#reelsView"); if (!box || !view) return;
+    const idx = Math.max(0, VIDEOS.findIndex(v => v.id === +startId));
+    box.innerHTML = VIDEOS.map(rvSlide).join("");
+    view.hidden = false; view.setAttribute("aria-hidden", "false");
+    document.body.classList.add("rv-open");
+    rvOpen = true;
+    rvSetMuted(true);
+    const slides = $$("#rvScroll .rv__slide");
+    box.scrollTop = idx * box.clientHeight;
+    // qaysi slayd ko'rinib turganini aylantirishdan aniqlaymiz (svayp, g'ildirak, klaviatura — hammasi uchun)
+    let rvT = null;
+    box.onscroll = () => {
+      clearTimeout(rvT);
+      rvT = setTimeout(() => {
+        const h = box.clientHeight || 1, s = slides[Math.round(box.scrollTop / h)];
+        if (s && !s.classList.contains("is-on")) rvPlay(s);
+      }, 90);
+    };
+    rvPlay(slides[idx] || slides[0]);
+    // progress bar + video o'lchamiga moslash (gorizontal video kesilmasin)
+    rvVideos().forEach(v => {
+      v.addEventListener("timeupdate", () => {
+        const bar = v.parentNode.querySelector(".rv__bar i");
+        if (bar && v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%";
+      });
+      const fit = () => {
+        if (!v.videoWidth) return;
+        v.closest(".rv__slide").classList.toggle("is-wide", v.videoWidth > v.videoHeight);
+        const d = v.closest(".rv__frame").querySelector("[data-rv-dur]");
+        if (d && v.duration) d.textContent = Math.floor(v.duration / 60) + ":" + String(Math.floor(v.duration % 60)).padStart(2, "0");
+      };
+      v.addEventListener("loadedmetadata", fit); fit();
+      v.addEventListener("pause", () => v.closest(".rv__slide").classList.add("is-paused"));
+      v.addEventListener("play", () => v.closest(".rv__slide").classList.remove("is-paused"));
+    });
+    box.querySelectorAll(".rv__tap").forEach(t => t.addEventListener("click", () => rvToggle(t.closest(".rv__slide"))));
+    box.querySelectorAll("[data-rv-like]").forEach(b => b.addEventListener("click", () => {
+      const on = b.getAttribute("aria-pressed") === "true";
+      b.setAttribute("aria-pressed", String(!on)); b.classList.toggle("is-liked", !on);
+    }));
+    box.querySelectorAll("[data-rv-sound]").forEach(b => b.addEventListener("click", () => rvSetMuted(!rvMuted)));
+    box.querySelectorAll("[data-rv-share]").forEach(b => b.addEventListener("click", () => {
+      const i = +b.closest(".rv__slide").dataset.idx, v = VIDEOS[i];
+      const url = location.origin + location.pathname + "#/video";
+      if (navigator.share) navigator.share({ title: v.title, url }).catch(() => {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => koToast("Havola nusxalandi")).catch(() => koToast("Havola: " + url));
+      else koToast("Havola: " + url);
+    }));
+  }
+  function rvStep(dir) {
+    const box = $("#rvScroll"); if (!box) return;
+    const h = box.clientHeight || 1, n = $$("#rvScroll .rv__slide").length;
+    const t = Math.min(n - 1, Math.max(0, Math.round(box.scrollTop / h) + dir)), y = t * h;
+    box.scrollTo({ top: y, behavior: "smooth" });
+    setTimeout(() => { if (Math.abs(box.scrollTop - y) > 4) box.scrollTop = y; }, 320);   // silliq aylantirish ishlamasa
+    const slide = $$("#rvScroll .rv__slide")[t];
+    if (slide && !slide.classList.contains("is-on")) rvPlay(slide);
+  }
+  function closeReels() {
+    const view = $("#reelsView"); if (!view) return;
+    rvVideos().forEach(v => v.pause());
+    view.hidden = true; view.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("rv-open");
+    rvOpen = false;
+    $("#rvScroll").innerHTML = "";
   }
   function setupReelModal() {
-    document.addEventListener("click", (e) => {
+    document.addEventListener("click", e => {
       const r = e.target.closest("[data-reel]");
-      if (r) { openReel(r.dataset.reel); return; }
-      if (e.target.closest("[data-reel-close]")) closeReel();
+      if (r) { openReels(r.dataset.reel); return; }
+      if (e.target.closest("[data-rv-close]")) { closeReels(); return; }
+      const nav = e.target.closest("[data-rv-nav]");
+      if (nav) rvStep(+nav.dataset.rvNav);
     });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeReel(); });
+    document.addEventListener("keydown", e => {
+      if (!rvOpen) return;
+      if (e.key === "Escape") closeReels();
+      if (e.key === "ArrowDown" || e.key === "PageDown") { e.preventDefault(); rvStep(1); }
+      if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); rvStep(-1); }
+      if (e.key === " ") { e.preventDefault(); const s = $("#rvScroll .rv__slide.is-on"); if (s) rvToggle(s); }
+    });
   }
 
   /* =========================================================
@@ -3297,6 +3367,7 @@ ${rowsHtml}
     trophy: svgI('<path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" stroke-linejoin="round"/><path d="M8 6H5v1.5a3 3 0 0 0 3 3M16 6h3v1.5a3 3 0 0 1-3 3" stroke-linejoin="round"/><path d="M12 13v4M8.5 20h7" stroke-linecap="round"/>'),
     academy:svgI('<path d="M3 9.5 12 4l9 5.5"/><path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7"/><path d="M3 20h18" stroke-linecap="round"/>'),
     home:   svgI('<path d="M3 10.5 12 4l9 6.5"/><path d="M5 9.5V20h14V9.5"/><rect x="10" y="13" width="4" height="7"/>'),
+    hands:  svgI('<path d="M12 20.5s-6.5-3.7-6.5-8.4a3.4 3.4 0 0 1 6.5-1.4 3.4 3.4 0 0 1 6.5 1.4c0 4.7-6.5 8.4-6.5 8.4Z" stroke-linejoin="round"/><path d="M7.4 6.2 8.6 4M12 5.6V3M16.6 6.2 15.4 4" stroke-linecap="round"/>'),
     grid:   svgI('<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'),
     play:   svgI('<circle cx="12" cy="12" r="9"/><path d="M10.3 8.7 15.6 12l-5.3 3.3V8.7Z" stroke-linejoin="round"/>'),
     userplus: svgI('<circle cx="10" cy="8.5" r="3.4"/><path d="M4 20c0-3.3 2.7-5.6 6-5.6 1 0 2 .2 2.8.5" stroke-linecap="round"/><path d="M17.5 14.6v5.2M14.9 17.2h5.2" stroke-linecap="round"/>'),
@@ -3403,7 +3474,7 @@ ${rowsHtml}
     const cfg = window.KO_NAV, box = $("#railMenu");
     if (!cfg || !box) return;
     const keep = {};
-    ["feedBadge", "mahallaBadge"].forEach(id => { const e = document.getElementById(id); if (e) keep[id] = { t: e.textContent, d: e.style.display }; });
+    ["feedBadge", "mahallaBadge", "careBadge"].forEach(id => { const e = document.getElementById(id); if (e) keep[id] = { t: e.textContent, d: e.style.display }; });
     const sec = s => s.collapsible ? navGroupHtml(s) : `<div class="rail__group nav-sec" data-sec="${s.key}"><div class="rail__label nav-sec__h">${escH(s.title)}</div>${s.items.map(navItemHtml).join("")}</div>`;
     const staff = cfg.staff && cfg.staff[currentRole];
     box.innerHTML =
@@ -3761,8 +3832,10 @@ ${rowsHtml}
     const avg = Math.round(res.reduce((s, r) => s + (+r.pct || 0), 0) / res.length);
     const best = Math.max(...res.map(r => +r.pct || 0));
     const earned = res.reduce((s, r) => s + (+r.earned || 0), 0);
+    const me = careMe(), careN = me ? careApprovedFor(me.id).length : 0;
     const cards = [
       { num: res.length, lab: "Topshirilgan sinov", cls: "i-blue", ico: ICON.exam },
+      { num: careN, lab: "Amaliy yordam (qo'shniga)", cls: "i-red", ico: ICON.shieldCheck },
       { num: avg + "%", lab: "O'rtacha natija", cls: "i-gold", ico: ICON.target },
       { num: best + "%", lab: "Eng yaxshi natija", cls: "i-teal", ico: ICON.medal },
       { num: "+" + fmtN(earned), lab: "Sinovlardan olingan ball", cls: "i-purple", ico: ICON.spark }
@@ -3811,6 +3884,228 @@ ${rowsHtml}
   }
 
   /* =========================================================
+     KIBER G'AMXO'R — qo'shniga real yordam
+     Oqim: yordam bergan fuqaro so'rov yuboradi -> yordam olgan qo'shni tasdiqlaydi
+           -> mahalla admini tasdiqlaydi -> yordam berganga ball qo'shiladi.
+     Holat brauzer xotirasida (localStorage "ko_care") saqlanadi va BroadcastChannel
+     orqali ochiq sahifalar o'rtasida darhol yangilanadi. Server ulangach, faqat
+     careCreate / careSetStatus funksiyalari API chaqiruviga almashtiriladi.
+     ========================================================= */
+  const CARE_KEY = "ko_care", CARE_POINTS = 25;
+  const CARE_ID_RE = /^KO-\d{4}-\d{6}$/;
+  const CARE_KINDS = [
+    { k: "yoriqnoma", t: "Platformadan foydalanishni o'rgatdim" },
+    { k: "telefon",   t: "Telefon xavfsizlik sozlamalarini tekshirdim" },
+    { k: "xabar",     t: "Shubhali xabar yoki qo'ng'iroqni birga ko'rdim" },
+    { k: "suhbat",    t: "So'nggi firibgarlik usullarini tushuntirdim" }
+  ];
+  const CARE_ST = {
+    pending_target: { t: "Qo'shni tasdig'i kutilmoqda", c: "care-st--wait" },
+    pending_admin:  { t: "Mahalla admini ko'rib chiqmoqda", c: "care-st--wait" },
+    approved:       { t: "Tasdiqlandi", c: "care-st--ok" },
+    rejected_target:{ t: "Qo'shni rad etdi", c: "care-st--no" },
+    rejected_admin: { t: "Mahalla admini rad etdi", c: "care-st--no" }
+  };
+  // mahalla ro'yxati — demo ID'lar (haqiqiy tizimda ID ro'yxatdan o'tishda beriladi)
+  const CARE_PEOPLE = HOUSEHOLDS.map((h, i) => ({
+    id: "KO-2026-" + String(200140 + i * 37), name: h.who, hh: h.hh, you: !!h.you
+  }));
+  const careKind = k => (CARE_KINDS.find(x => x.k === k) || {}).t || k;
+  const careDate = ts => { const d = new Date(+ts), z = n => String(n).padStart(2, "0"); return `${z(d.getDate())}.${z(d.getMonth() + 1)}.${d.getFullYear()} · ${z(d.getHours())}:${z(d.getMinutes())}`; };
+  const carePerson = id => CARE_PEOPLE.find(p => p.id === id) || null;
+  let careChan = null, careViewAs = null;   // careViewAs — demo: sahifani boshqa fuqaro sifatida ko'rish
+
+  function careMe() {
+    if (careViewAs) { const p = carePerson(careViewAs); if (p) return { id: p.id, name: p.name + " (" + p.hh + ")", demo: true }; }
+    if (KO_USER && KO_USER.id) return { id: KO_USER.id, name: KO_USER.name || "Siz" };
+    const you = CARE_PEOPLE.find(p => p.you);
+    return you ? { id: you.id, name: you.name } : null;
+  }
+  function loadCare() {
+    try { const a = JSON.parse(localStorage.getItem(CARE_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+  }
+  function saveCare(list) {
+    try { localStorage.setItem(CARE_KEY, JSON.stringify(list)); } catch (e) {}
+    try { if (careChan) careChan.postMessage("ko_care"); } catch (e) {}
+    careRefresh();
+  }
+  function careCreate(targetId, kind, note) {
+    const me = careMe(); if (!me) return;
+    const list = loadCare();
+    list.unshift({
+      id: "c" + Date.now().toString(36) + Math.floor(Math.random() * 1000),
+      helperId: me.id, helperName: me.name, targetId, targetName: (carePerson(targetId) || {}).name || targetId,
+      kind, note: (note || "").slice(0, 160), status: "pending_target", ts: Date.now()
+    });
+    saveCare(list);
+  }
+  function careSetStatus(id, status) {
+    const list = loadCare(), r = list.find(x => x.id === id); if (!r) return;
+    r.status = status; r.tsUpd = Date.now();
+    if (status === "approved") {
+      r.points = CARE_POINTS;
+      if (KO_USER && r.helperId === KO_USER.id) { userBall += CARE_POINTS; }   // ball yordam berganga qo'shiladi
+    }
+    saveCare(list);
+    if (status === "approved") { koToast(`Yordam tasdiqlandi — +${CARE_POINTS} ball`); refreshBallViews(); }
+  }
+  function refreshBallViews() {
+    if (typeof renderDashHero === "function" && $("#dashHero")) renderDashHero();
+    if ($("#view-ball") && $("#view-ball").classList.contains("is-active")) renderBall();
+    if ($("#view-natijalar") && $("#view-natijalar").classList.contains("is-active")) renderNatijalar();
+  }
+  const careInbox = () => { const me = careMe(); return me ? loadCare().filter(r => r.targetId === me.id && r.status === "pending_target") : []; };
+  const careMine = () => { const me = careMe(); return me ? loadCare().filter(r => r.helperId === me.id) : []; };
+  const careAdminQueue = () => loadCare().filter(r => r.status === "pending_admin");
+  const careApprovedFor = id => loadCare().filter(r => r.helperId === id && r.status === "approved");
+
+  function careBadgeSync() {
+    const b = $("#careBadge"); if (!b) return;
+    const n = careInbox().length;
+    b.textContent = n; b.style.display = n ? "" : "none";
+    if (typeof syncNavGroupBadges === "function") syncNavGroupBadges();
+  }
+  function careRefresh() {
+    careBadgeSync();
+    if ($("#view-gamxor") && $("#view-gamxor").classList.contains("is-active")) renderCare();
+    if ($("#view-mahalla") && $("#view-mahalla").classList.contains("is-active") && typeof renderMahallaCare === "function") renderMahallaCare();
+  }
+  function careInit() {
+    try { careChan = new BroadcastChannel("ko_care"); careChan.onmessage = () => careRefresh(); } catch (e) { careChan = null; }
+    window.addEventListener("storage", e => { if (e.key === CARE_KEY) careRefresh(); });
+    careBadgeSync();
+  }
+
+  function careRow(r, mode) {
+    const st = CARE_ST[r.status] || CARE_ST.pending_target;
+    const who = mode === "in" ? r.helperName : r.targetName;
+    const lab = mode === "in" ? "Yordam bergan" : "Yordam olgan";
+    return `<div class="care-row">
+      <div class="care-row__main">
+        <b>${escH(who)}</b>
+        <span>${lab} · ${escH(careKind(r.kind))}</span>
+        ${r.note ? `<span class="care-row__note">“${escH(r.note)}”</span>` : ""}
+      </div>
+      <div class="care-row__side">
+        <span class="care-st ${st.c}">${st.t}</span>
+        <span class="care-row__ts">${careDate(r.ts)}</span>
+      </div>
+      ${mode === "in" ? `<div class="care-row__btns">
+        <button type="button" class="btn btn--gold" data-care-ok="${r.id}">Tasdiqlayman</button>
+        <button type="button" class="btn btn--ghost" data-care-no="${r.id}">Bunday bo'lmagan</button>
+      </div>` : (r.status === "approved" ? `<div class="care-row__btns"><span class="care-pts">+${r.points || CARE_POINTS} ball</span></div>` : "")}
+    </div>`;
+  }
+  function renderCare() {
+    const w = $("#careWrap"); if (!w) return;
+    const me = careMe();
+    if (!me) {
+      w.innerHTML = `<div class="card ko-soon"><div class="ko-soon__ico">${ICON.users}</div><h3>Avval ro'yxatdan o'ting</h3>
+        <p>Kiber G'amxo'r bo'limi shaxsiy ID bilan ishlaydi: yordam bergan qo'shningiz sizning ID'ingizni kiritadi, siz esa tasdiqlaysiz.</p>
+        <button type="button" class="btn btn--gold" data-view="reg">Ro'yxatdan o'tish →</button></div>`;
+      wireViewBtns(w); return;
+    }
+    const inbox = careInbox(), mine = careMine();
+    const ok = mine.filter(r => r.status === "approved").length;
+    const wait = mine.filter(r => r.status === "pending_target" || r.status === "pending_admin").length;
+    const cards = [
+      { num: ok, lab: "Tasdiqlangan yordam", cls: "i-teal", ico: ICON.shieldCheck },
+      { num: wait, lab: "Tasdiq kutilmoqda", cls: "i-gold", ico: ICON.target },
+      { num: "+" + fmtN(ok * CARE_POINTS), lab: "Yordamdan olingan ball", cls: "i-purple", ico: ICON.spark }
+    ];
+    w.innerHTML = `
+      <div class="card care-hero">
+        <div>
+          <span class="eyebrow">Amaliy bosqich</span>
+          <h3>Bilganingizni qo'shningizga o'rgating</h3>
+          <p>Mahallangizdagi yolg'iz yoki yoshi katta qo'shningizga yordam bering: platformadan foydalanishni ko'rsating, telefon sozlamalarini tekshiring, shubhali xabar kelsa birga ko'ring. Yordamingizni qo'shningiz va mahalla admini tasdiqlagach, hisobingizga <b>+${CARE_POINTS} ball</b> qo'shiladi.</p>
+        </div>
+        <div class="care-hero__me"><span>Sizning ID</span><b>${escH(me.id)}</b><i>${escH(me.name)}</i></div>
+      </div>
+      ${careViewAs ? `<div class="care-as"><span>Demo ko'rinishi — siz hozir <b>${escH(me.name)}</b> sifatida ko'ryapsiz.</span><button type="button" class="btn btn--ghost" id="careAsBack">Menga qaytish</button></div>` : ""}
+      <div class="care-steps">
+        <span class="mv-step is-cur"><i>1</i>So'rov</span><span class="mv-step__sep">→</span>
+        <span class="mv-step"><i>2</i>Qo'shni tasdig'i</span><span class="mv-step__sep">→</span>
+        <span class="mv-step"><i>3</i>Mahalla admini</span><span class="mv-step__sep">→</span>
+        <span class="mv-step"><i>4</i>Ball</span>
+      </div>
+      <div class="grid stat-grid">${cards.map(c => `<div class="card stat"><div class="stat__ico ${c.cls}">${c.ico}</div><div class="stat__num">${c.num}</div><div class="stat__label">${c.lab}</div></div>`).join("")}</div>
+
+      <div class="section-title"><h2>Yordam berdim — qayd etish</h2></div>
+      <div class="card card--pad care-form">
+        <label class="care-lab" for="careId">Yordam bergan qo'shningiz ID'si</label>
+        <input class="checker__input" id="careId" type="text" placeholder="KO-2026-200140" autocomplete="off">
+        <label class="care-lab" for="careKind">Qanday yordam berdingiz</label>
+        <div class="select"><select id="careKind">${CARE_KINDS.map(k => `<option value="${k.k}">${k.t}</option>`).join("")}</select></div>
+        <label class="care-lab" for="careNote">Qisqacha izoh (ixtiyoriy)</label>
+        <input class="checker__input" id="careNote" type="text" maxlength="160" placeholder="Masalan: Telegramda ikki bosqichli parol o'rnatdik">
+        <div class="care-form__foot">
+          <button type="button" class="btn btn--gold" id="careSend">So'rov yuborish</button>
+          <span class="care-hint" id="careMsg">Qo'shningizga bildirishnoma boradi. U tasdiqlagach, so'rov mahalla adminiga o'tadi.</span>
+        </div>
+      </div>
+
+      <div class="section-title"><h2>Sizga kelgan so'rovlar</h2>${inbox.length ? `<span class="hint">${inbox.length} ta javob kutmoqda</span>` : ""}</div>
+      <div class="card care-list">${inbox.length
+        ? inbox.map(r => careRow(r, "in")).join("")
+        : `<div class="care-empty">Hozircha so'rov yo'q. Kimdir sizga yordam berganini qayd etsa, shu yerda paydo bo'ladi.</div>`}</div>
+
+      <div class="section-title"><h2>Mening so'rovlarim</h2></div>
+      <div class="card care-list">${mine.length
+        ? mine.map(r => careRow(r, "out")).join("")
+        : `<div class="care-empty">Hali yordam qayd etmagansiz.</div>`}</div>
+
+      <div class="care-demo">
+        <span><b>Demo rejimi.</b> Server ulanmagani uchun ikkinchi tomonni shu yerda ko'rsatish mumkin — sahifani boshqa qo'shni sifatida oching:</span>
+        <div class="select"><select id="careAs">
+          <option value="">Men — ${escH((KO_USER && KO_USER.name) || "ro'yxatdagi foydalanuvchi")}</option>
+          ${CARE_PEOPLE.map(p => `<option value="${p.id}"${careViewAs === p.id ? " selected" : ""}>${escH(p.name)} (${escH(p.hh)}) · ${p.id}</option>`).join("")}
+        </select></div>
+      </div>`;
+
+    wireViewBtns(w);
+    const msg = $("#careMsg");
+    const say = (t, bad) => { if (msg) { msg.textContent = t; msg.className = "care-hint" + (bad ? " is-bad" : " is-ok"); } };
+    const send = $("#careSend");
+    if (send) send.addEventListener("click", () => {
+      const v = ($("#careId").value || "").trim().toUpperCase();
+      if (!CARE_ID_RE.test(v)) return say("ID formati noto'g'ri. Namuna: KO-2026-200140", true);
+      if (v === me.id) return say("O'zingizga so'rov yubora olmaysiz.", true);
+      const p = carePerson(v);
+      if (!p) return say("Bu ID mahallangiz ro'yxatida topilmadi. Qo'shningizdan ID'sini aniqlang.", true);
+      if (loadCare().some(r => r.helperId === me.id && r.targetId === v && r.status === "pending_target"))
+        return say("Bu qo'shningizga yuborilgan so'rov hali javobsiz turibdi.", true);
+      careCreate(v, $("#careKind").value, $("#careNote").value);
+      koToast("So'rov yuborildi — qo'shningiz tasdiqlashini kutmoqda");
+    });
+    w.querySelectorAll("[data-care-ok]").forEach(b => b.addEventListener("click", () => careSetStatus(b.dataset.careOk, "pending_admin")));
+    w.querySelectorAll("[data-care-no]").forEach(b => b.addEventListener("click", () => careSetStatus(b.dataset.careNo, "rejected_target")));
+    const as = $("#careAs");
+    if (as) as.addEventListener("change", () => { careViewAs = as.value || null; renderCare(); });
+    const back = $("#careAsBack");
+    if (back) back.addEventListener("click", () => { careViewAs = null; renderCare(); });
+  }
+  /* mahalla admini paneli — tasdiq kutayotgan yordamlar */
+  function renderMahallaCare() {
+    const box = $("#mahallaCare"); if (!box) return;
+    const q = careAdminQueue(), done = loadCare().filter(r => r.status === "approved").length;
+    box.innerHTML = `
+      <div class="section-title" style="margin:0 0 10px"><h2 style="font-size:18px">Kiber G'amxo'r — tasdiq kutmoqda</h2><span class="hint">${q.length} ta so'rov · jami tasdiqlangan ${done}</span></div>
+      ${q.length ? q.map(r => `<div class="care-row">
+        <div class="care-row__main"><b>${escH(r.helperName)} → ${escH(r.targetName)}</b>
+          <span>${escH(careKind(r.kind))}</span>${r.note ? `<span class="care-row__note">“${escH(r.note)}”</span>` : ""}</div>
+        <div class="care-row__side"><span class="care-st care-st--wait">Qo'shni tasdiqlagan</span><span class="care-row__ts">${careDate(r.ts)}</span></div>
+        <div class="care-row__btns">
+          <button type="button" class="btn btn--gold" data-care-adm="${r.id}">Tasdiqlash (+${CARE_POINTS} ball)</button>
+          <button type="button" class="btn btn--ghost" data-care-rej="${r.id}">Rad etish</button>
+        </div>
+      </div>`).join("")
+      : `<div class="care-empty">Tasdiq kutayotgan yordam yo'q.</div>`}`;
+    box.querySelectorAll("[data-care-adm]").forEach(b => b.addEventListener("click", () => careSetStatus(b.dataset.careAdm, "approved")));
+    box.querySelectorAll("[data-care-rej]").forEach(b => b.addEventListener("click", () => careSetStatus(b.dataset.careRej, "rejected_admin")));
+  }
+
+  /* =========================================================
      INIT
      ========================================================= */
   function init() {
@@ -3854,6 +4149,7 @@ ${rowsHtml}
     showRegSaved();
     updateQuizLock();
     animateDash(); dashAnimated = true;
+    careInit();
     startLive();
     openInitialRoute();
   }
