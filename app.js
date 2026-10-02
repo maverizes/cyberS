@@ -638,8 +638,9 @@
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
     if (v === "mavzular") { koTopic = null; renderMavzular(); }   // menyu yoki havola orqali kirilganda — mavzular ro'yxati
+    if (v === "life") renderLife();
     if (v === "gamxor") renderCare();
-    if (v === "mahalla") renderMahallaCare();
+    if (v === "mahalla") { renderMahallaProf(); renderMahallaCare(); }
     if (v === "natijalar") renderNatijalar();
     if (v === "ball") renderBall();
     if (v === "quiz") {
@@ -963,13 +964,6 @@
      ========================================================= */
   /* ---- Foydalanuvchi paneli: odat (habit) yondashuvi ---- */
   const USER_NAME = "Azizbek";
-  const USER_SEC = [
-    { ok:true,  w:22, t:"Kuchli parol o'rnatilgan" },
-    { ok:true,  w:28, t:"Ikki bosqichli himoya (2FA) yoqilgan" },
-    { ok:true,  w:22, t:"Shubhali ilovalar o'rnatilmagan" },
-    { ok:false, w:14, t:"Telefon tizimi yangilanmagan", action:"Qanday yangilash", view:"life" },
-    { ok:false, w:14, t:"Phishing testidan o'tmagansiz", action:"Testni boshlash", view:"quiz" }
-  ];
   const BADGES = [
     { at:500, name:"Boshlovchi" }, { at:1000, name:"Hushyor fuqaro" },
     { at:1500, name:"Kiber faol" }, { at:2500, name:"Kiber qahramon" }
@@ -980,20 +974,262 @@
     "Bugun bank ilovangiz parolini brauzeringizdan emas, faqat ilovaning o'zidan kiriting.",
     "Bugun eng muhim akkauntlaringiz parolini takrorlanmas qilib o'zgartiring."
   ];
-  const LIFEHACKS = [
-    { ico:ICON.social, cls:"i-blue",   t:"Telegram akkauntini himoyalash", d:"2FA va faol sessiyalarni tekshirish", dur:"0:45",
-      steps:["Sozlamalar → Maxfiylik → Ikki bosqichli tasdiqlash'ni yoqing.", "Sozlamalar → Qurilmalar'da notanish faol sessiyalarni o'chiring.", "Telegramga kelgan kodni hech kimga bermang."] },
-    { ico:ICON.coin, cls:"i-gold",     t:"Bank kartangizni himoyalash", d:"CVV, SMS-kod va push xavfsizligi", dur:"0:50",
-      steps:["Karta orqasidagi 3 raqamni (CVV) hech kimga aytmang.", "SMS yoki qo'ng'iroqda kelgan kodni bermang — bank uni so'ramaydi.", "To'lovlar uchun push-tasdiq va limit o'rnating."] },
-    { ico:ICON.phone, cls:"i-teal",    t:"Telefonni tezlashtirish", d:"Kesh va ortiqcha ilovalardan tozalash", dur:"0:40",
-      steps:["Ishlatilmayotgan ilovalarni o'chiring.", "Ilovalar keshini tozalang (Sozlamalar → Ilovalar).", "Avtomatik ishga tushadigan ilovalarni cheklang."] },
-    { ico:ICON.phone, cls:"i-red",     t:"Firibgar qo'ng'iroqni aniqlash", d:"Shubhali qo'ng'iroq belgilari", dur:"0:55",
-      steps:["Shoshiltirish va qo'rqitish — asosiy belgi.", "Bank/davlat nomidan kod yoki parol so'rashsa — bu firibgar.", "Shubha bo'lsa, go'shakni qo'ying va rasmiy raqamga o'zingiz qo'ng'iroq qiling."] },
-    { ico:ICON.lock, cls:"i-purple",   t:"Wi-Fi parolini to'g'ri tanlash", d:"Kuchli parol qoidalari", dur:"0:35",
-      steps:["Kamida 12 belgidan, harf+raqam+belgi aralash.", "Ism, tug'ilgan sana yoki 12345 ishlatmang.", "Router'da WPA2/WPA3 himoyasini yoqing."] },
-    { ico:ICON.eye, cls:"i-blue",      t:"Deepfake videoni ajratish", d:"Soxta videoning belgilari", dur:"1:00",
-      steps:["Yuz va lab harakati ovozga mos kelmasligi.", "Ko'z pirpiratishi va yorug'lik g'ayritabiiy bo'lishi.", "Manbani tekshiring — rasmiy kanaldan tarqalganmi."] }
+  /* =========================================================
+     KIBERLAYFXAK — MA'LUMOT MODELI (2-bosqich)
+     HIMOYA — 12 ta himoya bandi (foydalanuvchi holati shular bo'yicha o'lchanadi)
+     LIFXAK — har bandga bog'langan amaliy lifxak; versiyalar android/ios bo'yicha
+     Saqlash: localStorage "ko_himoya" (bajarilgan bandlar), "ko_lifxak" (ko'rish/yuborish),
+              qurilma turi — "ko_qurilma"
+     Eski kod (life sahifasi, Kiber akademiya darsliklari) LIFEHACKS ko'prigi orqali ishlashda davom etadi.
+     ========================================================= */
+  const HIMOYA = [
+    { id: "2fa",        t: "Telegram ikki bosqichli himoya",        lifxak: "lx-2fa" },
+    { id: "seans",      t: "Faol seanslar tekshirilgan",            lifxak: "lx-seans" },
+    { id: "qulf",       t: "Telefon PIN yoki barmoq izi bilan qulflangan", lifxak: "lx-qulf" },
+    { id: "bank",       t: "Bank ilovasida kunlik limit o'rnatilgan", lifxak: "lx-bank" },
+    { id: "manba",      t: "Noma'lum manbadan o'rnatish o'chirilgan", lifxak: "lx-manba" },
+    { id: "yangilash",  t: "Tizim va ilovalar yangilangan",          lifxak: "lx-yangilash" },
+    { id: "ruxsat",     t: "Ilovalar ruxsatlari tekshirilgan",       lifxak: "lx-ruxsat" },
+    { id: "wifi",       t: "Uy Wi-Fi paroli kuchli",                 lifxak: "lx-wifi" },
+    { id: "zaxira",     t: "Muhim ma'lumotlar zaxiralangan",         lifxak: "lx-zaxira" },
+    { id: "spam",       t: "Notanish raqamlarni bloklash yoqilgan",  lifxak: "lx-spam" },
+    { id: "parol",      t: "Parollar takrorlanmaydi",                lifxak: "lx-parol" },
+    { id: "sim",        t: "SIM karta PIN kodi yoqilgan",            lifxak: "lx-sim" }
   ];
+
+  // q(tartib, matn) — qadam; skrinshot keyin qo'shiladi (skrinshot_url: null)
+  const qd = (matn, skrinshot_url = null) => ({ matn, skrinshot_url });   // qadam
+  const LIFXAK = [
+    { id: "lx-2fa", sarlavha: "Telegram akkauntini himoyalash", kategoriya: "kiber", himoya_bandi_id: "2fa",
+      kalendar_teg: null, tahdid_teg: "akkaunt", ico: ICON.social, cls: "i-blue", eski: 0, qisqa: "2FA va faol sessiyalarni tekshirish",
+      versiyalar: { umumiy: {
+        video_url: "./videos/video_2.mp4", poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Telegramda Sozlamalar bo'limini oching."), qd("Maxfiylik va xavfsizlik bandiga kiring."),
+                   qd("Ikki bosqichli tasdiqlash'ni yoqing va parol o'rnating."), qd("Tiklash uchun elektron pochtangizni kiriting."),
+                   qd("Telegramdan kelgan kodni hech kimga bermang — kod faqat sizniki.")],
+        tekshiruv: { savol: "Ikki bosqichli tasdiqlashni qaysi bo'limdan topdingiz?", variantlar: ["Chat sozlamalari", "Maxfiylik va xavfsizlik", "Xotira"], togri_index: 1 } } } },
+
+    { id: "lx-seans", sarlavha: "Faol seanslarni tekshirish", kategoriya: "kiber", himoya_bandi_id: "seans",
+      kalendar_teg: null, tahdid_teg: "akkaunt", ico: ICON.eye, cls: "i-purple", eski: null, qisqa: "Akkauntingizga kim ulangan",
+      versiyalar: { umumiy: {
+        video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Telegram → Sozlamalar → Qurilmalar bo'limini oching."), qd("Ro'yxatdagi har bir qurilmani ko'rib chiqing."),
+                   qd("Tanimagan qurilmangiz bo'lsa — Seansni tugatish tugmasini bosing."),
+                   qd("Eski seanslarni avtomatik o'chirish muddatini 1 oyga qo'ying.")],
+        tekshiruv: { savol: "Faol qurilmalar ro'yxati qaysi bo'limda?", variantlar: ["Qurilmalar", "Bildirishnomalar", "Ma'lumot va xotira"], togri_index: 0 } } } },
+
+    { id: "lx-qulf", sarlavha: "Telefonni qulflash", kategoriya: "kiber", himoya_bandi_id: "qulf",
+      kalendar_teg: null, tahdid_teg: null, ico: ICON.lock, cls: "i-teal", eski: null, qisqa: "PIN, barmoq izi va avtoqulf",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Xavfsizlik bo'limiga kiring."), qd("Ekran qulfi → PIN kodni tanlang (kamida 6 raqam)."),
+                     qd("Barmoq izi yoki yuz bilan ochishni qo'shing."), qd("Ekran avtomatik o'chishini 30 soniyaga qo'ying.")],
+          tekshiruv: { savol: "Ekran qulfi qaysi bo'limda joylashgan?", variantlar: ["Xavfsizlik", "Tarmoq", "Ovoz"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Face ID va kod bo'limini oching."), qd("Kodni yoqing va 6 raqamli kod kiriting."),
+                     qd("Face ID ni sozlang."), qd("Sozlamalar → Ekran va yorqinlik → Avtoqulf'ni 30 soniyaga qo'ying.")],
+          tekshiruv: { savol: "iPhone'da kod qaysi bo'limda o'rnatiladi?", variantlar: ["Face ID va kod", "Umumiy", "Maxfiylik"], togri_index: 0 } } } },
+
+    { id: "lx-bank", sarlavha: "Bank kartangizni himoyalash", kategoriya: "kiber", himoya_bandi_id: "bank",
+      kalendar_teg: null, tahdid_teg: "karta", ico: ICON.coin, cls: "i-gold", eski: 1, qisqa: "CVV, SMS-kod va kunlik limit",
+      versiyalar: { umumiy: {
+        video_url: "./videos/video_3.mp4", poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Bank ilovasini oching va Kartalar bo'limiga kiring."), qd("Karta sozlamalaridan Limitlar bandini toping."),
+                   qd("Kunlik onlayn to'lov limitini o'zingizga yetadigan miqdorga qo'ying."),
+                   qd("Push-tasdiqni yoqing — har to'lov tasdiq so'raydi."),
+                   qd("CVV va SMS-kodni hech kimga aytmang — bank ularni so'ramaydi.")],
+        tekshiruv: { savol: "Bank xodimi sizdan SMS-kod so'rasa nima qilasiz?", variantlar: ["Aytaman, bank-ku", "Aytmayman va qo'ng'iroqni tugataman", "SMS'ni skrinshot qilib yuboraman"], togri_index: 1 } } } },
+
+    { id: "lx-manba", sarlavha: "Noma'lum manbadan o'rnatishni o'chirish", kategoriya: "kiber", himoya_bandi_id: "manba",
+      kalendar_teg: null, tahdid_teg: "ilova", ico: ICON.shieldCheck, cls: "i-red", eski: null, qisqa: "APK va profil orqali yuqadigan zarar",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Ilovalar bo'limiga kiring."), qd("Maxsus ruxsatlar → Noma'lum ilovalarni o'rnatish'ni oching."),
+                     qd("Ro'yxatdagi har bir ilovada ruxsatni o'chiring."), qd("Ilovalarni faqat Play Market'dan yuklab oling.")],
+          tekshiruv: { savol: "APK faylni kim yuborsa ham nima qilish kerak?", variantlar: ["O'rnataman", "O'rnatmayman, rasmiy do'kondan qidiraman", "Do'stimga yuboraman"], togri_index: 1 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Umumiy → VPN va qurilma boshqaruvi'ni oching."), qd("Notanish konfiguratsiya profillari bo'lsa — o'chiring."),
+                     qd("Ilovalarni faqat App Store'dan yuklang."), qd("Havola orqali kelgan o'rnatish so'roviga rozi bo'lmang.")],
+          tekshiruv: { savol: "iPhone'ga ilova qayerdan o'rnatiladi?", variantlar: ["Havoladan", "App Store'dan", "Telegramdan"], togri_index: 1 } } } },
+
+    { id: "lx-yangilash", sarlavha: "Tizim va ilovalarni yangilash", kategoriya: "kiber", himoya_bandi_id: "yangilash",
+      kalendar_teg: null, tahdid_teg: null, ico: ICON.spark, cls: "i-blue", eski: null, qisqa: "Yopilmagan teshiklar orqali kiriladi",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Tizim → Tizim yangilanishi'ni oching."), qd("Mavjud yangilanishni o'rnating."),
+                     qd("Play Market → Profil → Ilovalarni boshqarish'ga kiring."), qd("Barchasini yangilash tugmasini bosing.")],
+          tekshiruv: { savol: "Ilovalar qayerdan yangilanadi?", variantlar: ["Play Market", "Galereya", "Kontaktlar"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Umumiy → Dasturiy ta'minotni yangilash'ni oching."), qd("Yangilanish bo'lsa o'rnating."),
+                     qd("Avtomatik yangilanishni yoqing."), qd("App Store → Profil'dan ilovalarni yangilang.")],
+          tekshiruv: { savol: "iOS yangilanishi qayerda?", variantlar: ["Umumiy → Dasturiy ta'minotni yangilash", "Maxfiylik", "Ekran vaqti"], togri_index: 0 } } } },
+
+    { id: "lx-ruxsat", sarlavha: "Ilovalar ruxsatlarini tekshirish", kategoriya: "kiber", himoya_bandi_id: "ruxsat",
+      kalendar_teg: null, tahdid_teg: "ilova", ico: ICON.eye, cls: "i-purple", eski: null, qisqa: "Mikrofon, kamera va kontaktlarga kim kirmoqda",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Maxfiylik → Ruxsatlar menejeri'ni oching."), qd("Kamera, Mikrofon va Kontaktlar ro'yxatini ko'ring."),
+                     qd("Kerak bo'lmagan ilovada ruxsatni o'chiring."), qd("Joylashuvni faqat ilova ochiqligida ruxsat eting.")],
+          tekshiruv: { savol: "Ruxsatlar menejeri qaysi bo'limda?", variantlar: ["Maxfiylik", "Batareya", "Displey"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Maxfiylik va xavfsizlik'ni oching."), qd("Kamera, Mikrofon, Kontaktlar bandlarini ko'rib chiqing."),
+                     qd("Keraksiz ilovada tugmani o'chiring."), qd("Joylashuvni 'Ilova ochiqligida' holatiga qo'ying.")],
+          tekshiruv: { savol: "iPhone'da ruxsatlar qaysi bo'limda?", variantlar: ["Maxfiylik va xavfsizlik", "Wi-Fi", "Ovoz"], togri_index: 0 } } } },
+
+    { id: "lx-wifi", sarlavha: "Wi-Fi parolini to'g'ri tanlash", kategoriya: "kiber", himoya_bandi_id: "wifi",
+      kalendar_teg: null, tahdid_teg: null, ico: ICON.lock, cls: "i-purple", eski: 4, qisqa: "Kuchli parol qoidalari",
+      versiyalar: { umumiy: {
+        video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Brauzerda router manzilini oching (odatda 192.168.0.1)."), qd("Wi-Fi sozlamalari bo'limiga kiring."),
+                   qd("Kamida 12 belgili parol qo'ying: harf, raqam va belgi aralash."),
+                   qd("Ism, tug'ilgan sana yoki 12345 ishlatmang."), qd("Himoya turini WPA2 yoki WPA3 ga qo'ying.")],
+        tekshiruv: { savol: "Qaysi parol kuchli hisoblanadi?", variantlar: ["12345678", "Kamida 12 belgi, aralash", "Telefon raqamim"], togri_index: 1 } } } },
+
+    { id: "lx-zaxira", sarlavha: "Ma'lumotlarni zaxiralash", kategoriya: "kiber", himoya_bandi_id: "zaxira",
+      kalendar_teg: null, tahdid_teg: null, ico: ICON.cert, cls: "i-teal", eski: null, qisqa: "Telefon yo'qolsa ham ma'lumot qoladi",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Google → Zaxira nusxasi'ni oching."), qd("Google Drive'ga zaxirani yoqing."),
+                     qd("Hozir zaxiralash tugmasini bosing."), qd("Fotosuratlar uchun Google Photos avtoyuklashni yoqing.")],
+          tekshiruv: { savol: "Zaxira qayerga saqlanadi?", variantlar: ["Google Drive", "Galereya", "Telegram"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → ismingiz → iCloud'ni oching."), qd("iCloud zaxira nusxasini yoqing."),
+                     qd("Hozir zaxiralash tugmasini bosing."), qd("Fotosuratlar uchun iCloud Photos'ni yoqing.")],
+          tekshiruv: { savol: "iPhone zaxirasi qayerda yoqiladi?", variantlar: ["iCloud", "App Store", "Safari"], togri_index: 0 } } } },
+
+    { id: "lx-spam", sarlavha: "Notanish raqamlarni bloklash", kategoriya: "kiber", himoya_bandi_id: "spam",
+      kalendar_teg: null, tahdid_teg: "qongiroq", ico: ICON.phone, cls: "i-red", eski: null, qisqa: "Spam qo'ng'iroqlarni kamaytirish",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Telefon ilovasini oching → uch nuqta → Sozlamalar."), qd("Raqamlarni bloklash bandiga kiring."),
+                     qd("Noma'lum raqamlarni bloklashni yoqing."), qd("Spam va firibgarlik filtri bandini ham yoqing.")],
+          tekshiruv: { savol: "Bloklash sozlamasi qayerda?", variantlar: ["Telefon ilovasi sozlamalari", "Galereya", "Soat"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Telefon bo'limini oching."), qd("Noma'lum qo'ng'iroqlarni o'chirish'ni yoqing."),
+                     qd("Kerakmas raqamni Kontaktlar → Bu abonentni bloklash orqali bloklang."), qd("SMS uchun Xabarlar → Noma'lum jo'natuvchilarni filtrlash'ni yoqing.")],
+          tekshiruv: { savol: "iPhone'da noma'lum qo'ng'iroqlar qaysi bo'limdan o'chiriladi?", variantlar: ["Telefon", "Kamera", "Batareya"], togri_index: 0 } } } },
+
+    { id: "lx-parol", sarlavha: "Har xizmatga alohida parol", kategoriya: "kiber", himoya_bandi_id: "parol",
+      kalendar_teg: null, tahdid_teg: "akkaunt", ico: ICON.lock, cls: "i-gold", eski: null, qisqa: "Bitta parol sizib chiqsa, qolgani omon qoladi",
+      versiyalar: { umumiy: {
+        video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Eng muhim uchta akkauntni yozing: pochta, bank, Telegram."), qd("Har biriga boshqa-boshqa parol qo'ying."),
+                   qd("Parolni telefon eslab qolsin — brauzer yoki tizim parol menejerini yoqing."),
+                   qd("Bir xil parolni ikkinchi joyda ishlatmang."), qd("Parolni SMS yoki chatda yubormang.")],
+        tekshiruv: { savol: "Bitta parolni hamma joyda ishlatsangiz nima bo'ladi?", variantlar: ["Hech nima", "Bitta sayt buzilsa, hammasi ochiladi", "Telefon tez ishlaydi"], togri_index: 1 } } } },
+
+    { id: "lx-sim", sarlavha: "SIM karta PIN kodi", kategoriya: "kiber", himoya_bandi_id: "sim",
+      kalendar_teg: null, tahdid_teg: "akkaunt", ico: ICON.phone, cls: "i-blue", eski: null, qisqa: "SIM o'g'irlansa, raqamingizga kirilmaydi",
+      versiyalar: {
+        android: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Xavfsizlik → SIM karta qulfi'ni oching."), qd("SIM PIN kodini yoqing."),
+                     qd("Operator bergan standart PIN'ni kiriting va o'zingiznikiga almashtiring."), qd("PIN'ni hech kimga aytmang.")],
+          tekshiruv: { savol: "SIM PIN nimadan himoya qiladi?", variantlar: ["SIM boshqa telefonda ishlatilishidan", "Batareya tugashidan", "Reklama'dan"], togri_index: 0 } },
+        ios: { video_url: null, poster_url: null, subtitr_url: null,
+          qadamlar: [qd("Sozlamalar → Uyali aloqa → SIM-PIN'ni oching."), qd("SIM-PIN'ni yoqing."),
+                     qd("Operatorning standart PIN'ini kiriting va o'zgartiring."), qd("PIN'ni yozib qo'ying, 3 marta xato kiritilsa SIM bloklanadi.")],
+          tekshiruv: { savol: "SIM-PIN qaysi bo'limda?", variantlar: ["Uyali aloqa", "Safari", "Musiqa"], togri_index: 0 } } } },
+
+    /* himoya bandiga bog'lanmagan, lekin foydali lifxaklar (eski ro'yxatdan) */
+    { id: "lx-tezlik", sarlavha: "Telefonni tezlashtirish", kategoriya: "kiber", himoya_bandi_id: null,
+      kalendar_teg: null, tahdid_teg: null, ico: ICON.phone, cls: "i-teal", eski: 2, qisqa: "Kesh va ortiqcha ilovalardan tozalash",
+      versiyalar: { umumiy: { video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Ishlatilmayotgan ilovalarni o'chiring."), qd("Sozlamalar → Ilovalar'dan keshni tozalang."),
+                   qd("Avtomatik ishga tushadigan ilovalarni cheklang.")],
+        tekshiruv: { savol: "Kesh qayerdan tozalanadi?", variantlar: ["Ilovalar sozlamasidan", "Kameradan", "Kontaktlardan"], togri_index: 0 } } } },
+
+    { id: "lx-qongiroq", sarlavha: "Firibgar qo'ng'iroqni aniqlash", kategoriya: "kiber", himoya_bandi_id: null,
+      kalendar_teg: null, tahdid_teg: "qongiroq", ico: ICON.phone, cls: "i-red", eski: 3, qisqa: "Shubhali qo'ng'iroq belgilari",
+      versiyalar: { umumiy: { video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Shoshiltirish va qo'rqitish — birinchi belgi."), qd("Bank yoki davlat nomidan kod, parol so'ralsa — bu firibgar."),
+                   qd("Go'shakni qo'ying."), qd("Rasmiy raqamga o'zingiz qo'ng'iroq qilib tekshiring.")],
+        tekshiruv: { savol: "Qo'ng'iroqda SMS-kod so'rashsa?", variantlar: ["Aytaman", "Go'shakni qo'yaman", "Qayta so'rayman"], togri_index: 1 } } } },
+
+    { id: "lx-deepfake", sarlavha: "Deepfake videoni ajratish", kategoriya: "kiber", himoya_bandi_id: null,
+      kalendar_teg: null, tahdid_teg: "ai", ico: ICON.eye, cls: "i-blue", eski: 5, qisqa: "Soxta videoning belgilari",
+      versiyalar: { umumiy: { video_url: null, poster_url: null, subtitr_url: null,
+        qadamlar: [qd("Yuz va lab harakati ovozga mos kelyaptimi — tekshiring."), qd("Ko'z pirpiratishi va yorug'lik tabiiymi."),
+                   qd("Manbani tekshiring: rasmiy kanaldanmi."), qd("Shubha bo'lsa, tarqatmang.")],
+        tekshiruv: { savol: "Deepfake shubhasi bo'lsa nima qilasiz?", variantlar: ["Tarqataman", "Manbani tekshiraman", "Izoh yozaman"], togri_index: 1 } } } }
+  ];
+
+  /* ---- qurilma turi ---- */
+  const QUR_KEY = "ko_qurilma";
+  const QUR_NOM = { android: "Android", ios: "iPhone" };
+  function qurilmaTanlangan() { try { const t = localStorage.getItem(QUR_KEY); return t === "android" || t === "ios"; } catch (e) { return false; } }
+  function qurilmaTuri() {
+    try { const t = localStorage.getItem(QUR_KEY); if (t === "android" || t === "ios") return t; } catch (e) {}
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "android";
+  }
+  function setQurilma(t) {
+    if (t !== "android" && t !== "ios") return;
+    try { localStorage.setItem(QUR_KEY, t); } catch (e) {}
+  }
+  // mos versiya: qurilma -> umumiy -> mavjud birinchisi
+  function lifxakVersiya(l, t) {
+    const v = l.versiyalar;
+    return v[t || qurilmaTuri()] || v.umumiy || v.android || v.ios || null;
+  }
+  const lifxakById = id => LIFXAK.find(l => l.id === id) || null;
+  const himoyaById = id => HIMOYA.find(h => h.id === id) || null;
+
+  /* ---- foydalanuvchi_himoya: qaysi bandlar bajarilgan ---- */
+  const HIM_KEY = "ko_himoya", LX_KEY = "ko_lifxak";
+  function loadHimoya() {
+    try { const o = JSON.parse(localStorage.getItem(HIM_KEY) || "null"); if (o && typeof o === "object") return o; } catch (e) {}
+    // birinchi ishga tushirish: eski "kiber pasport" holatidan ko'chiriladi
+    const seed = { "2fa": { holat: "bajarildi", sana: Date.now() }, parol: { holat: "bajarildi", sana: Date.now() }, manba: { holat: "bajarildi", sana: Date.now() } };
+    try { localStorage.setItem(HIM_KEY, JSON.stringify(seed)); } catch (e) {}
+    return seed;
+  }
+  function setHimoya(bandId, holat) {
+    const o = loadHimoya();
+    o[bandId] = { holat, sana: Date.now() };
+    try { localStorage.setItem(HIM_KEY, JSON.stringify(o)); } catch (e) {}
+    return o;
+  }
+  const himoyaBajarildi = id => (loadHimoya()[id] || {}).holat === "bajarildi";
+  const himoyaDaraja = () => {
+    const done = HIMOYA.filter(h => himoyaBajarildi(h.id)).length;
+    return { bajarildi: done, jami: HIMOYA.length, foiz: Math.round(done / HIMOYA.length * 100) };
+  };
+
+  /* ---- lifxak hisoblagichlari (ko'rilgan / oilaga yuborilgan) ---- */
+  function loadLx() { try { const o = JSON.parse(localStorage.getItem(LX_KEY) || "{}"); return o && typeof o === "object" ? o : {}; } catch (e) { return {}; } }
+  function bumpLx(id, maydon) {
+    const o = loadLx();
+    o[id] = o[id] || { korilgan: 0, yuborilgan: 0 };
+    o[id][maydon] = (o[id][maydon] || 0) + 1;
+    o[id].oxirgi = Date.now();
+    try { localStorage.setItem(LX_KEY, JSON.stringify(o)); } catch (e) {}
+  }
+
+  /* ---- KXI va tahliliy panel uchun chiqish nuqtasi (server ulangach shu joydan POST qilinadi) ---- */
+  window.KO_API = {
+    // foydalanuvchining himoya darajasi
+    himoya: () => Object.assign({ mahalla: (KO_USER && KO_USER.mahalla) || MY_MAHALLA }, himoyaDaraja()),
+    // lifxak statistikasi: ko'rilgan va oilaga yuborilgan
+    lifxak: () => loadLx(),
+    // KXI "profilaktika qamrovi" indikatori uchun — server shu ko'rinishda yig'adi
+    profilaktika: () => {
+      const d = himoyaDaraja(), lx = loadLx();
+      const bandlar = {}; HIMOYA.forEach(h => { bandlar[h.id] = himoyaBajarildi(h.id) ? 1 : 0; });
+      return {
+        mahalla: (KO_USER && KO_USER.mahalla) || MY_MAHALLA,
+        sana: new Date().toISOString().slice(0, 10),
+        foydalanuvchi_soni: 1,                 // bu qurilma; o'rtachani server hisoblaydi
+        ortacha_foiz: d.foiz,
+        bandlar,
+        yuborilgan: Object.values(lx).reduce((s, x) => s + (x.yuborilgan || 0), 0)
+      };
+    }
+  };
+
+  /* ---- ko'prik: eski life sahifasi va Kiber akademiya darsliklari uchun ---- */
+  const LIFEHACKS = LIFXAK.filter(l => l.eski != null).sort((a, b) => a.eski - b.eski).map(l => ({
+    ico: l.ico, cls: l.cls, t: l.sarlavha, d: l.qisqa, dur: "0:45",
+    steps: (lifxakVersiya(l, "umumiy") || lifxakVersiya(l)).qadamlar.map(x => x.matn)
+  }));
 
   function badgeInfo() {
     const next = BADGES.find(b => b.at > userBall) || BADGES[BADGES.length - 1];
@@ -1004,8 +1240,7 @@
   }
   function renderDashHero() {
     const wrap = $("#dashHero"); if (!wrap) return;
-    const secPct = USER_SEC.filter(s => s.ok).reduce((s, x) => s + x.w, 0);
-    const done = USER_SEC.filter(s => s.ok).length;
+    const hd = himoyaDaraja(), secPct = hd.foiz, done = hd.bajarildi;
     const bi = badgeInfo();
     const C = 2 * Math.PI * 34;
     wrap.innerHTML = `
@@ -1015,7 +1250,7 @@
           <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="sr-track"/><circle cx="40" cy="40" r="34" class="sr-prog" style="stroke-dasharray:${C};stroke-dashoffset:${C * (1 - secPct / 100)};stroke:${kxiColor(secPct)}"/></svg>
           <div class="sec-ring__c"><div class="sec-ring__pct">${secPct}%</div></div>
         </div>
-        <p class="hero-card__sub">${USER_SEC.length} tekshiruvdan <b>${done} tasi</b> bajarildi</p>
+        <p class="hero-card__sub">${hd.jami} ta himoya sozlamasidan <b>${done} tasi</b> bajarildi</p>
       </div>
       <div class="hero-card hero-card--task">
         <div class="hero-card__top"><span>Bugungi vazifa</span></div>
@@ -1033,21 +1268,9 @@
   }
   function renderSecLevel() {
     const c = $("#dashSec"); if (!c) return;
-    const secPct = USER_SEC.filter(s => s.ok).reduce((s, x) => s + x.w, 0);
-    c.innerHTML = `
-      <div class="seclevel__head">
-        <div><span class="eyebrow">Mening kiber pasportim</span><h3>Profilingiz qanchalik himoyalangan</h3></div>
-        <div class="seclevel__pct" style="color:${kxiColor(secPct)}">${secPct}<span>%</span></div>
-      </div>
-      <div class="seclevel__bar"><i style="width:${secPct}%;background:${kxiColor(secPct)}"></i></div>
-      <div class="seclevel__list">
-        ${USER_SEC.map(s => `<div class="sec-item ${s.ok ? "ok" : "no"}">
-          <span class="sec-item__mark">${s.ok ? "✔️" : "✖️"}</span>
-          <span class="sec-item__t">${s.t}</span>
-          ${!s.ok ? `<button class="sec-item__btn" data-view="${s.view}">${s.action} →</button>` : ""}
-        </div>`).join("")}
-      </div>`;
-    wireViewBtns(c);
+    c.className = "card seclevel hm";
+    c.innerHTML = himoyaCardHtml(false);
+    wireHimoya(c);
   }
   /* Dashboard — Murojaatlar bo'limi (Nurafshon shahri, rasmiy ma'lumot) */
   /* Rasmiy tahlil — qamrov rolga qarab:
@@ -1155,24 +1378,317 @@
     const tip = DAILY_TIPS[new Date().getDate() % DAILY_TIPS.length];
     c.innerHTML = `<div class="daytip__ico">💡</div><div><div class="daytip__lab">Bugungi tavsiya</div><p class="daytip__p">${tip}</p></div>`;
   }
-  function renderLifehacks() {
-    const prev = $("#dashLife");
-    const cards = (arr, withSteps) => arr.map((h, i) => `
-      <div class="lh-card${withSteps ? " lh-card--full" : ""}" ${withSteps ? `data-lh="${i}"` : `data-view="life"`}>
-        <div class="lh-card__top"><span class="lh-card__ico ${h.cls}">${h.ico}</span><span class="lh-card__dur">${ICON.play} ${h.dur}</span></div>
-        <h4>${h.t}</h4><p>${h.d}</p>
-        ${withSteps ? `<div class="lh-steps" id="lhSteps${i}"><ol>${h.steps.map(s => `<li>${s}</li>`).join("")}</ol></div><button class="lh-toggle" data-lh="${i}">Ko'rsatmalarni ochish ${ICON.caret}</button>` : ""}
-      </div>`).join("");
-    if (prev) { prev.innerHTML = cards(LIFEHACKS.slice(0, 3), false); wireViewBtns(prev); }
-    const full = $("#lifeGrid");
-    if (full) {
-      full.innerHTML = cards(LIFEHACKS, true);
-      full.querySelectorAll(".lh-toggle").forEach(b => b.addEventListener("click", e => {
-        e.stopPropagation();
-        const card = b.closest(".lh-card"); const open = card.classList.toggle("is-open");
-        b.innerHTML = (open ? "Ko'rsatmalarni yopish " : "Ko'rsatmalarni ochish ") + ICON.caret;
-      }));
+  /* ---- HIMOYA DARAJASI (3-bosqich) va LIFXAK KARTASI (4-bosqich) ---- */
+  let koLifxak = null;                     // ochilgan lifxak id — null bo'lsa ro'yxat ko'rinadi
+
+  function himoyaCardHtml(full) {
+    const d = himoyaDaraja(), col = kxiColor(d.foiz);
+    const list = full ? HIMOYA : HIMOYA.slice().sort((a, b) => himoyaBajarildi(a.id) - himoyaBajarildi(b.id)).slice(0, 5);
+    return `<div class="hm__head">
+        <div><span class="eyebrow">Sizning himoyangiz</span><h3>${full ? "12 ta asosiy sozlamadan nechtasi bajarilgan" : "Profilingiz qanchalik himoyalangan"}</h3></div>
+        <div class="hm__num" style="color:${col}">${d.bajarildi}<span>/${d.jami}</span></div>
+      </div>
+      <div class="hm__bar"><i style="width:${d.foiz}%;background:${col}"></i></div>
+      <div class="hm__list">${list.map(h => {
+        const ok = himoyaBajarildi(h.id);
+        return `<button type="button" class="hm__i${ok ? " is-ok" : ""}" data-lx="${h.lifxak}">
+          <span class="hm__mark">${ok ? "✓" : ""}</span>
+          <span class="hm__t">${escH(h.t)}</span>
+          <span class="hm__go">${ok ? "Ko'rish" : "Bajarish"} →</span>
+        </button>`;
+      }).join("")}</div>
+      ${full ? "" : `<button type="button" class="btn btn--ghost btn--block" data-view="life" style="margin-top:12px">Barcha ${HIMOYA.length} ta bandni ko'rish</button>`}`;
+  }
+  function wireHimoya(scope) {
+    scope.querySelectorAll("[data-lx]").forEach(b => b.addEventListener("click", () => openLifxak(b.dataset.lx)));
+    wireViewBtns(scope);
+  }
+  function openLifxak(id) {
+    koLifxak = id;
+    if (currentViewId() !== "life") showView("life"); else renderLife();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // ro'yxatdagi ixcham karta
+  function lxMiniHtml(l) {
+    const v = lifxakVersiya(l), band = l.himoya_bandi_id ? himoyaById(l.himoya_bandi_id) : null;
+    const ok = band && himoyaBajarildi(band.id);
+    return `<button type="button" class="lh-card lh-card--full${ok ? " is-done" : ""}" data-lx="${l.id}">
+      <div class="lh-card__top"><span class="lh-card__ico ${l.cls}">${l.ico}</span>
+        ${band ? `<span class="lh-card__band${ok ? " is-ok" : ""}">${ok ? "✓ Bajarilgan" : "Himoya bandi"}</span>`
+               : `<span class="lh-card__dur">${v.qadamlar.length} qadam</span>`}</div>
+      <h4>${escH(l.sarlavha)}</h4><p>${escH(l.qisqa)}</p>
+      <span class="lh-card__go">Ochish →</span>
+    </button>`;
+  }
+
+  /* ---- to'liq lifxak kartasi: video tepada, qadamlar ostida ---- */
+  function lxDetailHtml(l) {
+    const t = qurilmaTuri(), v = lifxakVersiya(l, t);
+    const band = l.himoya_bandi_id ? himoyaById(l.himoya_bandi_id) : null;
+    const ok = band && himoyaBajarildi(band.id);
+    const ikkita = !!(l.versiyalar.android && l.versiyalar.ios);
+    const video = v.video_url
+      ? `<div class="lxd-video" data-lx-play>
+           ${v.poster_url ? `<img src="${v.poster_url}" alt="">` : ""}
+           <span class="lxd-video__play">${ICON.play}</span>
+           <span class="lxd-video__hint">Videoni ko'rish · subtitr bilan</span>
+         </div>`
+      : `<div class="lxd-video is-empty">
+           <span class="lxd-video__ico">${ICON.play}</span>
+           <b>Video tayyorlanmoqda</b>
+           <span>Quyidagi qadamlar video bo'lmasa ham to'liq ishlaydi.</span>
+         </div>`;
+    return `
+      <div class="mv-crumb"><button type="button" class="mv-back" data-lx-back>← Lifxaklar</button><span aria-hidden="true">›</span><b>${escH(l.sarlavha)}</b></div>
+      <div class="card lxd">
+        ${video}
+        <div class="lxd__body">
+          <div class="lxd__head">
+            <div>
+              <span class="eyebrow">${band ? escH(band.t) : "Amaliy lifxak"}</span>
+              <h2>${escH(l.sarlavha)}</h2>
+              <p>${escH(l.qisqa)}</p>
+            </div>
+            ${ok ? `<span class="care-st care-st--ok">✓ Bajarilgan</span>` : ""}
+          </div>
+          ${ikkita ? `<div class="lxd-dev"><span>Qurilma:</span>
+            <button type="button" class="lxd-dev__b${t === "android" ? " is-on" : ""}" data-lx-dev="android">Android</button>
+            <button type="button" class="lxd-dev__b${t === "ios" ? " is-on" : ""}" data-lx-dev="ios">iPhone</button></div>`
+            : `<div class="lxd-dev lxd-dev--one"><span>Bu qadamlar Android va iPhone'da bir xil</span></div>`}
+          <ol class="lxd-steps">
+            ${v.qadamlar.map(x => `<li>
+              <span class="lxd-steps__t">${escH(x.matn)}</span>
+              ${x.skrinshot_url ? `<img class="lxd-steps__img" src="${x.skrinshot_url}" alt="" loading="lazy">` : ""}
+            </li>`).join("")}
+          </ol>
+          <div class="lxd__foot">
+            ${band ? (ok
+              ? `<span class="care-st care-st--ok">✓ Bu band bajarilgan</span>`
+              : `<button type="button" class="btn btn--gold" data-lx-done>Bajardim</button>`) : ""}
+            <button type="button" class="btn btn--ghost" data-lx-share>${ICON.social} Oilamga yuborish</button>
+            <button type="button" class="btn btn--ghost" data-lx-save>${ICON.cert} Yuklab olish</button>
+            <span class="lxd__note">Matn qurilmangizga saqlanadi — internetsiz ham o'qiladi.</span>
+          </div>
+          <div class="lxd-check" id="lxCheck" hidden></div>
+        </div>
+      </div>`;
+  }
+
+  function renderLife() {
+    const w = $("#lifeWrap"); if (!w) return;
+    const l = koLifxak ? lifxakById(koLifxak) : null;
+    if (l) {
+      w.innerHTML = lxDetailHtml(l);
+      w.querySelector("[data-lx-back]").addEventListener("click", () => { koLifxak = null; renderLife(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+      w.querySelectorAll("[data-lx-dev]").forEach(b => b.addEventListener("click", () => { setQurilma(b.dataset.lxDev); renderLife(); }));
+      const play = w.querySelector("[data-lx-play]");
+      if (play) play.addEventListener("click", () => lxPlay(play, lifxakVersiya(l)));
+      const save = w.querySelector("[data-lx-save]");
+      if (save) save.addEventListener("click", () => lxSave(l));
+      const done = w.querySelector("[data-lx-done]");
+      if (done) done.addEventListener("click", () => lxAskCheck(l));
+      const share = w.querySelector("[data-lx-share]");
+      if (share) share.addEventListener("click", () => lxShare(l));
+      bumpLx(l.id, "korilgan");
+      return;
     }
+    const t = qurilmaTuri();
+    const soraymi = !qurilmaTanlangan();   // birinchi kirish — qurilma bir marta so'raladi
+    w.innerHTML = (soraymi ? `<div class="card qur-ask">
+        <div><span class="eyebrow">Bir marta so'raymiz</span>
+          <h3>Telefoningiz qaysi?</h3>
+          <p>Sozlamalar yo'li Android va iPhone'da har xil. To'g'ri yo'l ko'rsatishimiz uchun qurilmangizni tanlang — keyin istalgan vaqtda o'zgartirasiz.</p></div>
+        <div class="qur-ask__btns">
+          <button type="button" class="btn btn--gold" data-qur="android">Android</button>
+          <button type="button" class="btn btn--gold" data-qur="ios">iPhone</button>
+        </div>
+      </div>` : "")
+      + kunLifxakHtml(kunLifxak())
+      + `<div class="card hm">${himoyaCardHtml(true)}</div>`
+      + arxivHtml()
+      + `
+      <div class="card card--pad lxd-note">${ICON.shieldCheck}<p>Qadamlar matn ko'rinishida doim ochiq — sekin internetda ham ishlaydi. Video faqat siz bosganda yuklanadi. Ball lifxakni ko'rgani uchun emas, qadamni bajarib tasdiqlaganingiz uchun beriladi.</p></div>`;
+    wireHimoya(w);
+    w.querySelectorAll("[data-filtr]").forEach(b => b.addEventListener("click", () => { lxFiltr = b.dataset.filtr; renderLife(); }));
+    w.querySelectorAll("[data-qur]").forEach(b => b.addEventListener("click", () => {
+      setQurilma(b.dataset.qur);
+      renderLife();
+      koToast(QUR_NOM[b.dataset.qur] + " tanlandi — qadamlar shunga moslandi");
+    }));
+  }
+
+  /* ---- "Bajardim" -> tekshiruv savoli (6-bosqich) ----
+     Band darhol belgilanmaydi: bitta savolga to'g'ri javob berilsa belgilanadi va ball qo'shiladi. */
+  const HIMOYA_BALL = 20;
+  function lxAskCheck(l) {
+    const box = $("#lxCheck"); if (!box) return;
+    const t = lifxakVersiya(l).tekshiruv;
+    box.hidden = false;
+    box.innerHTML = `<div class="lxd-check__h">Qadamlarni bajardingizmi? Bitta savol bilan tekshiramiz</div>
+      <div class="lxd-check__q">${escH(t.savol)}</div>
+      <div class="q-choices q-choices--list">${t.variantlar.map((o, i) =>
+        `<button type="button" class="q-choice q-choice--opt" data-ans="${i}"><span class="q-choice__n">${String.fromCharCode(65 + i)}</span><span>${escH(o)}</span></button>`).join("")}</div>
+      <div class="q-explain" id="lxCheckMsg"></div>`;
+    box.querySelectorAll("[data-ans]").forEach(b => b.addEventListener("click", () => lxAnswer(l, +b.dataset.ans, b, t)));
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function lxAnswer(l, idx, btn, t) {
+    const box = $("#lxCheck"), msg = $("#lxCheckMsg"), togri = idx === t.togri_index;
+    box.querySelectorAll(".q-choice").forEach((b, i) => {
+      b.disabled = true;
+      if (i === t.togri_index) b.classList.add("correct");
+      else if (b === btn) b.classList.add("wrong");
+    });
+    if (togri) {
+      msg.className = "q-explain show good";
+      msg.innerHTML = `<b>To'g'ri! ✓</b> Band bajarilgan deb belgilandi, hisobingizga <b>+${HIMOYA_BALL} ball</b> qo'shildi.`;
+      setHimoya(l.himoya_bandi_id, "bajarildi");
+      userBall += HIMOYA_BALL;
+      koToast(`Himoya darajangiz oshdi — +${HIMOYA_BALL} ball`);
+      // ro'yxatga qaytariladi — foydalanuvchi darajasi oshganini ko'radi
+      setTimeout(() => { koLifxak = null; renderLife(); refreshBallViews(); window.scrollTo({ top: 0, behavior: "smooth" }); }, 1400);
+    } else {
+      msg.className = "q-explain show bad";
+      msg.innerHTML = `<b>Qadamlarni qayta ko'rib chiqing.</b> Javob to'g'ri kelmadi — yuqoridagi qadamlarni yana bir bor bajarib ko'ring.`;
+      setTimeout(() => {
+        box.hidden = true; box.innerHTML = "";
+        const st = document.querySelector(".lxd-steps");
+        if (st) st.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 1800);
+    }
+  }
+
+  // video faqat bosilganda yuklanadi; subtitr doim yoqiladi
+  function lxPlay(box, v) {
+    box.classList.add("is-on");
+    box.innerHTML = `<video class="lxd-video__el" src="${v.video_url}" ${v.poster_url ? `poster="${v.poster_url}"` : ""} controls playsinline autoplay>
+        ${v.subtitr_url ? `<track kind="subtitles" src="${v.subtitr_url}" srclang="uz" label="O'zbekcha" default>` : ""}
+      </video>`;
+    const el = box.querySelector("video");
+    const yoq = () => { const tt = el.textTracks; for (let i = 0; i < tt.length; i++) tt[i].mode = "showing"; };
+    el.addEventListener("loadedmetadata", yoq);
+    el.textTracks.addEventListener && el.textTracks.addEventListener("change", yoq);   // subtitr o'chirilsa qayta yoqiladi
+    yoq();
+  }
+  /* ---- Oilamga yuborish (8-bosqich): tayyor xabar — Web Share, bo'lmasa Telegram, bo'lmasa nusxa ---- */
+  function lxShare(l) {
+    const v = lifxakVersiya(l);
+    const havola = location.origin + location.pathname + "#/life";
+    const matn = l.sarlavha + "\n\n"
+      + v.qadamlar.slice(0, 4).map((x, i) => (i + 1) + ". " + x.matn).join("\n")
+      + "\n\nTo'liq qadamlar: KiberOgoh UZ";
+    bumpLx(l.id, "yuborilgan");
+    if (navigator.share) {
+      navigator.share({ title: l.sarlavha, text: matn, url: havola }).catch(() => {});
+      return;
+    }
+    const tg = "https://t.me/share/url?url=" + encodeURIComponent(havola) + "&text=" + encodeURIComponent(matn);
+    const w = window.open(tg, "_blank", "noopener");
+    if (w) { koToast("Telegram ochildi — qo'shni yoki oila a'zosini tanlang"); return; }
+    if (navigator.clipboard) navigator.clipboard.writeText(matn + "\n" + havola)
+      .then(() => koToast("Xabar nusxalandi — Telegramga qo'ying"))
+      .catch(() => { location.href = tg; });          // nusxalash ham ishlamasa — Telegram shu oynada ochiladi
+    else location.href = tg;
+  }
+
+  // offline o'qish uchun qadamlarni faylga saqlash
+  function lxSave(l) {
+    const v = lifxakVersiya(l);
+    const matn = [l.sarlavha, "", l.qisqa, ""].concat(v.qadamlar.map((x, i) => (i + 1) + ". " + x.matn))
+      .concat(["", "KiberOgoh UZ — kiberogoh.uz"]).join("\n");
+    try {
+      const a = el("a");
+      a.href = URL.createObjectURL(new Blob([matn], { type: "text/plain;charset=utf-8" }));
+      a.download = l.id + ".txt";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      koToast("Qadamlar faylga saqlandi");
+    } catch (e) { koToast("Saqlab bo'lmadi — qadamlarni ekrandan o'qing"); }
+  }
+
+  /* ---- KUN LIFXAKI (7-bosqich) ----
+     Tanlash tartibi: 1) bajarilmagan himoya bandi  2) lentada faol tahdid sxemasi
+                      3) kalendar tegi  4) ko'rilmaganlaridan tasodifiy */
+  const TAHDID_MAP = { sms: "karta", fish: "karta", call: "qongiroq", social: "akkaunt", invest: "karta", prize: "qongiroq" };
+  // kalendar oynalari — sanalarni mas'ul xodim yangilab turadi
+  const KALENDAR = [
+    { teg: "yangi_yil", dan: "12-20", gacha: "01-10" },
+    { teg: "oquv_yili", dan: "08-20", gacha: "09-15" },
+    { teg: "ramazon",   dan: "02-17", gacha: "03-18" }   // 2026-yil uchun taxminiy — har yili suriladi
+  ];
+  function kalendarTeg(d) {
+    const md = String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    const ichida = k => k.dan <= k.gacha ? (md >= k.dan && md <= k.gacha) : (md >= k.dan || md <= k.gacha);
+    const k = KALENDAR.find(ichida);
+    return k ? k.teg : null;
+  }
+  function kunLifxak() {
+    const korilgan = loadLx();
+    // 1) bajarilmagan himoya bandi
+    const band = HIMOYA.filter(h => !himoyaBajarildi(h.id));
+    if (band.length) {
+      const yangi = band.filter(h => !(korilgan[h.lifxak] || {}).korilgan);
+      const tanlov = (yangi.length ? yangi : band)[0];
+      return { l: lifxakById(tanlov.lifxak), sabab: "Sizda bu himoya bandi hali bajarilmagan" };
+    }
+    // 2) tahdidlar lentasida faol sxema
+    const teglar = FEED.slice(0, 5).map(f => TAHDID_MAP[f.cat]).filter(Boolean);
+    const tahdid = LIFXAK.find(l => l.tahdid_teg && teglar.includes(l.tahdid_teg));
+    if (tahdid) return { l: tahdid, sabab: "Hozir mahallangizda shu turdagi firibgarlik ko'paygan" };
+    // 3) kalendar
+    const kt = kalendarTeg(new Date());
+    const kal = kt && LIFXAK.find(l => l.kalendar_teg === kt);
+    if (kal) return { l: kal, sabab: "Mavsumga mos — shu kunlarda ayni muddao" };
+    // 4) ko'rilmaganlaridan tasodifiy
+    const yangi = LIFXAK.filter(l => !(korilgan[l.id] || {}).korilgan);
+    const ro = yangi.length ? yangi : LIFXAK;
+    return { l: ro[Math.floor(Math.random() * ro.length)], sabab: "Bugungi tavsiya" };
+  }
+  function kunLifxakHtml(k) {
+    const v = lifxakVersiya(k.l);
+    return `<button type="button" class="card kun" data-lx="${k.l.id}">
+      <span class="kun__ico ${k.l.cls}">${k.l.ico}</span>
+      <span class="kun__body">
+        <span class="kun__lab">Kun lifxaki · ${escH(k.sabab)}</span>
+        <b>${escH(k.l.sarlavha)}</b>
+        <span class="kun__d">${escH(k.l.qisqa)}</span>
+        <span class="kun__meta">${v.qadamlar.length} qadam${v.video_url ? " · video bor" : ""}</span>
+      </span>
+      <span class="kun__go">Ochish →</span>
+    </button>`;
+  }
+
+  /* ---- ARXIV: kategoriya va holat bo'yicha filtr ---- */
+  let lxFiltr = "all";
+  function arxivHtml() {
+    const kats = [...new Set(LIFXAK.map(l => l.kategoriya))];
+    const chips = [["all", "Barchasi"], ["todo", "Bajarilmagan"], ["done", "Bajarilgan"]]
+      .concat(kats.length > 1 ? kats.map(k => [k, k]) : []);
+    const mos = l => {
+      const band = l.himoya_bandi_id, ok = band && himoyaBajarildi(band);
+      if (lxFiltr === "done") return !!ok;
+      if (lxFiltr === "todo") return !ok;
+      if (lxFiltr !== "all") return l.kategoriya === lxFiltr;
+      return true;
+    };
+    const ro = LIFXAK.filter(mos);
+    return `<div class="section-title" style="margin-top:26px"><h2>Arxiv</h2>
+        <span class="qur-sw">Qadamlar:
+          <button type="button" class="lxd-dev__b${qurilmaTuri() === "android" ? " is-on" : ""}" data-qur="android">Android</button>
+          <button type="button" class="lxd-dev__b${qurilmaTuri() === "ios" ? " is-on" : ""}" data-qur="ios">iPhone</button>
+        </span></div>
+      <div class="lx-filtr">${chips.map(([k, lab]) => `<button type="button" class="chip${lxFiltr === k ? " is-active" : ""}" data-filtr="${k}">${escH(lab)}</button>`).join("")}</div>
+      ${ro.length ? `<div class="grid lifehack-grid lifehack-grid--full">${ro.map(lxMiniHtml).join("")}</div>`
+                  : `<div class="card card--pad care-empty">Bu filtrga mos lifxak yo'q.</div>`}`;
+  }
+
+  // bosh sahifadagi qisqa ro'yxat
+  function renderLifehacks() {
+    const prev = $("#dashLife"); if (!prev) return;
+    prev.className = "";
+    prev.innerHTML = kunLifxakHtml(kunLifxak());
+    prev.querySelectorAll("[data-lx]").forEach(b => b.addEventListener("click", () => openLifxak(b.dataset.lx)));
   }
 
   /* ---- OFFLINE SERTIFIKAT SINOVI — asosiy maqsad ---- */
@@ -1768,9 +2284,15 @@
       </div>
     </button>`;
   }
+  // Reels bitta videodan boshlanadi — qolganlari pleyer ichida pastga surib ko'riladi
   function renderReels(target, mini) {
     const t = $(target); if (!t) return;
-    t.innerHTML = VIDEOS.map(v => reelCard(v, mini)).join("");
+    t.innerHTML = reelCard(VIDEOS[0], mini) +
+      (mini ? "" : `<div class="reels-more">
+        <b>${VIDEOS.length} ta video</b>
+        <span>Videoni oching va Reels kabi pastga surib qolganlarini ko'ring.</span>
+        <button type="button" class="btn btn--gold" data-reel="${VIDEOS[0].id}">Reels rejimida ochish →</button>
+      </div>`);
   }
   function renderDashVideos() {
     const c = $("#dashVideos"); if (!c) return;
@@ -3951,6 +4473,7 @@ ${rowsHtml}
   }
   function refreshBallViews() {
     if (typeof renderDashHero === "function" && $("#dashHero")) renderDashHero();
+    if (typeof renderSecLevel === "function" && $("#dashSec")) renderSecLevel();
     if ($("#view-ball") && $("#view-ball").classList.contains("is-active")) renderBall();
     if ($("#view-natijalar") && $("#view-natijalar").classList.contains("is-active")) renderNatijalar();
   }
@@ -4085,6 +4608,23 @@ ${rowsHtml}
     const back = $("#careAsBack");
     if (back) back.addEventListener("click", () => { careViewAs = null; renderCare(); });
   }
+  /* mahalla paneli — profilaktika qamrovi (KXI uchun chiqadigan ko'rsatkich) */
+  function renderMahallaProf() {
+    const box = $("#mahallaProf"); if (!box) return;
+    const p = window.KO_API.profilaktika();
+    const bajarilgan = Object.values(p.bandlar).filter(Boolean).length;
+    box.innerHTML = `
+      <div class="section-title" style="margin:0 0 10px"><h2 style="font-size:18px">Profilaktika qamrovi</h2>
+        <span class="hint">KXI tahliliy paneliga uzatiladigan ko'rsatkich</span></div>
+      <div class="grid stat-grid" style="margin-bottom:12px">
+        <div class="card stat"><div class="stat__ico i-teal">${ICON.shieldCheck}</div><div class="stat__num">${p.ortacha_foiz}%</div><div class="stat__label">O'rtacha himoya darajasi</div></div>
+        <div class="card stat"><div class="stat__ico i-blue">${ICON.check}</div><div class="stat__num">${bajarilgan}/${HIMOYA.length}</div><div class="stat__label">Bajarilgan himoya bandlari</div></div>
+        <div class="card stat"><div class="stat__ico i-purple">${ICON.social}</div><div class="stat__num">${p.yuborilgan}</div><div class="stat__label">Oilaga yuborilgan lifxak</div></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted)">Demo rejimida faqat shu qurilmaning ma'lumoti ko'rsatiladi. Server ulangach,
+      bu qiymat mahalladagi barcha foydalanuvchilar bo'yicha o'rtacha hisoblanadi va KXI ning profilaktika qamrovi indikatoriga uzatiladi.</p>`;
+  }
+
   /* mahalla admini paneli — tasdiq kutayotgan yordamlar */
   function renderMahallaCare() {
     const box = $("#mahallaCare"); if (!box) return;

@@ -622,6 +622,9 @@ img,svg{ display:block; }
 .reel__meta svg{ width:13px; height:13px; }
 
 /* dashboard mini reels */
+.reels-more{ align-self:center; max-width:320px; }
+.reels-more b{ display:block; font-size:15px; color:var(--navy); }
+.reels-more span{ display:block; font-size:13px; color:var(--muted); margin:6px 0 14px; line-height:1.5; }
 .reels--mini .reel{ width:104px; border-radius:14px; }
 .reels--mini .reel__title{ font-size:11.5px; }
 .reels--mini .reel__cat,.reels--mini .reel__icon,.reels--mini .reel__meta{ display:none; }
@@ -2165,6 +2168,104 @@ body[data-view="assist"] .ko-fab, body.rail-open .ko-fab{ display:none; }
   padding:18px 20px; margin-top:16px; border-left:4px solid var(--gold); }
 .mv-cta b{ display:block; color:var(--navy); font-size:15px; }
 .mv-cta span{ font-size:13px; color:var(--muted); }
+
+/* Himoya darajasi — 12 ta band */
+.hm{ padding:20px 22px; margin-bottom:18px; }
+.hm__head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.hm__head h3{ font-family:var(--display); font-weight:700; font-size:18px; color:var(--navy); margin-top:2px; }
+.hm__num{ font-family:var(--display); font-weight:700; font-size:32px; line-height:1; white-space:nowrap; }
+.hm__num span{ font-size:17px; color:var(--faint); }
+.hm__bar{ height:10px; background:var(--line); border-radius:7px; overflow:hidden; margin:14px 0 8px; }
+.hm__bar i{ display:block; height:100%; border-radius:7px; transition:width .9s cubic-bezier(.2,.7,.2,1); }
+.hm__list{ display:flex; flex-direction:column; }
+.hm__i{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 4px; border:0; background:transparent;
+  border-bottom:1px solid var(--line-2); text-align:left; cursor:pointer; font:inherit; }
+.hm__i:last-child{ border-bottom:0; }
+.hm__i:hover{ background:var(--canvas); }
+.hm__mark{ width:22px; height:22px; flex:0 0 22px; border-radius:50%; border:2px solid var(--line);
+  display:grid; place-items:center; font-size:12px; font-weight:800; color:transparent; }
+.hm__i.is-ok .hm__mark{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.hm__t{ flex:1; font-size:14.5px; color:var(--ink); min-width:0; }
+.hm__i.is-ok .hm__t{ color:var(--muted); }
+.hm__go{ font-size:12.5px; font-weight:700; color:var(--gold-700); white-space:nowrap; }
+.hm__i.is-ok .hm__go{ color:var(--faint); }
+.lh-card__band{ font-size:10.5px; font-weight:700; color:var(--gold-700); background:var(--gold-soft);
+  border-radius:999px; padding:3px 9px; white-space:nowrap; }
+.lh-card__band.is-ok{ color:#0B7A6B; background:var(--teal-soft); }
+.lh-card.is-flash{ box-shadow:0 0 0 3px var(--gold-soft), var(--shadow); }
+button.lh-card{ width:100%; text-align:left; font:inherit; color:inherit; display:block; }
+button.lh-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--gold); }
+.lh-card__go{ display:inline-block; margin-top:12px; font-size:13px; font-weight:700; color:var(--gold-700); }
+.lh-card.is-done h4{ color:var(--muted); }
+
+/* kun lifxaki */
+.kun{ display:flex; align-items:center; gap:18px; width:100%; text-align:left; font:inherit; color:inherit;
+  padding:20px 22px; margin-bottom:16px; cursor:pointer; border-left:4px solid var(--gold);
+  transition:transform .15s ease, box-shadow .15s ease; }
+.kun:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.kun__ico{ width:54px; height:54px; flex:0 0 54px; border-radius:15px; display:grid; place-items:center; }
+.kun__ico svg{ width:26px; height:26px; }
+.kun__body{ flex:1; min-width:0; }
+.kun__lab{ display:block; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--gold-700); }
+.kun__body b{ display:block; font-family:var(--display); font-size:18px; color:var(--navy); margin:5px 0 4px; }
+.kun__d{ display:block; font-size:13.5px; color:var(--muted); }
+.kun__meta{ display:block; font-size:12px; color:var(--faint); margin-top:6px; }
+.kun__go{ font-size:13px; font-weight:700; color:var(--gold-700); white-space:nowrap; }
+.lx-filtr{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+@media (max-width:560px){ .kun{ flex-wrap:wrap; gap:12px; } .kun__go{ width:100%; } }
+
+/* qurilma turini so'rash va almashtirish */
+.qur-ask{ display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  padding:20px 22px; margin-bottom:16px; border-color:var(--gold); background:linear-gradient(0deg,var(--gold-soft),var(--gold-soft)),var(--surface); }
+.qur-ask h3{ font-family:var(--display); font-size:19px; color:var(--navy); margin:6px 0 6px; }
+.qur-ask p{ font-size:13.5px; color:var(--muted); line-height:1.55; max-width:58ch; }
+.qur-ask__btns{ display:flex; gap:10px; flex-wrap:wrap; }
+.qur-ask__btns .btn{ min-width:120px; justify-content:center; }
+.qur-sw{ display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); }
+.qur-sw .lxd-dev__b{ padding:5px 12px; font-size:12.5px; }
+@media (max-width:560px){ .qur-ask__btns{ width:100%; } .qur-ask__btns .btn{ flex:1; } }
+
+/* lifxak kartasi: video + qadamlar */
+.lxd{ padding:0; overflow:hidden; }
+.lxd-video{ position:relative; display:grid; place-items:center; gap:6px; min-height:220px; padding:26px;
+  background:linear-gradient(150deg,var(--navy),var(--navy-2)); color:#fff; text-align:center; cursor:pointer; }
+.lxd-video.is-empty{ cursor:default; }
+.lxd-video img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.lxd-video__play, .lxd-video__ico{ width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.16);
+  display:grid; place-items:center; position:relative; }
+.lxd-video__play svg, .lxd-video__ico svg{ width:26px; height:26px; margin-left:3px; color:#fff; }
+.lxd-video b{ position:relative; font-family:var(--display); font-size:17px; }
+.lxd-video span:not(.lxd-video__play):not(.lxd-video__ico){ position:relative; font-size:13px; color:rgba(255,255,255,.75); }
+.lxd-video.is-on{ padding:0; min-height:0; background:#000; }
+.lxd-video__el{ width:100%; max-height:70vh; display:block; background:#000; }
+.lxd__body{ padding:22px 24px 24px; }
+.lxd__head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.lxd__head h2{ font-family:var(--display); font-size:22px; color:var(--navy); margin:6px 0 6px; }
+.lxd__head p{ font-size:14px; color:var(--muted); }
+.lxd-dev{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 0 4px; font-size:13px; color:var(--muted); }
+.lxd-dev__b{ border:1.5px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 14px;
+  font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; }
+.lxd-dev__b.is-on{ border-color:var(--gold); background:var(--gold-soft); color:var(--gold-700); }
+.lxd-dev--one{ font-style:italic; }
+.lxd-steps{ counter-reset:lxs; list-style:none; margin:18px 0 0; padding:0; }
+.lxd-steps li{ counter-increment:lxs; position:relative; padding:0 0 18px 44px; }
+.lxd-steps li::before{ content:counter(lxs); position:absolute; left:0; top:-2px; width:30px; height:30px; border-radius:50%;
+  background:var(--gold); color:#fff; font-weight:800; font-size:14px; display:grid; place-items:center; }
+.lxd-steps li:not(:last-child)::after{ content:""; position:absolute; left:14px; top:32px; bottom:6px; width:2px; background:var(--line); }
+.lxd-steps__t{ display:block; font-size:15px; line-height:1.55; color:var(--ink); }
+.lxd-steps__img{ display:block; margin-top:10px; max-width:260px; width:100%; border-radius:12px; border:1px solid var(--line); }
+.lxd__foot{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:6px; padding-top:18px; border-top:1px solid var(--line-2); }
+.lxd__foot .btn svg{ width:16px; height:16px; }
+.lxd__note{ font-size:12.5px; color:var(--muted); flex:1 1 220px; }
+.lxd-check{ margin-top:18px; padding:18px 20px; border-radius:14px; background:var(--canvas); border:1px solid var(--line); }
+.lxd-check[hidden]{ display:none; }
+.lxd-check__h{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+.lxd-check__q{ font-family:var(--display); font-size:17px; color:var(--navy); margin:8px 0 14px; }
+.lxd-check .q-choice{ background:var(--surface); }
+.lxd-note{ display:flex; gap:13px; align-items:flex-start; margin-top:22px; background:var(--canvas); }
+.lxd-note svg{ width:22px; height:22px; flex:0 0 22px; color:var(--teal); margin-top:1px; }
+.lxd-note p{ font-size:13.5px; color:var(--muted); line-height:1.55; }
+@media (max-width:640px){ .lxd__body{ padding:18px 16px 20px; } .lxd-steps li{ padding-left:38px; } }
 
 /* Kiber G'amxo'r */
 .care-hero{ display:grid; grid-template-columns:1fr auto; gap:22px; align-items:center; padding:22px 24px; margin-bottom:16px; }
