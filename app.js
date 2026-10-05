@@ -363,6 +363,7 @@
     superadmin: { name:"Superadmin", scope:"Butun platforma" },
     tuman:      { name:"Tuman mas'uli", scope:"Nurafshon shahri" },
     raisi:      { name:"Mahalla admini", scope:"Navro'z MFY" },
+    elchi:      { name:"Kiber elchi", scope:"Navro'z MFY" },
     user:       { name:"User", scope:"Faqat o'zingiz" }
   };
   const MY_TUMAN = "Nurafshon shahri";
@@ -638,6 +639,7 @@
     closeRail();
     if (v === "dash" && !dashAnimated) { animateDash(); dashAnimated = true; }
     if (v === "mavzular") { koTopic = null; renderMavzular(); }   // menyu yoki havola orqali kirilganda — mavzular ro'yxati
+    if (v === "feed") { renderFeedHead(); setFeedTab(feedTab); }
     if (v === "life") renderLife();
     if (v === "gamxor") renderCare();
     if (v === "mahalla") { renderMahallaProf(); renderMahallaCare(); }
@@ -798,6 +800,335 @@
       wrap.appendChild(c);
     });
   }
+  /* ---- ikki yorliq: Rasmiy / Reels (2-bosqich) ----
+     Ikki oqim aralashmaydi: rasmiy xabar — davlat manbai, Reels — jamoatchilik kontenti. */
+  let feedTab = "rasmiy";
+  function setFeedTab(t) {
+    feedTab = (t === "reels") ? "reels" : "rasmiy";
+    $$("#view-feed .ft-tab").forEach(b => {
+      const on = b.dataset.ftab === feedTab;
+      b.classList.toggle("is-on", on);
+      b.setAttribute("aria-selected", String(on));
+    });
+    const r = $("#ftPanelRasmiy"), v = $("#ftPanelReels");
+    if (r) r.hidden = feedTab !== "rasmiy";
+    if (v) v.hidden = feedTab !== "reels";
+    if (feedTab === "reels" && typeof renderReelsTab === "function") renderReelsTab();
+  }
+  function renderFeedHead() {
+    const ir = $("#ftIcoR"), iv = $("#ftIcoV");
+    if (ir) ir.innerHTML = ICON.shieldCheck;
+    if (iv) iv.innerHTML = ICON.play;
+    const g = $("#ftSrcGov");
+    if (g) g.innerHTML = `${ICON.shieldCheck}<span><b>Rasmiy manba.</b> IIB va Kiber AI guruhi tasdiqlagan ogohlantirishlar — tekshirilgan ma'lumot.</span>`;
+    const p = $("#ftSrcPub");
+    if (p) p.innerHTML = `${ICON.users}<span><b>Jamoatchilik kontenti.</b> Kiber elchilar yuklagan va moderatsiyadan o'tgan videolar. Bu rasmiy xabar emas.</span>`;
+    const tabs = $("#view-feed .ft-tabs");
+    if (tabs && !tabs._ulandi) {
+      tabs.addEventListener("click", e => { const b = e.target.closest("[data-ftab]"); if (b) setFeedTab(b.dataset.ftab); });
+      tabs._ulandi = true;
+    }
+  }
+  /* ---- Reels yorlig'i: filtrlar, qoplama kartalar, vertikal pleyer (3-bosqich) ---- */
+  let reelFiltr = "all";
+  // reels yozuvini pleyer tushunadigan ko'rinishga o'tkazish
+  function reelToRv(r) {
+    const kat = REELS_KAT[r.category] || { t: r.category };
+    const rol = (ROLE_META[r.author_rol] || {}).name || "Kiber elchi";
+    return {
+      __reel: true, id: r.id, src: r.video_url, poster: r.poster_url,
+      cat: kat.t, dur: Math.floor(r.duration_sec / 60) + ":" + String(r.duration_sec % 60).padStart(2, "0"),
+      title: r.title, cap: "", author: r.mahalla_id + " · " + rol + " " + r.author_name.split(" ")[0],
+      subtitr: r.subtitles_text, harakat: (REEL_HARAKAT[r.action_type] || {}).t, likes: 0
+    };
+  }
+  function reelCta(id) {
+    const r = loadReels().find(x => x.id === id); if (!r) return;
+    const h = ReelsAPI.hodisa(r.id, "action_click");          // ball faqat harakat uchun, bir marta
+    if (h.ball) koToast(`Harakat uchun +${h.ball} ball`);
+    closeReels();
+    if (r.action_type === "check_link") { showView("check"); return; }
+    showView("mavzular");                                      // showView koTopic ni tozalaydi — mavzu keyin o'rnatiladi
+    if (r.topic_id && topicList().some(t => t.slug === r.topic_id)) { koTopic = r.topic_id; renderMavzular(); }
+  }
+  /* ---- TRAFIK (6-bosqich): tejash rejimi, mobil tarmoqda avtoijro o'chiq ---- */
+  const TRAFIK_KEY = "ko_trafik";
+  const trafikTejash = () => { try { return localStorage.getItem(TRAFIK_KEY) === "1"; } catch (e) { return false; } };
+  function setTrafik(on) { try { localStorage.setItem(TRAFIK_KEY, on ? "1" : "0"); } catch (e) {} }
+  // uyali internet yoki tejash rejimi -> avtomatik ijro yo'q
+  function mobilTarmoq() {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!c) return false;
+    if (c.saveData) return true;
+    if (c.type === "cellular") return true;
+    return ["slow-2g", "2g", "3g"].includes(c.effectiveType);
+  }
+  const avtoIjro = () => !trafikTejash() && !mobilTarmoq();
+
+  /* ---- VIDEO YUKLASH — 5 qadamli oyna (4-bosqich). Rol tekshiruvi ReelsAPI ichida ---- */
+  let upQadam = 1, upD = null;
+  const UP_QOIDA = [
+    "Jabrlanuvchining yuzi, ismi yoki shaxsiy ma'lumoti ko'rsatilmasin",
+    "Firibgarlik usuli qadamma-qadam ko'rsatib berilmasin",
+    "Siyosiy yoki reklama mazmuni bo'lmasin"
+  ];
+  function upOpen() {
+    if (!REELS_YUKLASH.includes(currentRole)) { koToast("Video yuklash huquqi yo'q."); return; }
+    upQadam = 1;
+    upD = { video: null, nom: "", size_bytes: 0, duration_sec: 0, video_url: null,
+            category: "", topic_id: null, action_type: "", title: "", subtitles_text: "", qoida: false };
+    const m = $("#upModal"); m.classList.add("is-open"); m.setAttribute("aria-hidden", "false");
+    upRender();
+  }
+  function upClose() {
+    const m = $("#upModal"); m.classList.remove("is-open"); m.setAttribute("aria-hidden", "true");
+    if (upD && upD.video_url) { try { URL.revokeObjectURL(upD.video_url); } catch (e) {} }
+  }
+  function upXabar(t, bad) {
+    const e = $("#upMsg"); if (!e) return;
+    e.textContent = t || ""; e.className = "up-msg" + (t ? (bad ? " is-bad" : " is-ok") : "");
+  }
+  function upRender() {
+    const b = $("#upBody"), st = $("#upSteps"); if (!b) return;
+    upXabar("");
+    st.innerHTML = [1, 2, 3, 4, 5].map(n =>
+      `<span class="up-step${n === upQadam ? " is-cur" : n < upQadam ? " is-done" : ""}">${n < upQadam ? "✓" : n}</span>`).join("");
+    const mavzular = topicList();
+    if (upQadam === 1) {
+      b.innerHTML = `<p class="up-lab">Video tanlang — eng ko'pi ${REEL_LIMIT.sek} soniya, ${Math.round(REEL_LIMIT.bayt / 1048576)} MB</p>
+        <input type="file" id="upFile" accept="video/*" class="checker__input">
+        <div class="up-file" id="upFileInfo">${upD.nom ? `<b>${escH(upD.nom)}</b><span>${(upD.size_bytes / 1048576).toFixed(1)} MB · ${upD.duration_sec} soniya</span>` : "Fayl tanlanmagan"}</div>`;
+      $("#upFile").addEventListener("change", e => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        const url = URL.createObjectURL(f), v = document.createElement("video");
+        v.preload = "metadata";
+        v.onloadedmetadata = () => {
+          upD.video = f; upD.nom = f.name; upD.size_bytes = f.size;
+          upD.duration_sec = Math.round(v.duration || 0); upD.video_url = url;
+          upPoster(v);                                  // qoplama rasm videoning o'zidan olinadi
+          $("#upFileInfo").innerHTML = `<b>${escH(f.name)}</b><span>${(f.size / 1048576).toFixed(1)} MB · ${upD.duration_sec} soniya</span>`;
+          if (f.size > REEL_LIMIT.bayt) upXabar(`Fayl ${Math.round(REEL_LIMIT.bayt / 1048576)} MB dan katta — siqib qayta tanlang.`, true);
+          else if (upD.duration_sec > REEL_LIMIT.sek) upXabar(`Video ${REEL_LIMIT.sek} soniyadan uzun — qisqartiring.`, true);
+          else upXabar("Video tayyor.", false);
+        };
+        v.src = url;
+      });
+    } else if (upQadam === 2) {
+      b.innerHTML = `<p class="up-lab">Kategoriya</p><div class="filters">${Object.keys(REELS_KAT).map(k =>
+        `<button type="button" class="chip${upD.category === k ? " is-active" : ""}" data-upkat="${k}">${escH(REELS_KAT[k].t)}</button>`).join("")}</div>`;
+      b.querySelectorAll("[data-upkat]").forEach(x => x.addEventListener("click", () => { upD.category = x.dataset.upkat; upRender(); }));
+    } else if (upQadam === 3) {
+      b.innerHTML = `<p class="up-lab">Harakat turi — video ostidagi tugma qayerga olib boradi</p>
+        <div class="filters">${Object.keys(REEL_HARAKAT).map(k =>
+          `<button type="button" class="chip${upD.action_type === k ? " is-active" : ""}" data-upact="${k}">${escH(REEL_HARAKAT[k].t)}</button>`).join("")}</div>
+        <p class="up-lab">Qaysi mavzuga bog'lanadi${upD.action_type === "check_link" ? " (ixtiyoriy)" : ""}</p>
+        <div class="select"><select id="upTopic"><option value="">— tanlanmagan —</option>${mavzular.map(t =>
+          `<option value="${t.slug}"${upD.topic_id === t.slug ? " selected" : ""}>${escH(t.t)}</option>`).join("")}</select></div>`;
+      b.querySelectorAll("[data-upact]").forEach(x => x.addEventListener("click", () => { upD.action_type = x.dataset.upact; upRender(); }));
+      $("#upTopic").addEventListener("change", e => { upD.topic_id = e.target.value || null; });
+    } else if (upQadam === 4) {
+      b.innerHTML = `<p class="up-lab">Sarlavha <span id="upCnt">${upD.title.length}/${REEL_LIMIT.sarlavha}</span></p>
+        <input type="text" id="upTitle" class="checker__input" maxlength="${REEL_LIMIT.sarlavha}" value="${escH(upD.title)}" placeholder="Masalan: Soxta “posilka keldi” SMS'ini tanish">
+        <p class="up-lab">Subtitr matni — majburiy</p>
+        <textarea id="upSub" class="checker__input" rows="3" placeholder="Videoda aytilgan gaplarni yozing — odamlar ovozsiz ko'radi">${escH(upD.subtitles_text)}</textarea>`;
+      $("#upTitle").addEventListener("input", e => { upD.title = e.target.value; $("#upCnt").textContent = upD.title.length + "/" + REEL_LIMIT.sarlavha; });
+      $("#upSub").addEventListener("input", e => { upD.subtitles_text = e.target.value; });
+    } else {
+      b.innerHTML = `<p class="up-lab">Qoidalar</p>
+        <ul class="up-rules">${UP_QOIDA.map(r => `<li>${escH(r)}</li>`).join("")}</ul>
+        <label class="up-check"><input type="checkbox" id="upOk"${upD.qoida ? " checked" : ""}> Qoidalarga rioya qilganimni tasdiqlayman</label>
+        <p class="up-note">Video avtomatik e'lon qilinmaydi — avval moderatsiyadan o'tadi.</p>`;
+      $("#upOk").addEventListener("change", e => { upD.qoida = e.target.checked; });
+    }
+    $("#upBack").style.visibility = upQadam === 1 ? "hidden" : "visible";
+    $("#upNext").textContent = upQadam === 5 ? "Yuborish" : "Keyingisi";
+  }
+  // poster: 1-soniyadagi kadrni rasmga olamiz (server ulangach buni ffmpeg qiladi)
+  function upPoster(v) {
+    try {
+      v.currentTime = Math.min(1, (v.duration || 2) / 2);
+      v.onseeked = () => {
+        try {
+          const c = document.createElement("canvas");
+          const en = 360, bo = Math.round(en * (v.videoHeight / v.videoWidth || 16 / 9));
+          c.width = en; c.height = bo;
+          c.getContext("2d").drawImage(v, 0, 0, en, bo);
+          upD.poster_url = c.toDataURL("image/jpeg", 0.6);
+        } catch (e) {}
+      };
+    } catch (e) {}
+  }
+  function upKeyingi() {
+    if (upQadam === 1) {
+      if (!upD.video) return upXabar("Avval video faylni tanlang.", true);
+      if (upD.size_bytes > REEL_LIMIT.bayt) return upXabar(`Fayl ${Math.round(REEL_LIMIT.bayt / 1048576)} MB dan katta.`, true);
+      if (upD.duration_sec > REEL_LIMIT.sek) return upXabar(`Video ${REEL_LIMIT.sek} soniyadan uzun.`, true);
+    }
+    if (upQadam === 2 && !upD.category) return upXabar("Kategoriyani tanlang.", true);
+    if (upQadam === 3) {
+      if (!upD.action_type) return upXabar("Harakat turini tanlang.", true);
+      if (upD.action_type === "learn_topic" && !upD.topic_id) return upXabar("Mavzuni tanlang.", true);
+    }
+    if (upQadam === 4) {
+      if (!upD.title.trim()) return upXabar("Sarlavhani yozing.", true);
+      if (upD.subtitles_text.trim().length < 10) return upXabar("Subtitr matni majburiy — subtitrsiz video e'lon qilinmaydi.", true);
+    }
+    if (upQadam < 5) { upQadam++; upRender(); return; }
+    upD.ishlov = "kutilmoqda";                       // server: 480p H.264 ga siqish navbati
+    const j = ReelsAPI.yuklash(upD);                 // yakuniy tekshiruv API qatlamida
+    if (!j.ok) return upXabar(j.xabar, true);
+    upClose();
+    koToast("Video yuborildi — moderatsiyadan keyin e'lon qilinadi");
+    renderReelsTab();
+  }
+  function setupUpload() {
+    const n = $("#upNext"); if (!n) return;
+    n.addEventListener("click", upKeyingi);
+    $("#upBack").addEventListener("click", () => { if (upQadam > 1) { upQadam--; upRender(); } });
+    $("#upClose").addEventListener("click", upClose);
+    $("#upModal").addEventListener("click", e => { if (e.target.id === "upModal") upClose(); });
+    // mavzu taklifi — oddiy foydalanuvchi uchun
+    $("#tkClose").addEventListener("click", () => { $("#tkModal").classList.remove("is-open"); });
+    $("#tkSend").addEventListener("click", () => {
+      const t = $("#tkText").value, j = ReelsAPI.taklif(t), m = $("#tkMsg");
+      if (!j.ok) { m.textContent = j.xabar; m.className = "up-msg is-bad"; return; }
+      $("#tkModal").classList.remove("is-open"); $("#tkText").value = "";
+      m.textContent = ""; koToast("Taklif yuborildi — moderatorlar ko'rib chiqadi");
+    });
+  }
+
+  /* ---- MODERATSIYA (5-bosqich): navbat, ko'rish, tasdiqlash/rad etish ----
+     Rad etish sababi majburiy — tekshiruv ReelsAPI.moderatsiya() ichida ham bor. */
+  function renderModer(w) {
+    const j = ReelsAPI.navbat();
+    if (!j.ok) return;
+    const tk = ReelsAPI.takliflar();
+    const q = j.royxat;
+    w.insertAdjacentHTML("beforeend", `
+      <div class="section-title" style="margin-top:26px"><h2>Moderatsiya navbati</h2>
+        <span class="hint">${q.length} ta video javob kutmoqda</span></div>
+      <div class="card care-list" id="modList">${q.length ? q.map(r => `
+        <div class="care-row" data-mrow="${r.id}">
+          <div class="care-row__main">
+            <b>${escH(r.title)}</b>
+            <span>${escH(r.author_name)} · ${escH(r.mahalla_id)} · ${escH((REELS_KAT[r.category] || {}).t || r.category)} · ${r.duration_sec} soniya</span>
+            <span class="care-row__note">Subtitr: ${escH(r.subtitles_text)}</span>
+            <span class="care-row__note">Harakat: ${escH((REEL_HARAKAT[r.action_type] || {}).t || r.action_type)}${r.topic_id ? " → " + escH(r.topic_id) : ""}</span>
+          </div>
+          <div class="care-row__side"><span class="care-st care-st--wait">Tekshiruvda</span>
+            <span class="care-row__ts">${careDate(r.created_at)}</span></div>
+          <div class="care-row__btns">
+            ${r.video_url ? `<button type="button" class="btn btn--ghost" data-mview="${r.id}">Ko'rish</button>` : ""}
+            <button type="button" class="btn btn--gold" data-mok="${r.id}">Tasdiqlash</button>
+            <button type="button" class="btn btn--ghost" data-mno="${r.id}">Rad etish</button>
+          </div>
+          <div class="mod-rej" data-mrej="${r.id}" hidden>
+            <input type="text" class="checker__input" placeholder="Rad etish sababi — elchi nimani tuzatishini bilsin" data-mreason="${r.id}">
+            <div class="mod-rej__b">
+              <button type="button" class="btn btn--gold" data-msend="${r.id}">Yuborish</button>
+              <button type="button" class="btn btn--ghost" data-mcancel="${r.id}">Bekor</button>
+            </div>
+            <span class="up-msg" data-merr="${r.id}"></span>
+          </div>
+        </div>`).join("") : `<div class="care-empty">Navbat bo'sh — yangi video yo'q.</div>`}</div>
+      ${tk.ok && tk.royxat.length ? `
+      <div class="section-title" style="margin-top:22px"><h2>Mavzu takliflari</h2><span class="hint">fuqarolardan ${tk.royxat.length} ta</span></div>
+      <div class="card care-list">${tk.royxat.map(t => `<div class="care-row">
+          <div class="care-row__main"><b>${escH(t.text)}</b><span>${careDate(t.created_at)}</span></div>
+        </div>`).join("")}</div>` : ""}`);
+
+    const yangila = () => renderReelsTab();
+    w.querySelectorAll("[data-mview]").forEach(b => b.addEventListener("click", () => {
+      const r = loadReels().find(x => x.id === b.dataset.mview);
+      if (r) openReels(r.id, [reelToRv(r)]);
+    }));
+    w.querySelectorAll("[data-mok]").forEach(b => b.addEventListener("click", () => {
+      const j2 = ReelsAPI.moderatsiya(b.dataset.mok, "tasdiqlangan");
+      koToast(j2.ok ? "Video tasdiqlandi va e'lon qilindi" : j2.xabar);
+      yangila();
+    }));
+    w.querySelectorAll("[data-mno]").forEach(b => b.addEventListener("click", () => {
+      const box = w.querySelector(`[data-mrej="${b.dataset.mno}"]`);
+      if (box) { box.hidden = false; const i = box.querySelector("input"); if (i) i.focus(); }
+    }));
+    w.querySelectorAll("[data-mcancel]").forEach(b => b.addEventListener("click", () => {
+      const box = w.querySelector(`[data-mrej="${b.dataset.mcancel}"]`); if (box) box.hidden = true;
+    }));
+    w.querySelectorAll("[data-msend]").forEach(b => b.addEventListener("click", () => {
+      const id = b.dataset.msend;
+      const sabab = (w.querySelector(`[data-mreason="${id}"]`) || {}).value || "";
+      const j2 = ReelsAPI.moderatsiya(id, "rad_etilgan", sabab);
+      if (!j2.ok) { const e = w.querySelector(`[data-merr="${id}"]`); if (e) { e.textContent = j2.xabar; e.className = "up-msg is-bad"; } return; }
+      koToast("Video rad etildi — sabab elchiga ko'rinadi");
+      yangila();
+    }));
+  }
+
+  function renderReelsTab() {
+    const w = $("#reelsWrap"); if (!w) return;
+    const ro = ReelsAPI.royxat(reelFiltr);
+    const chips = [["all", "Hammasi"], ["mahalla", "Mahallamdan"]].concat(Object.keys(REELS_KAT).map(k => [k, REELS_KAT[k].t]));
+    const yuklay = REELS_YUKLASH.includes(currentRole);          // tugma oddiy foydalanuvchiga umuman chizilmaydi
+    const meniki = yuklay ? ReelsAPI.meniki() : [];
+    w.innerHTML = `<div class="rl-top">
+        ${yuklay
+          ? `<button type="button" class="btn btn--gold" data-upopen>${ICON.play} Video yuklash</button>
+             <span class="rl-top__n">${ROLE_META[currentRole].name} sifatida yuklaysiz</span>`
+          : `<button type="button" class="btn btn--ghost" data-tkopen>Mavzu taklif qilish</button>
+             <span class="rl-top__n">Video yuklash kiber elchilarga ochiq. Mavzu taklif qilsangiz, elchilar tayyorlaydi.</span>`}
+      </div>
+      <div class="rl-tr">
+        <label class="rl-tr__sw"><input type="checkbox" id="rlTrafik"${trafikTejash() ? " checked" : ""}> Trafikni tejash</label>
+        <span>${trafikTejash() ? "Videolar faqat siz bosganda yuklanadi." : (mobilTarmoq() ? "Mobil internet aniqlandi — avtomatik ijro o'chiq." : "Wi-Fi: video o'zi ijro etiladi.")}</span>
+      </div>
+      <div class="filters">${chips.map(([k, lab]) =>
+        `<button type="button" class="chip${reelFiltr === k ? " is-active" : ""}" data-rfiltr="${k}">${escH(lab)}</button>`).join("")}</div>`
+      + (ro.length
+        ? `<div class="reels">${ro.map(r => {
+            const kat = REELS_KAT[r.category] || { t: r.category, cls: "i-blue" };
+            return `<button type="button" class="reel" data-ropen="${r.id}" aria-label="${escH(r.title)}">
+              <div class="reel__bg" style="background:linear-gradient(155deg,var(--navy),var(--navy-2))"></div>
+              ${r.poster_url ? `<img class="reel__poster" src="${r.poster_url}" alt="">` : ""}
+              <span class="reel__cat">${escH(kat.t)}</span>
+              <span class="reel__dur">0:${String(r.duration_sec).padStart(2, "0")}</span>
+              <div class="reel__grad"></div>
+              <span class="reel__play">${ICON.play}</span>
+              <div class="reel__info">
+                <div class="reel__title">${escH(r.title)}</div>
+                <div class="reel__meta"><span class="m">${escH(r.mahalla_id)}</span></div>
+              </div>
+            </button>`;
+          }).join("")}</div>`
+        : `<div class="card ko-soon"><div class="ko-soon__ico">${ICON.play}</div>
+             <h3>Bu filtrda video yo'q</h3>
+             <p>Kiber elchilar yangi video yuklaganda va u moderatsiyadan o'tgach shu yerda paydo bo'ladi.</p></div>`);
+    if (REELS_MODER.includes(currentRole)) renderModer(w);        // faqat tuman mas'uli va superadmin
+    if (yuklay) {
+      w.insertAdjacentHTML("beforeend", `<div class="section-title" style="margin-top:26px"><h2>Mening videolarim</h2>
+          <span class="hint">${meniki.length} ta</span></div>` +
+        (meniki.length
+          ? `<div class="card care-list">${meniki.map(r => {
+              const h = REEL_HOLAT[r.status] || REEL_HOLAT.tekshiruvda;
+              return `<div class="care-row">
+                <div class="care-row__main"><b>${escH(r.title)}</b>
+                  <span>${escH((REELS_KAT[r.category] || {}).t || r.category)} · ${r.duration_sec} soniya${r.ishlov === "kutilmoqda" ? " · 480p ga siqish navbatida" : ""}</span>
+                  ${r.reject_reason ? `<span class="care-row__note">Sabab: ${escH(r.reject_reason)}</span>` : ""}</div>
+                <div class="care-row__side"><span class="care-st ${h.c}">${h.t}</span>
+                  <span class="care-row__ts">${careDate(r.created_at)}</span></div>
+              </div>`;
+            }).join("")}</div>`
+          : `<div class="card card--pad care-empty">Hali video yuklamagansiz.</div>`));
+    }
+    const tr = w.querySelector("#rlTrafik");
+    if (tr) tr.addEventListener("change", () => { setTrafik(tr.checked); renderReelsTab(); koToast(tr.checked ? "Trafikni tejash yoqildi" : "Trafikni tejash o'chirildi"); });
+    const up = w.querySelector("[data-upopen]"); if (up) up.addEventListener("click", upOpen);
+    const tk = w.querySelector("[data-tkopen]"); if (tk) tk.addEventListener("click", () => { $("#tkModal").classList.add("is-open"); setTimeout(() => $("#tkText").focus(), 80); });
+    w.querySelectorAll("[data-rfiltr]").forEach(b => b.addEventListener("click", () => { reelFiltr = b.dataset.rfiltr; renderReelsTab(); }));
+    w.querySelectorAll("[data-ropen]").forEach(b => b.addEventListener("click", () => {
+      openReels(b.dataset.ropen, ReelsAPI.royxat(reelFiltr).map(reelToRv));
+    }));
+  }
+
   function renderFullFeed() {
     const f = $("#fullFeed"); f.innerHTML = "";
     FEED.filter(a => feedFilter === "all" || a.cat === feedFilter).forEach(a => f.appendChild(alertNode(a)));
@@ -2313,25 +2644,33 @@
     share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 3-9.5 9.5" stroke-linecap="round"/><path d="M21 3 14.5 21l-3-7.5L4 10.5 21 3Z" stroke-linejoin="round"/></svg>',
     play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>'
   };
+  // pleyer ikki manbadan ishlaydi: So'nggi videolar (VIDEOS) va Tahdidlar lentasi Reels (ReelsAPI)
+  function rvNorm(x) {
+    if (x.__reel) return x;
+    return { id: x.id, src: x.src, poster: x.poster, cat: x.cat, dur: x.dur, title: x.title, cap: x.cap,
+             author: x.author + " · " + x.views + " ko'rishlar", likes: x.likes, c1: x.c1, c2: x.c2, ico: x.ico };
+  }
   function rvSlide(v, i) {
     return `<section class="rv__slide" data-idx="${i}">
       <div class="rv__frame">
         ${v.src
-          ? `<video class="rv__video" src="${v.src}" playsinline loop muted preload="metadata"></video>`
+          ? `<video class="rv__video" src="${v.src}" playsinline loop muted preload="none"></video>`
           : `<div class="rv__bg" style="background:linear-gradient(155deg,${v.c1},${v.c2})"><span class="rv__bgico">${v.ico}</span></div>`}
         <div class="rv__bar"><i></i></div>
         <button type="button" class="rv__tap" aria-label="Pauza / davom ettirish"></button>
         <span class="rv__big" aria-hidden="true">${RV_ICO.play}</span>
         <div class="rv__side">
-          <button type="button" class="rv__act" data-rv-like aria-pressed="false">${RV_ICO.heart}<b>${v.likes}</b></button>
+          ${v.likes ? `<button type="button" class="rv__act" data-rv-like aria-pressed="false">${RV_ICO.heart}<b>${v.likes}</b></button>` : ""}
           <button type="button" class="rv__act" data-rv-sound>${RV_ICO.muted}<b>Ovoz</b></button>
           <button type="button" class="rv__act" data-rv-share>${RV_ICO.share}<b>Ulashish</b></button>
         </div>
         <div class="rv__info">
+          ${v.subtitr ? `<div class="rv__sub">${escH(v.subtitr)}</div>` : ""}
           <span class="rv__cat">${escH(v.cat)} · <i data-rv-dur>${escH(v.dur)}</i></span>
           <h3>${escH(v.title)}</h3>
-          <p>${escH(v.cap)}</p>
-          <span class="rv__author">${ICON.shieldCheck}${escH(v.author)} · ${escH(v.views)} ko'rishlar</span>
+          ${v.cap ? `<p>${escH(v.cap)}</p>` : ""}
+          <span class="rv__author">${ICON.shieldCheck}${escH(v.author)}</span>
+          ${v.harakat ? `<button type="button" class="btn btn--gold btn--block rv__cta" data-rv-cta="${v.id}">${escH(v.harakat)} →</button>` : ""}
         </div>
       </div>
     </section>`;
@@ -2341,9 +2680,18 @@
     const vid = slide.querySelector(".rv__video");
     rvVideos().forEach(v => { if (v !== vid) { v.pause(); } });
     $$("#rvScroll .rv__slide").forEach(s => s.classList.toggle("is-on", s === slide));
+    const it = rvList[+slide.dataset.idx];
+    if (it && it.__reel) ReelsAPI.hodisa(it.id, "view");          // ko'rish qayd etiladi, ball yo'q
     if (!vid) return;
     vid.muted = rvMuted;
     slide.classList.remove("is-paused");
+    // keyingi videogina oldindan yuklanadi, qolganlari tegilmaydi
+    const idx = +slide.dataset.idx;
+    $$("#rvScroll .rv__slide").forEach((sl, i) => {
+      const v2 = sl.querySelector(".rv__video"); if (!v2) return;
+      v2.preload = (i === idx || i === idx + 1) ? "metadata" : "none";
+    });
+    if (!avtoIjro()) { slide.classList.add("is-paused"); return; }   // mobil internet yoki tejash rejimi
     const p = vid.play();
     if (p && p.catch) p.catch(() => {               // hali yuklanmagan bo'lsa — yuklab, qayta urinadi
       try { vid.load(); } catch (e) {}
@@ -2363,10 +2711,12 @@
       b.classList.toggle("is-on", !on);
     });
   }
-  function openReels(startId) {
+  let rvList = [];
+  function openReels(startId, list) {
     const box = $("#rvScroll"), view = $("#reelsView"); if (!box || !view) return;
-    const idx = Math.max(0, VIDEOS.findIndex(v => v.id === +startId));
-    box.innerHTML = VIDEOS.map(rvSlide).join("");
+    rvList = (list || VIDEOS).map(rvNorm);
+    const idx = Math.max(0, rvList.findIndex(v => String(v.id) === String(startId)));
+    box.innerHTML = rvList.map(rvSlide).join("");
     view.hidden = false; view.setAttribute("aria-hidden", "false");
     document.body.classList.add("rv-open");
     rvOpen = true;
@@ -2405,8 +2755,9 @@
       b.setAttribute("aria-pressed", String(!on)); b.classList.toggle("is-liked", !on);
     }));
     box.querySelectorAll("[data-rv-sound]").forEach(b => b.addEventListener("click", () => rvSetMuted(!rvMuted)));
+    box.querySelectorAll("[data-rv-cta]").forEach(b => b.addEventListener("click", () => reelCta(b.dataset.rvCta)));
     box.querySelectorAll("[data-rv-share]").forEach(b => b.addEventListener("click", () => {
-      const i = +b.closest(".rv__slide").dataset.idx, v = VIDEOS[i];
+      const i = +b.closest(".rv__slide").dataset.idx, v = rvList[i];
       const url = location.origin + location.pathname + "#/video";
       if (navigator.share) navigator.share({ title: v.title, url }).catch(() => {});
       else if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => koToast("Havola nusxalandi")).catch(() => koToast("Havola: " + url));
@@ -3905,9 +4256,10 @@ ${rowsHtml}
     { login: "superadmin", pass: "1234", role: "superadmin", name: "Platforma administratori" },
     { login: "tuman",      pass: "1234", role: "tuman",      name: "Nurafshon shahri mas'uli" },
     { login: "mahalla",    pass: "1234", role: "raisi",      name: "Akmal Yusupov" },
+    { login: "elchi",      pass: "1234", role: "elchi",      name: "Dilnoza Rahimova" },
     { login: "admin",      pass: "1234", role: "superadmin", name: "Platforma administratori" }   // eski demo hisob — ishlashda qoladi
   ];
-  const ROLE_HOME = { user: "dash", superadmin: "admin", tuman: "kxi", raisi: "mahalla" };
+  const ROLE_HOME = { user: "dash", superadmin: "admin", tuman: "kxi", raisi: "mahalla", elchi: "feed" };
   let staffSession = null;
   function loadStaff() {
     try {
@@ -4646,6 +4998,169 @@ ${rowsHtml}
   }
 
   /* =========================================================
+     TAHDIDLAR LENTASI — REELS (jamoatchilik videolari)
+     Ma'lumot modeli va API qatlami. Server hali yo'q: ReelsAPI funksiyalari
+     localStorage bilan ishlaydi, lekin rol va tekshiruvlar aynan server kabi
+     shu qatlamda bajariladi — API ulangach faqat shu funksiyalar ichi fetch()
+     ga almashtiriladi, interfeys o'zgarmaydi.
+     ========================================================= */
+  const REELS_KEY = "ko_reels", REEV_KEY = "ko_reel_events", TAKLIF_KEY = "ko_takliflar";
+  const REELS_YUKLASH = ["elchi", "raisi", "tuman", "superadmin"];   // video yuklay oladigan rollar
+  const REELS_MODER   = ["tuman", "superadmin"];                     // moderatsiya qiladigan rollar
+  const REEL_LIMIT = { sek: 45, bayt: 50 * 1024 * 1024, sarlavha: 60 };
+  const REEL_BALL = 10;                                              // harakat uchun (ko'rish uchun emas)
+  const REELS_KAT = {
+    kiberxavfsizlik:    { t: "Kiberxavfsizlik",     cls: "i-red" },
+    yol_harakati:       { t: "Yo'l harakati",       cls: "i-blue" },
+    voyaga_yetmaganlar: { t: "Voyaga yetmaganlar",  cls: "i-purple" },
+    jamoat_tartibi:     { t: "Jamoat tartibi",      cls: "i-teal" }
+  };
+  const REEL_HOLAT = {
+    tekshiruvda:  { t: "Tekshiruvda",  c: "care-st--wait" },
+    tasdiqlangan: { t: "Tasdiqlangan", c: "care-st--ok" },
+    rad_etilgan:  { t: "Rad etilgan",  c: "care-st--no" }
+  };
+  const REEL_HARAKAT = {
+    learn_topic: { t: "Shu mavzuni o'rganish", view: "mavzular" },
+    check_link:  { t: "Havolani tekshirish",   view: "check" }
+  };
+  // demo yozuvlar — server ulangach bazadan keladi
+  const REELS_SEED = [
+    { id: "r1", author_id: "elchi", author_name: "Dilnoza Rahimova", author_rol: "elchi",
+      mahalla_id: "Navro'z MFY", district_id: "Nurafshon shahri",
+      title: "Telegramda ikki bosqichli parolni 1 daqiqada yoqing", category: "kiberxavfsizlik",
+      topic_id: "telegram", action_type: "learn_topic",
+      video_url: "./videos/video_2.mp4", poster_url: null,
+      subtitles_text: "Telegram sozlamalarini oching. Maxfiylik va xavfsizlik bandiga kiring. Ikki bosqichli tasdiqlashni yoqing.",
+      duration_sec: 42, size_bytes: 8400000, status: "tasdiqlangan", reject_reason: null,
+      reviewed_by: "tuman", reviewed_at: Date.now() - 864e5 * 3, created_at: Date.now() - 864e5 * 4, published_at: Date.now() - 864e5 * 3 },
+    { id: "r2", author_id: "elchi", author_name: "Dilnoza Rahimova", author_rol: "elchi",
+      mahalla_id: "Navro'z MFY", district_id: "Nurafshon shahri",
+      title: "Bank xodimi SMS-kod so'radimi? Bu firibgar", category: "kiberxavfsizlik",
+      topic_id: null, action_type: "check_link",
+      video_url: "./videos/video_3.mp4", poster_url: null,
+      subtitles_text: "Bank hech qachon SMS-kod so'ramaydi. Kod so'ralsa, go'shakni qo'ying va o'zingiz bankka qo'ng'iroq qiling.",
+      duration_sec: 38, size_bytes: 7900000, status: "tasdiqlangan", reject_reason: null,
+      reviewed_by: "superadmin", reviewed_at: Date.now() - 864e5, created_at: Date.now() - 864e5 * 2, published_at: Date.now() - 864e5 },
+    { id: "r3", author_id: "elchi", author_name: "Dilnoza Rahimova", author_rol: "elchi",
+      mahalla_id: "Navro'z MFY", district_id: "Nurafshon shahri",
+      title: "Soxta “Click bloklandi” SMS'ini qanday tanish", category: "kiberxavfsizlik",
+      topic_id: "kx-ijtimoiy", action_type: "learn_topic",
+      video_url: "./videos/video_1.mp4", poster_url: null,
+      subtitles_text: "Rasmiy SMS havola yubormaydi. Domenni tekshiring: click.uz to'g'ri, clik-uz.xyz soxta.",
+      duration_sec: 27, size_bytes: 2600000, status: "tekshiruvda", reject_reason: null,
+      reviewed_by: null, reviewed_at: null, created_at: Date.now() - 36e5, published_at: null }
+  ];
+
+  function loadReels() {
+    try { const a = JSON.parse(localStorage.getItem(REELS_KEY) || "null"); if (Array.isArray(a)) return a; } catch (e) {}
+    try { localStorage.setItem(REELS_KEY, JSON.stringify(REELS_SEED)); } catch (e) {}
+    return REELS_SEED.slice();
+  }
+  function saveReels(list) { try { localStorage.setItem(REELS_KEY, JSON.stringify(list)); } catch (e) {} }
+  function loadReev() { try { const a = JSON.parse(localStorage.getItem(REEV_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function saveReev(a) { try { localStorage.setItem(REEV_KEY, JSON.stringify(a)); } catch (e) {} }
+  // joriy foydalanuvchi: xodim akkaunti -> ro'yxatdan o'tgan fuqaro -> mehmon
+  function reelMe() {
+    const acc = staffAccount();
+    if (acc) return { id: acc.login, name: acc.name, rol: currentRole };
+    if (KO_USER && KO_USER.id) return { id: KO_USER.id, name: KO_USER.name || "Fuqaro", rol: "user" };
+    return { id: "mehmon", name: "Mehmon", rol: currentRole };
+  }
+
+  const ReelsAPI = {
+    /* --- o'qish --- */
+    // tasdiqlangan videolar; filtr: all | mahalla | <kategoriya>
+    royxat(filtr = "all") {
+      const me = reelMe();
+      return loadReels().filter(r => r.status === "tasdiqlangan").filter(r => {
+        if (filtr === "all") return true;
+        if (filtr === "mahalla") return r.mahalla_id === ((KO_USER && KO_USER.mahalla) || MY_MAHALLA);
+        return r.category === filtr;
+      }).sort((a, b) => (b.published_at || 0) - (a.published_at || 0));
+    },
+    // elchining o'z videolari va holati
+    meniki() {
+      const me = reelMe();
+      return loadReels().filter(r => r.author_id === me.id).sort((a, b) => b.created_at - a.created_at);
+    },
+    // moderatsiya navbati — faqat tuman mas'uli va superadmin
+    navbat() {
+      if (!REELS_MODER.includes(currentRole)) return { ok: false, kod: 403, xabar: "Bu bo'lim faqat tuman mas'uli va superadmin uchun." };
+      return { ok: true, royxat: loadReels().filter(r => r.status === "tekshiruvda").sort((a, b) => a.created_at - b.created_at) };
+    },
+
+    /* --- yozish --- */
+    // video yuklash: rol + hajm + davomiylik + sarlavha + subtitr tekshiriladi
+    yuklash(d) {
+      if (!REELS_YUKLASH.includes(currentRole))
+        return { ok: false, kod: 403, xabar: "Video yuklash faqat kiber elchi va yuqori rollar uchun ochiq." };
+      if (!d || !d.video) return { ok: false, kod: 400, xabar: "Video fayl tanlanmagan." };
+      if (d.size_bytes > REEL_LIMIT.bayt) return { ok: false, kod: 413, xabar: `Fayl hajmi ${Math.round(REEL_LIMIT.bayt / 1048576)} MB dan oshmasligi kerak.` };
+      if (d.duration_sec > REEL_LIMIT.sek) return { ok: false, kod: 400, xabar: `Video ${REEL_LIMIT.sek} soniyadan uzun bo'lmasligi kerak.` };
+      if (!d.title || d.title.length > REEL_LIMIT.sarlavha) return { ok: false, kod: 400, xabar: `Sarlavha 1–${REEL_LIMIT.sarlavha} belgi bo'lsin.` };
+      if (!REELS_KAT[d.category]) return { ok: false, kod: 400, xabar: "Kategoriya tanlanmagan." };
+      if (!REEL_HARAKAT[d.action_type]) return { ok: false, kod: 400, xabar: "Harakat turi tanlanmagan." };
+      if (!d.subtitles_text || d.subtitles_text.trim().length < 10)
+        return { ok: false, kod: 400, xabar: "Subtitr matni majburiy — subtitrsiz video e'lon qilinmaydi." };
+      if (!d.qoida) return { ok: false, kod: 400, xabar: "Qoidalarni tasdiqlash majburiy." };
+      const me = reelMe(), list = loadReels();
+      const r = {
+        id: "r" + Date.now().toString(36), author_id: me.id, author_name: me.name, author_rol: me.rol,
+        mahalla_id: (KO_USER && KO_USER.mahalla) || MY_MAHALLA, district_id: MY_TUMAN,
+        title: d.title.trim(), category: d.category, topic_id: d.topic_id || null, action_type: d.action_type,
+        video_url: d.video_url || null, poster_url: d.poster_url || null, subtitles_text: d.subtitles_text.trim(),
+        duration_sec: d.duration_sec, size_bytes: d.size_bytes,
+        status: "tekshiruvda", ishlov: d.ishlov || "kutilmoqda",   // siqish tugamaguncha ko'rinmaydi
+        reject_reason: null, reviewed_by: null, reviewed_at: null,
+        created_at: Date.now(), published_at: null
+      };
+      list.unshift(r); saveReels(list);
+      return { ok: true, reel: r };
+    },
+    // moderatsiya: rad etishda sabab majburiy
+    moderatsiya(id, qaror, sabab) {
+      if (!REELS_MODER.includes(currentRole)) return { ok: false, kod: 403, xabar: "Moderatsiya huquqi yo'q." };
+      if (qaror !== "tasdiqlangan" && qaror !== "rad_etilgan") return { ok: false, kod: 400, xabar: "Noto'g'ri qaror." };
+      if (qaror === "rad_etilgan" && (!sabab || sabab.trim().length < 5))
+        return { ok: false, kod: 400, xabar: "Rad etish sababi majburiy — elchi nimani tuzatishini bilishi kerak." };
+      const list = loadReels(), r = list.find(x => x.id === id);
+      if (!r) return { ok: false, kod: 404, xabar: "Video topilmadi." };
+      r.status = qaror;
+      r.reject_reason = qaror === "rad_etilgan" ? sabab.trim() : null;
+      r.reviewed_by = reelMe().id; r.reviewed_at = Date.now();
+      r.published_at = qaror === "tasdiqlangan" ? Date.now() : null;
+      saveReels(list);
+      return { ok: true, reel: r };
+    },
+    // hodisa: view | action_click | action_completed. Ball faqat harakat uchun va bir marta.
+    hodisa(reelId, event) {
+      const me = reelMe(), evs = loadReev();
+      const kalit = reelId + ":" + me.id + ":" + event;
+      const yangi = !evs.some(e => e.kalit === kalit);
+      if (yangi) { evs.push({ kalit, id: "e" + Date.now().toString(36), reel_id: reelId, user_id: me.id, event, created_at: Date.now() }); saveReev(evs); }
+      let ball = 0;
+      if (event !== "view" && yangi) { ball = REEL_BALL; userBall += ball; }   // ko'rish uchun ball yo'q
+      return { ok: true, yangi, ball };
+    },
+    // oddiy foydalanuvchi uchun — mavzu taklifi
+    taklif(matn) {
+      if (!matn || matn.trim().length < 10) return { ok: false, kod: 400, xabar: "Taklif matni juda qisqa." };
+      let a = [];
+      try { a = JSON.parse(localStorage.getItem(TAKLIF_KEY) || "[]"); } catch (e) {}
+      a.unshift({ id: "t" + Date.now().toString(36), user_id: reelMe().id, text: matn.trim(), status: "tekshiruvda", created_at: Date.now() });
+      try { localStorage.setItem(TAKLIF_KEY, JSON.stringify(a)); } catch (e) {}
+      return { ok: true };
+    },
+    takliflar() {
+      if (!REELS_MODER.includes(currentRole)) return { ok: false, kod: 403, xabar: "Huquq yo'q." };
+      try { return { ok: true, royxat: JSON.parse(localStorage.getItem(TAKLIF_KEY) || "[]") }; } catch (e) { return { ok: true, royxat: [] }; }
+    }
+  };
+  window.KO_REELS_API = ReelsAPI;   // server ulanganda shu qatlam almashtiriladi
+
+
+  /* =========================================================
      INIT
      ========================================================= */
   function init() {
@@ -4683,6 +5198,7 @@ ${rowsHtml}
     renderFooter();
     setupFooter();
     setupLogin();
+    setupUpload();
     setupNavRouter();
     applyRole(restoredRole());    // xodim sessiyasi bo'lsa tiklanadi, aks holda fuqaro rejimi
     applyUserChip();

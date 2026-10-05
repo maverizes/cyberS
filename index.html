@@ -121,11 +121,29 @@
         <div class="page-head">
           <span class="eyebrow">Tahdidlar lentasi</span>
           <h1>O'zbekistonda aylanayotgan firibgarliklar</h1>
-          <p class="lead">Ko'ngillilar va tizim tasdiqlagan ogohlantirishlar. Toifani tanlab, o'zingizga tegishlisini
-            kuzating.</p>
+          <p class="lead">Rasmiy ogohlantirishlar va kiber elchilar yuklagan qisqa videolar — ikki alohida oqimda.</p>
         </div>
-        <div class="filters" id="feedFilters"></div>
-        <div class="feed" id="fullFeed"></div>
+
+        <!-- ikki yorliq: rasmiy oqim va jamoatchilik videolari hech qachon aralashmaydi -->
+        <div class="ft-tabs" role="tablist">
+          <button type="button" class="ft-tab is-on" data-ftab="rasmiy" role="tab" aria-selected="true">
+            <span class="ft-tab__ico" id="ftIcoR"></span>Rasmiy
+          </button>
+          <button type="button" class="ft-tab" data-ftab="reels" role="tab" aria-selected="false">
+            <span class="ft-tab__ico" id="ftIcoV"></span>Reels
+          </button>
+        </div>
+
+        <div id="ftPanelRasmiy">
+          <div class="ft-src ft-src--gov" id="ftSrcGov"></div>
+          <div class="filters" id="feedFilters"></div>
+          <div class="feed" id="fullFeed"></div>
+        </div>
+
+        <div id="ftPanelReels" hidden>
+          <div class="ft-src ft-src--pub" id="ftSrcPub"></div>
+          <div id="reelsWrap"></div>
+        </div>
       </section>
 
       <!-- ===== CHECKER ===== -->
@@ -754,6 +772,35 @@
   <script src="nav-config.js"></script>
   <script src="app.js"></script>
   <!-- ===== LOGIN MODAL (imtiyozli rollar) ===== -->
+  <!-- ===== VIDEO YUKLASH (5 qadam) — faqat kiber elchi va yuqori rollar ===== -->
+  <div class="login-modal" id="upModal" aria-hidden="true">
+    <div class="login-card up-card" role="dialog" aria-modal="true" aria-labelledby="upTitle">
+      <div class="up-steps" id="upSteps"></div>
+      <h3 id="upTitle">Video yuklash</h3>
+      <div class="up-body" id="upBody"></div>
+      <div class="up-msg" id="upMsg"></div>
+      <div class="up-foot">
+        <button type="button" class="btn btn--ghost" id="upBack">Orqaga</button>
+        <button type="button" class="btn btn--gold" id="upNext">Keyingisi</button>
+      </div>
+      <button type="button" class="login-x" id="upClose" aria-label="Yopish">&times;</button>
+    </div>
+  </div>
+
+  <!-- ===== MAVZU TAKLIFI — oddiy foydalanuvchi uchun ===== -->
+  <div class="login-modal" id="tkModal" aria-hidden="true">
+    <div class="login-card" role="dialog" aria-modal="true">
+      <h3>Mavzu taklif qilish</h3>
+      <p class="login-card__sub">Qanday firibgarlik haqida video kerakligini yozing — taklif moderatorlarga boradi.</p>
+      <textarea class="checker__input" id="tkText" rows="4" maxlength="400" placeholder="Masalan: mahallamizda “posilka keldi” SMS'i ko'paydi, shu haqda video kerak"></textarea>
+      <div class="up-msg" id="tkMsg"></div>
+      <div class="up-foot">
+        <button type="button" class="btn btn--ghost" id="tkClose">Bekor qilish</button>
+        <button type="button" class="btn btn--gold" id="tkSend">Yuborish</button>
+      </div>
+    </div>
+  </div>
+
   <div class="login-modal" id="loginModal" aria-hidden="true">
     <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <div class="login-card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -779,6 +826,7 @@
           <button type="button" data-fill-login="superadmin"><code>superadmin</code><span>Superadmin</span></button>
           <button type="button" data-fill-login="tuman"><code>tuman</code><span>Tuman mas'uli</span></button>
           <button type="button" data-fill-login="mahalla"><code>mahalla</code><span>Mahalla admini</span></button>
+          <button type="button" data-fill-login="elchi"><code>elchi</code><span>Kiber elchi</span></button>
         </div>
       </div>
     </div>
