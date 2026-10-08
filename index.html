@@ -92,13 +92,13 @@
           <div class="card daytip daytip--full" id="dashTip"></div>
         </div>
 
-        <button class="assist-cta" data-view="assist" id="assistCta">
+        <button class="assist-cta" data-bot id="assistCta">
           <span class="assist-cta__glow"></span>
           <span class="assist-cta__ico" id="assistCtaIco"></span>
           <span class="assist-cta__txt">
-            <span class="assist-cta__t">AI Hamroh — aqlli kiber hamroh</span>
-            <span class="assist-cta__p">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Yozing yoki rasm yuklang — AI
-              soniyada tekshiradi.</span>
+            <span class="assist-cta__t">Kiber maslahat — Telegram bot</span>
+            <span class="assist-cta__p">Shubhali SMS, qo'ng'iroq yoki havola keldimi? Botga tashlang — darhol javob
+              beradi va nima qilishni aytadi.</span>
           </span>
           <span class="assist-cta__go" id="assistCtaGo"></span>
         </button>
@@ -556,32 +556,12 @@
       <!-- ===== KIBER ASSIST (AI chat) ===== -->
       <section class="view" id="view-assist">
         <div class="page-head">
-          <span class="eyebrow">AI Hamroh · Kiber Himoyachi</span>
-          <h1>Kundalik aqlli hamroh — sizni himoya qiladi</h1>
-          <p class="lead">Istalgan mavzuda suhbatlashing. AI Hamroh javob beradi va agar suhbatda pul, bank, havola,
-            kod, sovg'a kabi xavfli mavzu sezsa — avtomatik ogohlantiradi hamda xavfsizlik maslahatini beradi.</p>
+          <span class="eyebrow">Kiber maslahat</span>
+          <h1>Savolingiz bormi? Telegram botga yozing</h1>
+          <p class="lead">Shubhali xabar, qo'ng'iroq yoki havola bo'yicha maslahat — Telegram bot orqali, bepul va
+            ro'yxatdan o'tmasdan.</p>
         </div>
-        <div class="chat" id="chat">
-          <div class="chat__head">
-            <span class="chat__ava" id="chatAva"></span>
-            <div>
-              <div class="chat__name">AI Hamroh</div>
-              <div class="chat__status"><span class="chat__dot"></span>Onlayn · suhbatdosh + Kiber Himoyachi</div>
-            </div>
-            <button class="chat__reset" id="chatReset" title="Suhbatni tozalash">Tozalash</button>
-          </div>
-          <div class="chat__body" id="chatBody"></div>
-          <div class="chat__suggest" id="chatSuggest"></div>
-          <div class="chat__bar">
-            <input type="file" accept="image/*" id="chatFile" hidden>
-            <button class="chat__icon" id="chatImg" title="Rasm yuklash" aria-label="Rasm yuklash"></button>
-            <input type="text" id="chatText" class="chat__text"
-              placeholder="Xohlagan narsangizni yozing yoki shubhali xabarni tashlang..." autocomplete="off">
-            <button class="chat__send" id="chatSend" aria-label="Yuborish"></button>
-          </div>
-        </div>
-        <p class="chat__note">AI Hamroh — namunaviy demo. Suhbat va xavf aniqlash avtomatik tahlil asosida ishlaydi;
-          real platformada AI model (masalan, Claude) bilan ishlaydi. Shaxsiy yozishmalar saqlanmaydi.</p>
+        <div id="assistWrap"></div>
       </section>
 
 
@@ -750,8 +730,8 @@
   </div>
 
   <!-- ===== AI HAMROH — suzuvchi tugma (bo'limlardan tashqarida) ===== -->
-  <button type="button" class="ko-fab" id="koFab" data-view="assist" aria-label="AI Hamroh chatini ochish">
-    <span class="ko-fab__ico" aria-hidden="true">💬</span><span class="ko-fab__t">AI Hamroh</span>
+  <button type="button" class="ko-fab" id="koFab" data-bot aria-label="Telegram botni ochish">
+    <span class="ko-fab__ico" aria-hidden="true">💬</span><span class="ko-fab__t">Kiber maslahat</span>
   </button>
 
   <!-- ===== VIDEO PLEYER MODAL ===== -->

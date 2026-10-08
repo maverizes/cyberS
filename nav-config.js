@@ -13,7 +13,7 @@ window.KO_NAV = {
   home: { id: "dash", label: "Bosh sahifa", icon: "grid" },
 
   // bo'limlardan tashqarida, o'ng pastki burchakdagi suzuvchi tugma
-  assistant: { id: "assist", label: "AI Hamroh", emoji: "💬" },
+  assistant: { id: "assist", label: "Kiber maslahat", emoji: "💬" },   // Telegram bot: t.me/JIZZAXKIBERMASLAHATBOT
 
   sections: [
     { key: "learn", title: "Kiber akademiya", icon: "academy", collapsible: true, items: [
